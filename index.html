@@ -3,8 +3,6 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <title>Sexual Health Tracker</title>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -14,7 +12,8 @@
 <div id="root"></div>
 <script type="text/babel">
 const { useState, useRef, useEffect, createContext, useContext } = React;
-
+ 
+ 
 // ═══════════════════════════════════════════════════════════════
 // TRANSLATION SYSTEM
 // ═══════════════════════════════════════════════════════════════
@@ -88,6 +87,20 @@ const STRINGS = {
     qrAlert: "QR Code scanning requires the native mobile app.",
     dose: "Dose", pending: "Pending",
     contactHandles: "Contact handles",
+    share: "Share",
+    shareTitle: "Share Contact",
+    shareSub: "Let someone scan this to add you as a contact",
+    shareNFC: "or tap phones (NFC)",
+    shareHandleHint: "Your {platform} handle ({handle}) is shared with this code.",
+    shareTokenOnly: "Only your anonymous token is shared. No personal contact info is included.",
+    sharingPrefs: "Contact sharing",
+    sharingPrefsSub: "What to include when sharing your QR code",
+    shareMode: "Share mode",
+    shareTokenOnlyLabel: "Anonymous token only",
+    shareWithHandle: "Include contact handle",
+    sharePlatform: "Platform to share",
+    shareHandle: "Handle",
+    nfcAlert: "NFC sharing requires the native mobile app.",
   },
   de: {
     dashboard: "Übersicht", calendar: "Kalender", settings: "Einstellungen",
@@ -158,9 +171,23 @@ const STRINGS = {
     qrAlert: "QR-Code-Scan erfordert die native mobile App.",
     dose: "Dosis", pending: "Ausstehend",
     contactHandles: "Kontaktdaten",
+    share: "Teilen",
+    shareTitle: "Kontakt teilen",
+    shareSub: "Lass jemanden diesen Code scannen, um dich als Kontakt hinzuzufügen",
+    shareNFC: "oder Handys zusammenhalten (NFC)",
+    shareHandleHint: "Dein {platform}-Handle ({handle}) wird mit diesem Code geteilt.",
+    shareTokenOnly: "Nur dein anonymer Token wird geteilt. Keine persönlichen Kontaktdaten enthalten.",
+    sharingPrefs: "Kontakt-Sharing",
+    sharingPrefsSub: "Was beim Teilen deines QR-Codes eingeschlossen wird",
+    shareMode: "Freigabemodus",
+    shareTokenOnlyLabel: "Nur anonymer Token",
+    shareWithHandle: "Kontaktdaten teilen",
+    sharePlatform: "Plattform",
+    shareHandle: "Handle",
+    nfcAlert: "NFC-Sharing erfordert die native mobile App.",
   }
 };
-
+ 
 const LangContext = createContext({ lang: "en", t: (k) => k });
 function useLang() { return useContext(LangContext); }
 function tFn(lang) {
@@ -170,7 +197,7 @@ function tFn(lang) {
     return s;
   };
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // PALETTE
 // ═══════════════════════════════════════════════════════════════
@@ -184,14 +211,14 @@ const RO = { none:0, negligible:1, very_low:2, low:3, moderate:4, high:5, very_h
 const ACT_KEYS = ["passiveAnal","activeAnal","passiveOral","activeOral","vaginal","manual","kissing"];
 const EMPTY_ACTS = () => Object.fromEntries(ACT_KEYS.map(k => [k, 0]));
 const fnt = "DM Sans, sans-serif";
-
+ 
 const WIKI_LINKS = {
   HIV:"https://en.wikipedia.org/wiki/HIV/AIDS", Gonorrhea:"https://en.wikipedia.org/wiki/Gonorrhea",
   Chlamydia:"https://en.wikipedia.org/wiki/Chlamydia", Syphilis:"https://en.wikipedia.org/wiki/Syphilis",
   "Hep B":"https://en.wikipedia.org/wiki/Hepatitis_B", "HSV-2":"https://en.wikipedia.org/wiki/Herpes_simplex_virus",
   Mpox:"https://en.wikipedia.org/wiki/Mpox",
 };
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // STI DATABASE
 // ═══════════════════════════════════════════════════════════════
@@ -212,7 +239,7 @@ const STI_DB = {
               tx:{ passiveAnal:{r:"very_high",p:.20,c:.40}, activeAnal:{r:"high",p:.15,c:.40}, vaginal:{r:"moderate",p:.08,c:.40}, passiveOral:{r:"moderate",p:.06,c:.30}, activeOral:{r:"moderate",p:.06,c:.30}, manual:{r:"low",p:.02,c:.30}, kissing:{r:"low",p:.02,c:.20} } },
 };
 const STI_NAMES = Object.keys(STI_DB);
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // COUNTRY PREVALENCE
 // ═══════════════════════════════════════════════════════════════
@@ -226,7 +253,7 @@ const HIGH_PREV = {
   "Germany":["Syphilis","Gonorrhea","Chlamydia"], "France":["Gonorrhea","Chlamydia"],
   "Australia":["Gonorrhea","Chlamydia","Syphilis"], "Mexico":["HIV","Syphilis"],
 };
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // DEMO DATA
 // ═══════════════════════════════════════════════════════════════
@@ -235,7 +262,7 @@ const genId = (pfx="x") => `${pfx}${++_idC}`;
 const toDate = s => new Date(s + "T12:00:00");
 const ds = d => typeof d==="string" ? d : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 const fdFull = (s, lang="en") => toDate(s).toLocaleDateString(lang==="de"?"de-DE":"en-GB",{day:"numeric",month:"short",year:"numeric"});
-
+ 
 // Pseudonym = opaque hex token for anonymous server-side notification
 const genToken = () => {
   const arr = new Uint8Array(12);
@@ -243,7 +270,7 @@ const genToken = () => {
   else for (let i = 0; i < 12; i++) arr[i] = Math.floor(Math.random() * 256);
   return Array.from(arr, b => b.toString(16).padStart(2, "0")).join("");
 };
-
+ 
 const INIT_CONTACTS = [
   { id:"c1", name:"Alex", notes:null, token: "a3f8c1d902e74b6f19a8c3d2", cx:{} },
   { id:"c2", name:"Jordan", notes:"Met on New Year's", token: "7e2b9f01c4a83d56e1f20b97", cx:{ instagram:"@jordanxo", telegram:"jordanplus" } },
@@ -275,7 +302,7 @@ const INIT_VACCINATIONS = [
   { id:"v5", kind:"doxypep", date:"2026-01-15" },
   { id:"v6", kind:"prep", startDate:"2026-02-01", endDate:null },
 ];
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // PROPHYLAXIS UTILS
 // ═══════════════════════════════════════════════════════════════
@@ -303,7 +330,7 @@ function isDoxyPEPFor(vacc, dateStr) {
   }
   return false;
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // RISK CALCULATION
 // ═══════════════════════════════════════════════════════════════
@@ -315,12 +342,12 @@ function calcRisks(intercourse, tests, vacc, country) {
   const rel = intercourse.filter(e=>!cut||toDate(e.date)>cut);
   const vacProt = getVaccineProtection(vacc);
   const hp = HIGH_PREV[country]||[];
-
+ 
   const lastTestedMap = {};
   for (const sti of STI_NAMES) {
     for (const t of sortedTests) { if (t.ts[sti]) { lastTestedMap[sti] = { date:t.date, result:t.results?.[sti]||"negative" }; break; } }
   }
-
+ 
   const risks = {};
   for (const [sn, si] of Object.entries(STI_DB)) {
     if (vacProt[sn]) { risks[sn]={exposed:false,vaccinated:true}; continue; }
@@ -344,7 +371,7 @@ function calcRisks(intercourse, tests, vacc, country) {
   }
   return { lastTest, risks, lastTestedMap };
 }
-
+ 
 // Compute contacts to notify per positive STI (contacts between prev negative and positive test)
 function getNotifiableContacts(tests, intercourse, contacts) {
   const sorted = [...tests].sort((a,b)=>toDate(a.date)-toDate(b.date));
@@ -364,7 +391,7 @@ function getNotifiableContacts(tests, intercourse, contacts) {
   }
   return alerts;
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // SHARED COMPONENTS
 // ═══════════════════════════════════════════════════════════════
@@ -395,7 +422,7 @@ const Btn = ({onClick,children,color=P.teal,variant="filled",danger,full,small,d
   const c=danger?P.rose:color; const isFilled=variant==="filled";
   return <button onClick={onClick} disabled={disabled} style={{ padding:small?"8px 14px":"12px 20px", borderRadius:12, background:isFilled?c:"transparent", border:`1.5px solid ${c}`, color:isFilled?"#fff":c, fontFamily:fnt, fontSize:small?12:14, fontWeight:600, cursor:disabled?"not-allowed":"pointer", opacity:disabled?.5:1, transition:"all .15s", width:full?"100%":"auto", textAlign:"center", ...sx }}>{children}</button>;
 };
-
+ 
 function BottomSheet({onClose,children,title}) {
   return <>
     <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.35)",zIndex:50,backdropFilter:"blur(3px)"}}/>
@@ -411,7 +438,7 @@ function BottomSheet({onClose,children,title}) {
     </div>
   </>;
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // DAY SHEET
 // ═══════════════════════════════════════════════════════════════
@@ -458,7 +485,7 @@ function DaySheet({date,intercourse,tests,vaccinations,contacts,onClose,onEdit,l
     </div>;})}
   </BottomSheet>;
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // ADD / EDIT SHEET
 // ═══════════════════════════════════════════════════════════════
@@ -489,7 +516,7 @@ function AddEditSheet({onClose,onSave,onDelete,contacts,editType,editData,initia
   const [vEnd,setVEnd]=useState(editData?.endDate||"");
   const [vOngoing,setVOngoing]=useState(editData?!editData.endDate:true);
   useEffect(()=>{if(editType)setTab(editType);},[editType]);
-
+ 
   const handleSave = () => {
     let saved = null;
     if (tab==="intercourse") { saved = {...(editData||{}),id:editData?.id||genId("i"),date:icDate,cid:icAnon?null:(icContact||null),t:{...icActs},p:{...icProt}}; onSave("intercourse",saved); }
@@ -506,7 +533,7 @@ function AddEditSheet({onClose,onSave,onDelete,contacts,editType,editData,initia
   };
   const handleDelete = () => { if (editData&&confirm(t("confirmDelete"))) { onDelete(tab,editData.id); onClose(null,null); } };
   const fl = text => <label style={{fontFamily:fnt,fontSize:12,fontWeight:600,color:P.muted,display:"block",marginBottom:6}}>{text}</label>;
-
+ 
   return <BottomSheet onClose={()=>onClose(null,null)} title={isEdit?t("editEntry"):t("addEntry")}>
     {!isEdit&&<button onClick={()=>alert(t("qrAlert"))} style={{ width:"100%",padding:"10px",borderRadius:10,marginBottom:16, background:P.cardEl,border:`1.5px dashed ${P.border}`, fontFamily:fnt,fontSize:13,color:P.muted,cursor:"pointer",textAlign:"center" }}>📱 {t("addViaQR")}</button>}
     <div style={{display:"flex",gap:8,marginBottom:20,overflowX:"auto",flexWrap:"nowrap"}}>
@@ -583,7 +610,7 @@ function AddEditSheet({onClose,onSave,onDelete,contacts,editType,editData,initia
     </div>
   </BottomSheet>;
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // POSITIVE RESULT POPUP
 // ═══════════════════════════════════════════════════════════════
@@ -600,7 +627,7 @@ function PositiveResultPopup({stis, onGoToAlerts, onDismiss}) {
     </div>
   </>;
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // PARTNER ALERTS PAGE
 // ═══════════════════════════════════════════════════════════════
@@ -609,10 +636,10 @@ function PartnerAlertsView({alerts, onBack}) {
   // Per-contact notification status: pending → notified → confirmed → testedNegative
   const [statuses, setStatuses] = useState({}); // { "sti:contactId": "pending"|"notified"|"confirmed"|"testedNegative" }
   const [personal, setPersonal] = useState({}); // { "sti:contactId": true }
-
+ 
   const statusKey = (sti, cid) => `${sti}:${cid}`;
   const getStatus = (sti, cid) => statuses[statusKey(sti,cid)] || "pending";
-
+ 
   const sendNotify = (sti, contact) => {
     const key = statusKey(sti, contact.id);
     // Simulated: POST to server with contact.token + sti info
@@ -623,17 +650,17 @@ function PartnerAlertsView({alerts, onBack}) {
     // Simulate: tested negative after 8s
     setTimeout(() => setStatuses(s => ({...s, [key]: "testedNegative"})), 8000);
   };
-
+ 
   const statusColors = { pending: P.muted, notified: P.amber, confirmed: P.teal, testedNegative: P.green };
   const statusLabels = { pending: t("pending"), notified: t("awaitingResponse"), confirmed: t("contactConfirmed"), testedNegative: t("testedNegative") };
   const statusIcons = { pending: "○", notified: "◔", confirmed: "◑", testedNegative: "●" };
-
+ 
   return <div style={{flex:1,overflowY:"auto",padding:"28px 16px 100px"}}>
     <button onClick={onBack} style={{background:"none",border:"none",fontFamily:fnt,fontSize:14,color:P.teal,fontWeight:600,cursor:"pointer",padding:"0 0 16px",display:"block"}}>{t("back")}</button>
     <h1 style={{fontFamily:fnt,fontSize:28,fontWeight:700,color:P.text,margin:"0 0 8px"}}>{t("partnerAlertsPage")}</h1>
-
+ 
     {alerts.length === 0 && <p style={{fontFamily:fnt,fontSize:14,color:P.muted,marginTop:16}}>No positive results to report.</p>}
-
+ 
     {alerts.map((alert, ai) => (
       <div key={ai} style={{marginTop:20}}>
         <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
@@ -643,17 +670,17 @@ function PartnerAlertsView({alerts, onBack}) {
         <div style={{fontFamily:fnt,fontSize:13,color:P.muted,lineHeight:1.6,marginBottom:16}}>
           {t("partnerAlertsExplain",{sti:alert.sti})}
         </div>
-
+ 
         {alert.contacts.length === 0 && (
           <div style={{fontFamily:fnt,fontSize:13,color:P.muted,fontStyle:"italic",padding:"12px 0"}}>{t("noContactsToNotify")}</div>
         )}
-
+ 
         {alert.contacts.map(contact => {
           const key = statusKey(alert.sti, contact.id);
           const status = getStatus(alert.sti, contact.id);
           const isPersonal = personal[key];
           const sc = statusColors[status];
-
+ 
           return <div key={contact.id} style={{background:P.card,borderRadius:16,padding:"16px 18px",marginBottom:10,border:`1px solid ${P.border}`,boxShadow:"0 1px 4px rgba(0,0,0,.04)"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
               <div>
@@ -665,13 +692,13 @@ function PartnerAlertsView({alerts, onBack}) {
                 <span style={{fontFamily:fnt,fontSize:11,fontWeight:600,color:sc}}>{statusLabels[status]}</span>
               </div>
             </div>
-
+ 
             {status === "pending" && !isPersonal && (
               <Btn onClick={() => sendNotify(alert.sti, contact)} color={P.rose} full small>
                 {t("notifyAnonymously")}
               </Btn>
             )}
-
+ 
             {status === "notified" && (
               <div style={{padding:"10px 14px",borderRadius:10,background:`${P.amber}10`,border:`1px solid ${P.amber}30`,textAlign:"center"}}>
                 <span style={{fontFamily:fnt,fontSize:12,color:P.amber,fontWeight:600}}>{t("awaitingResponse")}</span>
@@ -680,25 +707,25 @@ function PartnerAlertsView({alerts, onBack}) {
                 </div>
               </div>
             )}
-
+ 
             {status === "confirmed" && (
               <div style={{padding:"10px 14px",borderRadius:10,background:`${P.teal}10`,border:`1px solid ${P.teal}30`,textAlign:"center"}}>
                 <span style={{fontFamily:fnt,fontSize:12,color:P.teal,fontWeight:600}}>✓ {t("contactConfirmed")}</span>
               </div>
             )}
-
+ 
             {status === "testedNegative" && (
               <div style={{padding:"10px 14px",borderRadius:10,background:`${P.green}10`,border:`1px solid ${P.green}30`,textAlign:"center"}}>
                 <span style={{fontFamily:fnt,fontSize:12,color:P.green,fontWeight:600}}>✓ {t("testedNegative")}</span>
               </div>
             )}
-
+ 
             <div style={{marginTop:10}}>
               <Checkbox checked={!!isPersonal} onChange={v=>setPersonal(p=>({...p,[key]:v}))} label={t("notifiedPersonally")} color={P.green}/>
             </div>
           </div>;
         })}
-
+ 
         {alert.hasAnonymous && (
           <div style={{fontFamily:fnt,fontSize:12,color:P.muted,fontStyle:"italic",padding:"8px 0"}}>
             {lang === "de" ? "Hinweis: Einige Einträge waren anonym und können nicht benachrichtigt werden." : "Note: Some entries were anonymous and cannot be notified."}
@@ -708,7 +735,7 @@ function PartnerAlertsView({alerts, onBack}) {
     ))}
   </div>;
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // RISK CARD
 // ═══════════════════════════════════════════════════════════════
@@ -760,7 +787,7 @@ function RiskCard({name,data}) {
     </div>}
   </div>;
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // DASHBOARD
 // ═══════════════════════════════════════════════════════════════
@@ -772,13 +799,13 @@ function DashboardView({intercourse,tests,vaccinations,contacts,country,onOpenAl
   const daysSinceTest=lastTest?Math.floor((new Date()-toDate(lastTest.date))/86400000):null;
   const alerts = getNotifiableContacts(tests, intercourse, contacts);
   const hasAlerts = alerts.length > 0;
-
+ 
   return <div style={{flex:1,overflowY:"auto",padding:"28px 16px 100px"}}>
     <div style={{marginBottom:24}}>
       <h1 style={{fontFamily:fnt,fontSize:28,fontWeight:700,color:P.text,margin:"0 0 4px"}}>{t("dashboard")}</h1>
       <p style={{fontFamily:fnt,fontSize:13,color:P.muted,margin:0}}>{new Date().toLocaleDateString(lang==="de"?"de-DE":"en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</p>
     </div>
-
+ 
     {/* Status banner */}
     {(()=>{
       if(testNow.length>0) return <div style={{background:`${P.rose}0C`,border:`1px solid ${P.rose}35`,borderRadius:16,padding:"16px 18px",marginBottom:18,display:"flex",alignItems:"center",gap:14}}>
@@ -797,7 +824,7 @@ function DashboardView({intercourse,tests,vaccinations,contacts,country,onOpenAl
         <div style={{fontFamily:fnt,fontSize:12,color:P.muted}}>{t("allClearSub")}</div></div>
       </div>;
     })()}
-
+ 
     {/* Partner Alerts button */}
     {hasAlerts && (
       <button onClick={onOpenAlerts} style={{
@@ -816,7 +843,7 @@ function DashboardView({intercourse,tests,vaccinations,contacts,country,onOpenAl
         <span style={{color:P.rose,fontSize:18}}>›</span>
       </button>
     )}
-
+ 
     {/* Last test */}
     <div style={{fontFamily:fnt,fontSize:11,fontWeight:600,color:P.muted,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:10}}>{t("lastTest")}</div>
     {lastTest?<div style={{background:P.card,borderRadius:16,padding:"16px 18px",marginBottom:24,border:`1px solid ${P.border}`,boxShadow:"0 1px 4px rgba(0,0,0,.04)"}}>
@@ -836,7 +863,7 @@ function DashboardView({intercourse,tests,vaccinations,contacts,country,onOpenAl
     </div>:<div style={{background:P.card,borderRadius:16,padding:"16px 18px",marginBottom:24,border:`1px solid ${P.border}`}}>
       <div style={{fontFamily:fnt,fontSize:13,color:P.muted}}>{t("noTests")}</div>
     </div>}
-
+ 
     {/* Risk cards */}
     {exposed.length>0&&<>
       <div style={{fontFamily:fnt,fontSize:11,fontWeight:600,color:P.muted,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:10}}>
@@ -846,7 +873,7 @@ function DashboardView({intercourse,tests,vaccinations,contacts,country,onOpenAl
     </>}
   </div>;
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // CALENDAR
 // ═══════════════════════════════════════════════════════════════
@@ -866,7 +893,7 @@ function CalendarView({intercourse,tests,vaccinations,contacts,onEdit}) {
   const dateStr=d=>`${yr}-${String(mo+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
   const isToday=d=>d===today.getDate()&&mo===today.getMonth()&&yr===today.getFullYear();
   const dayHas=d=>{const s=dateStr(d);return{ic:intercourse.some(e=>e.date===s),te:tests.some(e=>e.date===s),vx:vaccinations.some(e=>e.date===s||e.startDate===s)};};
-
+ 
   return <div style={{flex:1,overflowY:"auto",padding:"28px 16px 100px"}}>
     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:24}}>
       <h1 style={{margin:0,fontFamily:fnt,fontSize:28,fontWeight:700,color:P.text}}>{months[mo]}<span style={{color:P.muted,fontWeight:300}}> {yr}</span></h1>
@@ -883,9 +910,9 @@ function CalendarView({intercourse,tests,vaccinations,contacts,onEdit}) {
       {cells.map((d,i)=>{
         if(!d) return <div key={`e${i}`}/>;
         const evs=dayHas(d); const hasAny=evs.ic||evs.te||evs.vx;
-        return <div key={dateStr(d)} onClick={()=>hasAny&&setSelected(dateStr(d))} style={{
+        return <div key={dateStr(d)} onClick={()=>setSelected(dateStr(d))} style={{
           aspectRatio:"1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
-          borderRadius:12,cursor:hasAny?"pointer":"default",position:"relative",
+          borderRadius:12,cursor:"pointer",position:"relative",
           background:isToday(d)?P.teal+"12":"transparent",
           border:isToday(d)?`1.5px solid ${P.teal}50`:"1.5px solid transparent",transition:"background .15s"
         }}>
@@ -904,11 +931,11 @@ function CalendarView({intercourse,tests,vaccinations,contacts,onEdit}) {
     {selected&&<DaySheet date={selected} intercourse={intercourse} tests={tests} vaccinations={vaccinations} contacts={contacts} onClose={()=>setSelected(null)} onEdit={(type,data)=>{setSelected(null);onEdit(type,data);}} lang={lang}/>}
   </div>;
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // SETTINGS
 // ═══════════════════════════════════════════════════════════════
-function SettingsView({country,setCountry,lang,setLang,notifs,setNotifs,lock,setLock,onExport,onDeleteAll}) {
+function SettingsView({country,setCountry,lang,setLang,notifs,setNotifs,lock,setLock,onExport,onDeleteAll,shareMode,setShareMode,sharePlatform,setSharePlatform,shareHandle,setShareHandle}) {
   const {t}=useLang();
   const sections=[
     {label:t("general"),items:[
@@ -916,6 +943,13 @@ function SettingsView({country,setCountry,lang,setLang,notifs,setNotifs,lock,set
       {type:"select",label:t("region"),sub:t("regionSub"),value:country,onChange:setCountry,options:COUNTRIES.map(c=>({value:c,label:c}))},
       {type:"toggle",label:t("testReminders"),sub:t("testRemindersSub"),value:notifs,onChange:setNotifs},
       {type:"toggle",label:t("appLock"),sub:t("appLockSub"),value:lock,onChange:setLock},
+    ]},
+    {label:t("sharingPrefs"),sub:t("sharingPrefsSub"),items:[
+      {type:"select",label:t("shareMode"),value:shareMode,onChange:setShareMode,options:[{value:"token",label:t("shareTokenOnlyLabel")},{value:"handle",label:t("shareWithHandle")}]},
+      ...(shareMode==="handle"?[
+        {type:"select",label:t("sharePlatform"),value:sharePlatform,onChange:setSharePlatform,options:["instagram","telegram","signal","whatsapp","snapchat"].map(s=>({value:s,label:s.charAt(0).toUpperCase()+s.slice(1)}))},
+        {type:"input",label:t("shareHandle"),value:shareHandle,onChange:setShareHandle,placeholder:"@yourhandle"},
+      ]:[]),
     ]},
     {label:t("data"),items:[
       {type:"action",label:t("exportData"),sub:t("exportDataSub"),icon:"↓",onClick:onExport},
@@ -946,6 +980,10 @@ function SettingsView({country,setCountry,lang,setLang,notifs,setNotifs,lock,set
             color:P.text,fontFamily:fnt,fontSize:12,padding:"6px 10px",cursor:"pointer",outline:"none",maxWidth:150
           }}>{item.options.map(o=>typeof o==="string"?<option key={o} value={o}>{o}</option>:<option key={o.value} value={o.value}>{o.label}</option>)}</select>}
           {item.type==="toggle"&&<Toggle value={item.value} onChange={item.onChange}/>}
+          {item.type==="input"&&<input value={item.value} onChange={e=>item.onChange(e.target.value)} placeholder={item.placeholder} style={{
+            background:P.cardEl,border:`1px solid ${P.border}`,borderRadius:8,
+            color:P.text,fontFamily:fnt,fontSize:12,padding:"6px 10px",outline:"none",maxWidth:150,boxSizing:"border-box"
+          }} onFocus={e=>e.target.style.borderColor=P.teal} onBlur={e=>e.target.style.borderColor=P.border}/>}
           {item.type==="info"&&<span style={{fontFamily:fnt,fontSize:12,color:P.muted,textAlign:"right",maxWidth:160}}>{item.value}</span>}
           {item.type==="action"&&<span style={{color:item.danger?P.rose:P.muted,fontSize:16,flexShrink:0}}>{item.icon}</span>}
         </div>)}
@@ -953,9 +991,111 @@ function SettingsView({country,setCountry,lang,setLang,notifs,setNotifs,lock,set
     </div>)}
   </div>;
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
-// FAB — expandable with 4 sub-actions
+// QR CODE GENERATOR (minimal, deterministic from data)
+// ═══════════════════════════════════════════════════════════════
+function QRCode({data, size=240}) {
+  // Simple deterministic hash → grid. Real app would use a proper QR library.
+  const gridSize = 25;
+  const cellSize = size / gridSize;
+  const cells = [];
+ 
+  // Hash function for deterministic pattern
+  let hash = 0;
+  for (let i = 0; i < data.length; i++) { hash = ((hash << 5) - hash + data.charCodeAt(i)) | 0; }
+  const seed = (n) => { hash = (hash * 16807 + n) % 2147483647; return hash; };
+ 
+  // Finder patterns (3 corners)
+  const drawFinder = (ox, oy) => {
+    for (let y = 0; y < 7; y++) for (let x = 0; x < 7; x++) {
+      const ring = Math.max(Math.abs(x-3), Math.abs(y-3));
+      if (ring === 0 || ring === 2 || ring === 3) cells.push({x:ox+x,y:oy+y,on:true,finder:true});
+      else cells.push({x:ox+x,y:oy+y,on:false,finder:true});
+    }
+  };
+  drawFinder(0,0); drawFinder(gridSize-7,0); drawFinder(0,gridSize-7);
+ 
+  // Timing patterns
+  for (let i = 8; i < gridSize-8; i++) {
+    cells.push({x:i,y:6,on:i%2===0,finder:true});
+    cells.push({x:6,y:i,on:i%2===0,finder:true});
+  }
+ 
+  // Fill data area with deterministic pattern
+  const finderSet = new Set(cells.map(c=>`${c.x},${c.y}`));
+  for (let y = 0; y < gridSize; y++) for (let x = 0; x < gridSize; x++) {
+    if (finderSet.has(`${x},${y}`)) continue;
+    cells.push({x,y,on:seed(x*gridSize+y)%3!==0});
+  }
+ 
+  return <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{borderRadius:12}}>
+    <rect width={size} height={size} fill="#fff"/>
+    {cells.filter(c=>c.on).map((c,i)=><rect key={i} x={c.x*cellSize} y={c.y*cellSize} width={cellSize} height={cellSize} rx={c.finder?0:cellSize*0.15} fill={P.text}/>)}
+  </svg>;
+}
+ 
+// ═══════════════════════════════════════════════════════════════
+// SHARE VIEW
+// ═══════════════════════════════════════════════════════════════
+function ShareView({shareMode, sharePlatform, shareHandle, myToken}) {
+  const {t} = useLang();
+ 
+  // Build QR payload
+  const payload = shareMode === "handle" && sharePlatform && shareHandle
+    ? JSON.stringify({ token: myToken, platform: sharePlatform, handle: shareHandle })
+    : JSON.stringify({ token: myToken });
+ 
+  const isHandleMode = shareMode === "handle" && sharePlatform && shareHandle;
+ 
+  return <div style={{flex:1,overflowY:"auto",padding:"28px 16px 100px",display:"flex",flexDirection:"column",alignItems:"center"}}>
+    <h1 style={{fontFamily:fnt,fontSize:28,fontWeight:700,color:P.text,margin:"0 0 4px",alignSelf:"flex-start"}}>{t("shareTitle")}</h1>
+    <p style={{fontFamily:fnt,fontSize:13,color:P.muted,margin:"0 0 32px",alignSelf:"flex-start"}}>{t("shareSub")}</p>
+ 
+    {/* QR Code */}
+    <div style={{
+      padding:20, background:P.card, borderRadius:24, border:`1px solid ${P.border}`,
+      boxShadow:"0 4px 24px rgba(0,0,0,.06)", marginBottom:20,
+    }}>
+      <QRCode data={payload} size={220}/>
+    </div>
+ 
+    {/* NFC button */}
+    <button onClick={()=>alert(t("nfcAlert"))} style={{
+      display:"flex", alignItems:"center", gap:10, padding:"12px 24px", borderRadius:14,
+      background:P.card, border:`1.5px solid ${P.border}`, cursor:"pointer",
+      marginBottom:28, boxShadow:"0 1px 4px rgba(0,0,0,.04)",
+    }}>
+      <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={P.teal} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6 8.32a7.43 7.43 0 0 1 0 7.36"/><path d="M9.46 6.21a11.76 11.76 0 0 1 0 11.58"/>
+        <path d="M12.91 4.1a16.07 16.07 0 0 1 0 15.8"/><path d="M16.37 2a20.4 20.4 0 0 1 0 20"/>
+      </svg>
+      <span style={{fontFamily:fnt,fontSize:14,fontWeight:600,color:P.teal}}>{t("shareNFC")}</span>
+    </button>
+ 
+    {/* Sharing status hint */}
+    <div style={{
+      width:"100%", padding:"14px 18px", borderRadius:14,
+      background: isHandleMode ? `${P.teal}08` : P.cardEl,
+      border: `1px solid ${isHandleMode ? P.teal+"30" : P.border}`,
+    }}>
+      <div style={{display:"flex",alignItems:"flex-start",gap:10}}>
+        <span style={{fontSize:16,marginTop:1}}>{isHandleMode ? "🔗" : "🔒"}</span>
+        <div>
+          <div style={{fontFamily:fnt,fontSize:13,color:P.text,lineHeight:1.5}}>
+            {isHandleMode
+              ? t("shareHandleHint", {platform: sharePlatform, handle: shareHandle})
+              : t("shareTokenOnly")}
+          </div>
+          <div style={{fontFamily:"monospace",fontSize:10,color:P.muted,marginTop:6,wordBreak:"break-all"}}>
+            Token: {myToken}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>;
+}
+ 
 // ═══════════════════════════════════════════════════════════════
 function FAB({onAdd}) {
   const {t} = useLang();
@@ -966,16 +1106,16 @@ function FAB({onAdd}) {
     { id:"contact", color:"#6B6B80", label:t("contact"), icon:<svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
     { id:"vaccination", color:P.amber, label:t("vaccination"), icon:<svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> },
   ];
-
+ 
   return <>
     {/* Backdrop when open */}
     {open && <div onClick={()=>setOpen(false)} style={{position:"fixed",inset:0,zIndex:38,background:"rgba(0,0,0,.15)"}}/>}
-
+ 
     {/* Sub-buttons */}
     {open && items.map((item, i) => (
       <button key={item.id} onClick={()=>{setOpen(false);onAdd(item.id);}}
         style={{
-          position:"fixed", bottom: 80 + (i+1)*58, right:"calc(50% - 195px)",
+          position:"fixed", bottom: 80 + (i+1)*58, right:"calc(50% - 175px)",
           width:44, height:44, borderRadius:14,
           background:item.color, border:"none", color:"#fff",
           cursor:"pointer", boxShadow:`0 3px 12px ${item.color}40`,
@@ -988,7 +1128,7 @@ function FAB({onAdd}) {
     {/* Labels */}
     {open && items.map((item, i) => (
       <div key={`l-${item.id}`} style={{
-        position:"fixed", bottom: 80 + (i+1)*58 + 10, right:"calc(50% - 195px + 54px)",
+        position:"fixed", bottom: 80 + (i+1)*58 + 10, right:"calc(50% - 175px + 54px)",
         fontFamily:fnt, fontSize:12, fontWeight:600, color:P.text,
         background:P.card, padding:"4px 10px", borderRadius:8,
         boxShadow:"0 2px 8px rgba(0,0,0,.1)", zIndex:39,
@@ -997,10 +1137,10 @@ function FAB({onAdd}) {
         {item.label}
       </div>
     ))}
-
+ 
     {/* Main FAB */}
     <button onClick={()=>setOpen(o=>!o)} style={{
-      position:"fixed", bottom:76, right:"calc(50% - 195px)", width:52, height:52, borderRadius:16,
+      position:"fixed", bottom:76, right:"calc(50% - 175px)", width:52, height:52, borderRadius:16,
       background:P.teal, border:"none", color:"#fff", fontSize:26, fontWeight:300,
       cursor:"pointer", boxShadow:"0 4px 16px rgba(42,149,153,.35)", zIndex:39,
       display:"flex", alignItems:"center", justifyContent:"center", lineHeight:1,
@@ -1011,7 +1151,7 @@ function FAB({onAdd}) {
     </button>
   </>;
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // BOTTOM NAV
 // ═══════════════════════════════════════════════════════════════
@@ -1020,6 +1160,7 @@ function BottomNav({view,setView}) {
   const tabs=[
     {id:"dashboard",label:t("dashboard"),icon:<svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>},
     {id:"calendar",label:t("calendar"),icon:<svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>},
+    {id:"share",label:t("share"),icon:<svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="7" width="3" height="3"/><rect x="14" y="7" width="3" height="3"/><rect x="7" y="14" width="3" height="3"/><rect x="11" y="11" width="2" height="2"/><rect x="14" y="14" width="3" height="3"/></svg>},
     {id:"settings",label:t("settings"),icon:<svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>},
   ];
   return <nav style={{ position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)", width:"100%",maxWidth:430,background:P.bg+"F0", borderTop:`1px solid ${P.border}`,display:"flex", paddingBottom:"env(safe-area-inset-bottom, 8px)",zIndex:40,backdropFilter:"blur(20px)" }}>
@@ -1030,7 +1171,7 @@ function BottomNav({view,setView}) {
     }}>{tab.icon}<span style={{fontFamily:fnt,fontSize:10,letterSpacing:"0.05em",fontWeight:view===tab.id?600:400}}>{tab.label}</span></button>)}
   </nav>;
 }
-
+ 
 // ═══════════════════════════════════════════════════════════════
 // APP
 // ═══════════════════════════════════════════════════════════════
@@ -1047,8 +1188,12 @@ function App() {
   const [showAdd,setShowAdd]=useState(null); // null | { tab } for new, or { type, data } for edit
   const [positivePopup,setPositivePopup]=useState(null); // null or {stis:[...]}
   const [showAlerts,setShowAlerts]=useState(false);
+  const [shareMode,setShareMode]=useState("token"); // "token" | "handle"
+  const [sharePlatform,setSharePlatform]=useState("instagram");
+  const [shareHandle,setShareHandle]=useState("");
+  const [myToken]=useState(()=>genToken()); // user's own anonymous token
   const t=tFn(lang);
-
+ 
   useEffect(()=>{
     const link=document.createElement("link");link.rel="stylesheet";
     link.href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap";
@@ -1057,7 +1202,7 @@ function App() {
     style.textContent=`*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}body{background:${P.bg};overflow:hidden;font-family:'DM Sans',sans-serif;}::-webkit-scrollbar{display:none;}button:focus{outline:none;}select option{background:${P.card};}@keyframes calIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@keyframes slideUp{from{transform:translate(-50%,100%)}to{transform:translate(-50%,0)}}@keyframes popIn{from{opacity:0;transform:translate(-50%,-50%) scale(.92)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}@keyframes fabItem{from{opacity:0;transform:translateY(10px) scale(.8)}to{opacity:1;transform:translateY(0) scale(1)}}`;
     document.head.appendChild(style);
   },[]);
-
+ 
   const handleSave=(type,data)=>{
     const update=setter=>setter(prev=>{const idx=prev.findIndex(e=>e.id===data.id);if(idx>=0){const n=[...prev];n[idx]=data;return n;}return[...prev,data];});
     if(type==="intercourse")update(setIntercourse);else if(type==="test")update(setTests);else if(type==="contact")update(setContacts);else if(type==="vaccination")update(setVaccinations);
@@ -1066,7 +1211,7 @@ function App() {
     const rm=setter=>setter(prev=>prev.filter(e=>e.id!==id));
     if(type==="intercourse")rm(setIntercourse);else if(type==="test")rm(setTests);else if(type==="contact")rm(setContacts);else if(type==="vaccination")rm(setVaccinations);
   };
-
+ 
   // Called when AddEditSheet closes (savedData, savedType)
   const handleSheetClose = (savedData, savedType) => {
     setShowAdd(null);
@@ -1078,12 +1223,12 @@ function App() {
       }
     }
   };
-
+ 
   const handleExport=()=>{const d=JSON.stringify({contacts,intercourse,tests,vaccinations},null,2);const b=new Blob([d],{type:"application/json"});const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download="sexual-health-data.json";a.click();URL.revokeObjectURL(u);};
   const handleDeleteAll=()=>{if(confirm(lang==="de"?"Alle Daten unwiderruflich löschen?":"Permanently delete all data?")){setContacts([]);setIntercourse([]);setTests([]);setVaccinations([]);}};
-
+ 
   const alerts = getNotifiableContacts(tests, intercourse, contacts);
-
+ 
   return <LangContext.Provider value={{lang,t}}>
     <div style={{display:"flex",flexDirection:"column",height:"100vh",maxWidth:430,margin:"0 auto",background:P.bg,position:"relative",overflow:"hidden"}}>
       {/* Partner Alerts is a full-page overlay */}
@@ -1092,11 +1237,12 @@ function App() {
       ) : (<>
         {view==="dashboard"&&<DashboardView intercourse={intercourse} tests={tests} vaccinations={vaccinations} contacts={contacts} country={country} onOpenAlerts={()=>setShowAlerts(true)}/>}
         {view==="calendar"&&<CalendarView intercourse={intercourse} tests={tests} vaccinations={vaccinations} contacts={contacts} onEdit={(type,data)=>setShowAdd({type,data})}/>}
-        {view==="settings"&&<SettingsView country={country} setCountry={setCountry} lang={lang} setLang={setLang} notifs={notifs} setNotifs={setNotifs} lock={lock} setLock={setLock} onExport={handleExport} onDeleteAll={handleDeleteAll}/>}
+        {view==="share"&&<ShareView shareMode={shareMode} sharePlatform={sharePlatform} shareHandle={shareHandle} myToken={myToken}/>}
+        {view==="settings"&&<SettingsView country={country} setCountry={setCountry} lang={lang} setLang={setLang} notifs={notifs} setNotifs={setNotifs} lock={lock} setLock={setLock} onExport={handleExport} onDeleteAll={handleDeleteAll} shareMode={shareMode} setShareMode={setShareMode} sharePlatform={sharePlatform} setSharePlatform={setSharePlatform} shareHandle={shareHandle} setShareHandle={setShareHandle}/>}
       </>)}
       <BottomNav view={view} setView={(v)=>{setShowAlerts(false);setView(v);}}/>
-      {view!=="settings"&&!showAlerts&&<FAB onAdd={(tab)=>setShowAdd({tab})}/>}
-
+      {(view==="dashboard"||view==="calendar")&&!showAlerts&&<FAB onAdd={(tab)=>setShowAdd({tab})}/>}
+ 
       {/* Add/Edit sheet */}
       {showAdd&&<AddEditSheet
         onClose={handleSheetClose}
@@ -1107,7 +1253,7 @@ function App() {
         editData={showAdd.data||null}
         initialTab={showAdd.tab||null}
       />}
-
+ 
       {/* Positive result popup */}
       {positivePopup && <PositiveResultPopup
         stis={positivePopup.stis}
@@ -1117,8 +1263,9 @@ function App() {
     </div>
   </LangContext.Provider>;
 }
-
+ 
 ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
+ 
