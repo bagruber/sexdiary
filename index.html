@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<title>Sexual Health Tracker</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useRef, useEffect, createContext, useContext } = React;
+
+// ═══════════════════════════════════════════════════════════════
+// TRANSLATION SYSTEM
+// ═══════════════════════════════════════════════════════════════
+const STRINGS = {
+  en: {
+    dashboard: "Dashboard", calendar: "Calendar", settings: "Settings",
+    testingRecommended: "Testing recommended",
+    testingRecommendedSub: "{n} STI{s} testable now based on recent activity",
+    windowPeriod: "Window period active",
+    windowPeriodSub: "Exposures detected — testing not yet meaningful",
+    allClear: "All clear", allClearSub: "No relevant activity since last test",
+    lastTest: "Last Test", noTests: "No tests recorded yet.",
+    notTested: "Not tested", daysAgo: "{n}d ago",
+    riskAssessment: "Risk Assessment", sinceLastTest: "since last test",
+    tapExpand: "tap to expand", testableNow: "Ready to test ✓",
+    notYetMeaningful: "Not yet meaningful · {n} more days",
+    notifyWhenReady: "Notify me when ready", reminderSet: "Reminder set ✓",
+    symptoms: "Symptoms to watch for", moreInfo: "More info →",
+    highPrevalence: "High prevalence", positive: "Positive",
+    exposures: "{n} exposure{s}", allProtected: "All protected",
+    partnerAlerts: "Partner Alerts",
+    partnerAlertsSub: "Inform recent contacts anonymously",
+    partnerAlertsPage: "Partner Alerts",
+    partnerAlertsExplain: "Based on your positive {sti} result, the following contacts may have been exposed. You can notify them anonymously — they'll receive an alert without seeing your identity or contact details.",
+    notifyAnonymously: "Send anonymous alert", notifySent: "Alert sent",
+    awaitingResponse: "Awaiting response", contactConfirmed: "Acknowledged",
+    testedNegative: "Tested negative", notifiedPersonally: "I notified them personally",
+    anonymousToken: "Anonymous token",
+    noContactsToNotify: "No identifiable contacts in the risk period. Anonymous entries cannot be notified.",
+    positiveResultTitle: "Positive result recorded",
+    positiveResultBody: "Your test shows a positive result for {stis}. It's important to inform recent sexual contacts so they can get tested too. You can do this anonymously — contacts will never see your identity.",
+    goToPartnerAlerts: "Notify contacts",
+    dismissForNow: "I'll do this later",
+    legend_intercourse: "Intercourse", legend_test: "Test", legend_vaccination: "Vaccination",
+    noEntries: "No entries on this day.", edit: "Edit",
+    addEntry: "Add Entry", editEntry: "Edit Entry",
+    intercourse: "Intercourse", contact: "Contact", vaccination: "Vaccination / PrEP",
+    addViaQR: "Add via QR Code", date: "Date",
+    anonymousPartner: "Anonymous partner", selectContact: "Select contact",
+    activities: "Activities", protection: "Protection used",
+    save: "Save", delete: "Delete", cancel: "Cancel", back: "← Back",
+    name: "Name", notes: "Notes", optional: "optional",
+    passiveAnal: "Receptive anal", activeAnal: "Insertive anal",
+    passiveOral: "Receiving oral", activeOral: "Giving oral",
+    vaginal: "Vaginal", manual: "Manual", kissing: "Kissing",
+    kind: "Type", vaccine: "Vaccine", prep: "PrEP", doxyPep: "Doxy-PEP",
+    vaccineType: "Vaccine type", manufacturer: "Manufacturer",
+    doseNumber: "Dose number", startDate: "Start date", endDate: "End date",
+    ongoing: "Ongoing", dateTaken: "Date taken",
+    general: "General", language: "Language", region: "Region",
+    regionSub: "Used for prevalence-adjusted risk flags",
+    testReminders: "Testing reminders",
+    testRemindersSub: "Notify when testing becomes recommended",
+    appLock: "App lock", appLockSub: "Require biometrics or PIN to open",
+    data: "Data", exportData: "Export data",
+    exportDataSub: "Download a copy of your entries as JSON",
+    deleteAllData: "Delete all data",
+    deleteAllDataSub: "Permanently erase everything",
+    about: "About", version: "Version", storage: "Storage",
+    storageValue: "Local only · no server sync",
+    medicalDisclaimer: "Medical disclaimer",
+    medicalDisclaimerSub: "Risk data is for informational purposes only. Not a substitute for professional advice.",
+    none: "None", negligible: "Negligible", very_low: "Very Low", low: "Low",
+    moderate: "Moderate", high: "High", very_high: "Very High",
+    testEntry: "Test", facility: "Facility", testNumber: "Test number",
+    testedFor: "Tested for", results: "Results", negative: "Negative",
+    months: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+    daysShort: ["Mo","Tu","We","Th","Fr","Sa","Su"],
+    protected: "Protected", unprotected: "Unprotected",
+    confirmDelete: "Are you sure you want to delete this entry?",
+    qrAlert: "QR Code scanning requires the native mobile app.",
+    dose: "Dose", pending: "Pending",
+    contactHandles: "Contact handles",
+  },
+  de: {
+    dashboard: "Übersicht", calendar: "Kalender", settings: "Einstellungen",
+    testingRecommended: "Test empfohlen",
+    testingRecommendedSub: "{n} STI{s} jetzt testbar basierend auf kürzlicher Aktivität",
+    windowPeriod: "Fensterperiode aktiv",
+    windowPeriodSub: "Expositionen erkannt — Test noch nicht aussagekräftig",
+    allClear: "Alles in Ordnung", allClearSub: "Keine relevante Aktivität seit dem letzten Test",
+    lastTest: "Letzter Test", noTests: "Noch keine Tests erfasst.",
+    notTested: "Nicht getestet", daysAgo: "vor {n} T.",
+    riskAssessment: "Risikobewertung", sinceLastTest: "seit letztem Test",
+    tapExpand: "tippen zum Aufklappen", testableNow: "Testbar ✓",
+    notYetMeaningful: "Noch nicht aussagekräftig · noch {n} Tage",
+    notifyWhenReady: "Erinnerung erhalten", reminderSet: "Erinnerung gesetzt ✓",
+    symptoms: "Symptome, auf die man achten sollte", moreInfo: "Mehr Infos →",
+    highPrevalence: "Hohe Prävalenz", positive: "Positiv",
+    exposures: "{n} Exposition{s}", allProtected: "Alle geschützt",
+    partnerAlerts: "Partner-Warnungen",
+    partnerAlertsSub: "Kontakte anonym informieren",
+    partnerAlertsPage: "Partner-Warnungen",
+    partnerAlertsExplain: "Aufgrund deines positiven {sti}-Ergebnisses könnten folgende Kontakte exponiert gewesen sein. Du kannst sie anonym benachrichtigen — sie erhalten einen Hinweis, ohne deine Identität oder Kontaktdaten zu sehen.",
+    notifyAnonymously: "Anonyme Warnung senden", notifySent: "Warnung gesendet",
+    awaitingResponse: "Wartet auf Antwort", contactConfirmed: "Bestätigt",
+    testedNegative: "Negativ getestet", notifiedPersonally: "Persönlich informiert",
+    anonymousToken: "Anonymer Token",
+    noContactsToNotify: "Keine identifizierbaren Kontakte im Risikozeitraum. Anonyme Einträge können nicht benachrichtigt werden.",
+    positiveResultTitle: "Positives Ergebnis erfasst",
+    positiveResultBody: "Dein Test zeigt ein positives Ergebnis für {stis}. Es ist wichtig, kürzliche sexuelle Kontakte zu informieren, damit sie sich testen lassen können. Du kannst das anonym tun — Kontakte sehen niemals deine Identität.",
+    goToPartnerAlerts: "Kontakte benachrichtigen",
+    dismissForNow: "Später erledigen",
+    legend_intercourse: "Geschlechtsverkehr", legend_test: "Test", legend_vaccination: "Impfung",
+    noEntries: "Keine Einträge an diesem Tag.", edit: "Bearbeiten",
+    addEntry: "Eintrag hinzufügen", editEntry: "Eintrag bearbeiten",
+    intercourse: "Geschlechtsverkehr", contact: "Kontakt", vaccination: "Impfung / PrEP",
+    addViaQR: "Per QR-Code hinzufügen", date: "Datum",
+    anonymousPartner: "Anonymer Partner", selectContact: "Kontakt auswählen",
+    activities: "Aktivitäten", protection: "Schutz verwendet",
+    save: "Speichern", delete: "Löschen", cancel: "Abbrechen", back: "← Zurück",
+    name: "Name", notes: "Notizen", optional: "optional",
+    passiveAnal: "Rezeptiv anal", activeAnal: "Insertiv anal",
+    passiveOral: "Oral empfangend", activeOral: "Oral gebend",
+    vaginal: "Vaginal", manual: "Manuell", kissing: "Küssen",
+    kind: "Art", vaccine: "Impfstoff", prep: "PrEP", doxyPep: "Doxy-PEP",
+    vaccineType: "Impfstofftyp", manufacturer: "Hersteller",
+    doseNumber: "Dosisnummer", startDate: "Startdatum", endDate: "Enddatum",
+    ongoing: "Laufend", dateTaken: "Einnahmedatum",
+    general: "Allgemein", language: "Sprache", region: "Region",
+    regionSub: "Für Prävalenz-basierte Risikoeinschätzung",
+    testReminders: "Testerinnerungen",
+    testRemindersSub: "Benachrichtigen, wenn Test empfohlen wird",
+    appLock: "App-Sperre", appLockSub: "Biometrie oder PIN zum Öffnen erforderlich",
+    data: "Daten", exportData: "Daten exportieren",
+    exportDataSub: "Kopie der Einträge als JSON herunterladen",
+    deleteAllData: "Alle Daten löschen",
+    deleteAllDataSub: "Alles unwiderruflich löschen",
+    about: "Über", version: "Version", storage: "Speicher",
+    storageValue: "Nur lokal · kein Server-Sync",
+    medicalDisclaimer: "Medizinischer Haftungsausschluss",
+    medicalDisclaimerSub: "Risikodaten dienen nur zur Information. Kein Ersatz für professionelle Beratung.",
+    none: "Keine", negligible: "Vernachlässigbar", very_low: "Sehr niedrig", low: "Niedrig",
+    moderate: "Mittel", high: "Hoch", very_high: "Sehr hoch",
+    testEntry: "Test", facility: "Einrichtung", testNumber: "Testnummer",
+    testedFor: "Getestet auf", results: "Ergebnisse", negative: "Negativ",
+    months: ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"],
+    daysShort: ["Mo","Di","Mi","Do","Fr","Sa","So"],
+    protected: "Geschützt", unprotected: "Ungeschützt",
+    confirmDelete: "Möchtest du diesen Eintrag wirklich löschen?",
+    qrAlert: "QR-Code-Scan erfordert die native mobile App.",
+    dose: "Dosis", pending: "Ausstehend",
+    contactHandles: "Kontaktdaten",
+  }
+};
+
+const LangContext = createContext({ lang: "en", t: (k) => k });
+function useLang() { return useContext(LangContext); }
+function tFn(lang) {
+  return (key, vars = {}) => {
+    let s = STRINGS[lang]?.[key] ?? STRINGS.en[key] ?? key;
+    if (typeof s === "string") for (const [k, v] of Object.entries(vars)) s = s.replace(`{${k}}`, v);
+    return s;
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PALETTE
+// ═══════════════════════════════════════════════════════════════
+const P = {
+  bg: "#F6F4F0", card: "#FFFFFF", cardEl: "#F0EDE8", border: "#E6E2DB",
+  text: "#2A2836", muted: "#8A8698",
+  rose: "#D4556A", teal: "#2A9599", amber: "#CF8A30", green: "#48A870",
+};
+const riskColor = r => ({ none:P.green, negligible:"#6BC98F", very_low:"#8ABB3A", low:"#D4B033", moderate:"#E08840", high:"#DB5E5E", very_high:"#C4264A" }[r] || "#999");
+const RO = { none:0, negligible:1, very_low:2, low:3, moderate:4, high:5, very_high:6 };
+const ACT_KEYS = ["passiveAnal","activeAnal","passiveOral","activeOral","vaginal","manual","kissing"];
+const EMPTY_ACTS = () => Object.fromEntries(ACT_KEYS.map(k => [k, 0]));
+const fnt = "DM Sans, sans-serif";
+
+const WIKI_LINKS = {
+  HIV:"https://en.wikipedia.org/wiki/HIV/AIDS", Gonorrhea:"https://en.wikipedia.org/wiki/Gonorrhea",
+  Chlamydia:"https://en.wikipedia.org/wiki/Chlamydia", Syphilis:"https://en.wikipedia.org/wiki/Syphilis",
+  "Hep B":"https://en.wikipedia.org/wiki/Hepatitis_B", "HSV-2":"https://en.wikipedia.org/wiki/Herpes_simplex_virus",
+  Mpox:"https://en.wikipedia.org/wiki/Mpox",
+};
+
+// ═══════════════════════════════════════════════════════════════
+// STI DATABASE
+// ═══════════════════════════════════════════════════════════════
+const STI_DB = {
+  HIV:      { wd:45, sym:["Flu-like illness 2–4 weeks post-exposure","Fever, fatigue, swollen lymph nodes","Often completely asymptomatic"],
+              tx:{ passiveAnal:{r:"very_high",p:.0138,c:.80}, activeAnal:{r:"high",p:.0011,c:.80}, vaginal:{r:"moderate",p:.0008,c:.80}, passiveOral:{r:"negligible",p:.00002,c:.90}, activeOral:{r:"negligible",p:.00001,c:.90}, manual:{r:"none",p:0,c:1}, kissing:{r:"none",p:0,c:1} } },
+  Gonorrhea:{ wd:7,  sym:["Discharge (genital, anal, or throat)","Burning urination","Often asymptomatic — especially throat/rectum"],
+              tx:{ passiveAnal:{r:"high",p:.17,c:.90}, activeAnal:{r:"moderate",p:.06,c:.90}, vaginal:{r:"high",p:.35,c:.90}, passiveOral:{r:"moderate",p:.15,c:.70}, activeOral:{r:"moderate",p:.10,c:.70}, manual:{r:"none",p:0,c:1}, kissing:{r:"none",p:0,c:1} } },
+  Chlamydia:{ wd:14, sym:["Usually asymptomatic","Discharge or painful urination","Rectal discomfort or discharge"],
+              tx:{ passiveAnal:{r:"high",p:.19,c:.90}, activeAnal:{r:"moderate",p:.08,c:.90}, vaginal:{r:"high",p:.30,c:.90}, passiveOral:{r:"low",p:.02,c:.70}, activeOral:{r:"low",p:.01,c:.70}, manual:{r:"none",p:0,c:1}, kissing:{r:"none",p:0,c:1} } },
+  Syphilis: { wd:21, sym:["Painless ulcer (chancre) at exposure site","Skin rash on palms and soles","Easy to overlook or entirely miss"],
+              tx:{ passiveAnal:{r:"high",p:.14,c:.50}, activeAnal:{r:"high",p:.14,c:.50}, vaginal:{r:"high",p:.14,c:.50}, passiveOral:{r:"moderate",p:.05,c:.30}, activeOral:{r:"moderate",p:.05,c:.30}, manual:{r:"low",p:.01,c:.50}, kissing:{r:"low",p:.005,c:0} } },
+  "Hep B":  { wd:45, sym:["Jaundice (yellow skin/eyes)","Fatigue and nausea","Often asymptomatic in acute phase"],
+              tx:{ passiveAnal:{r:"very_high",p:.37,c:.85}, activeAnal:{r:"high",p:.20,c:.85}, vaginal:{r:"moderate",p:.06,c:.85}, passiveOral:{r:"low",p:.01,c:.50}, activeOral:{r:"low",p:.01,c:.50}, manual:{r:"none",p:0,c:1}, kissing:{r:"none",p:0,c:1} } },
+  "HSV-2":  { wd:16, sym:["Blisters or sores on genitals/anus","Burning or itching at site","Often mild or entirely asymptomatic"],
+              tx:{ passiveAnal:{r:"high",p:.10,c:.30}, activeAnal:{r:"high",p:.10,c:.30}, vaginal:{r:"moderate",p:.08,c:.30}, passiveOral:{r:"low",p:.02,c:.20}, activeOral:{r:"low",p:.02,c:.20}, manual:{r:"very_low",p:.005,c:.20}, kissing:{r:"none",p:0,c:0} } },
+  Mpox:     { wd:21, sym:["Rash progressing to pustules","Fever and swollen lymph nodes","Lesions near genitals or anus"],
+              tx:{ passiveAnal:{r:"very_high",p:.20,c:.40}, activeAnal:{r:"high",p:.15,c:.40}, vaginal:{r:"moderate",p:.08,c:.40}, passiveOral:{r:"moderate",p:.06,c:.30}, activeOral:{r:"moderate",p:.06,c:.30}, manual:{r:"low",p:.02,c:.30}, kissing:{r:"low",p:.02,c:.20} } },
+};
+const STI_NAMES = Object.keys(STI_DB);
+
+// ═══════════════════════════════════════════════════════════════
+// COUNTRY PREVALENCE
+// ═══════════════════════════════════════════════════════════════
+const COUNTRIES = ["Germany","Austria","Switzerland","United Kingdom","France","Netherlands","Belgium","Spain","Italy","Portugal","Sweden","Norway","Denmark","Finland","Poland","Czech Republic","United States","Canada","Mexico","Brazil","Argentina","Australia","South Africa","Nigeria","Kenya","India","Thailand","Japan","China","Russia"];
+const HIGH_PREV = {
+  "South Africa":["HIV","Syphilis","Gonorrhea","Chlamydia","HSV-2"], "Nigeria":["HIV","Syphilis","Gonorrhea","Hep B"],
+  "Kenya":["HIV","Syphilis","Gonorrhea","HSV-2"], "India":["HIV","Syphilis","Gonorrhea","Hep B"],
+  "Thailand":["HIV","Gonorrhea","Chlamydia","Syphilis"], "Brazil":["HIV","Syphilis","Gonorrhea","Hep B"],
+  "Russia":["HIV","Syphilis","Hep B"], "China":["Hep B","Syphilis","Gonorrhea"],
+  "United States":["Syphilis","Gonorrhea","Chlamydia"], "United Kingdom":["Gonorrhea","Chlamydia","Syphilis"],
+  "Germany":["Syphilis","Gonorrhea","Chlamydia"], "France":["Gonorrhea","Chlamydia"],
+  "Australia":["Gonorrhea","Chlamydia","Syphilis"], "Mexico":["HIV","Syphilis"],
+};
+
+// ═══════════════════════════════════════════════════════════════
+// DEMO DATA
+// ═══════════════════════════════════════════════════════════════
+let _idC = 100;
+const genId = (pfx="x") => `${pfx}${++_idC}`;
+const toDate = s => new Date(s + "T12:00:00");
+const ds = d => typeof d==="string" ? d : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const fdFull = (s, lang="en") => toDate(s).toLocaleDateString(lang==="de"?"de-DE":"en-GB",{day:"numeric",month:"short",year:"numeric"});
+
+// Pseudonym = opaque hex token for anonymous server-side notification
+const genToken = () => {
+  const arr = new Uint8Array(12);
+  if (typeof crypto !== "undefined" && crypto.getRandomValues) crypto.getRandomValues(arr);
+  else for (let i = 0; i < 12; i++) arr[i] = Math.floor(Math.random() * 256);
+  return Array.from(arr, b => b.toString(16).padStart(2, "0")).join("");
+};
+
+const INIT_CONTACTS = [
+  { id:"c1", name:"Alex", notes:null, token: "a3f8c1d902e74b6f19a8c3d2", cx:{} },
+  { id:"c2", name:"Jordan", notes:"Met on New Year's", token: "7e2b9f01c4a83d56e1f20b97", cx:{ instagram:"@jordanxo", telegram:"jordanplus" } },
+  { id:"c3", name:"Sam", notes:null, token: "d4e601a8b3f29c7502eadf18", cx:{ signal:"+49 176 1234567" } },
+  { id:"c4", name:"Riley", notes:"College friend", token: "91c7f3e840b26d5a03fe82c1", cx:{ whatsapp:"+44 7700 900123", instagram:"@riley.j" } },
+];
+const INIT_INTERCOURSE = [
+  { id:"i1", date:"2025-11-15", cid:"c1", t:{passiveAnal:1,activeOral:1,kissing:1,activeAnal:0,vaginal:0,passiveOral:0,manual:0}, p:{passiveAnal:0,activeOral:0,kissing:0,activeAnal:0,vaginal:0,passiveOral:0,manual:0} },
+  { id:"i2", date:"2025-11-28", cid:"c2", t:{activeAnal:1,passiveOral:1,manual:1,kissing:1,passiveAnal:0,vaginal:0,activeOral:0}, p:{activeAnal:1,passiveOral:0,manual:0,kissing:0,passiveAnal:0,vaginal:0,activeOral:0} },
+  { id:"i3", date:"2025-12-05", cid:"c4", t:{vaginal:1,activeOral:1,manual:1,kissing:1,passiveAnal:0,activeAnal:0,passiveOral:0}, p:{vaginal:0,activeOral:0,manual:0,kissing:0,passiveAnal:0,activeAnal:0,passiveOral:0} },
+  { id:"i4", date:"2025-12-12", cid:"c3", t:{passiveAnal:1,passiveOral:1,vaginal:0,activeOral:0,activeAnal:0,manual:0,kissing:0}, p:{passiveAnal:0,passiveOral:0,vaginal:0,activeOral:0,activeAnal:0,manual:0,kissing:0} },
+  { id:"i5", date:"2025-12-20", cid:"c1", t:{activeOral:1,passiveOral:1,manual:1,kissing:1,passiveAnal:0,activeAnal:0,vaginal:0}, p:{activeOral:0,passiveOral:0,manual:0,kissing:0,passiveAnal:0,activeAnal:0,vaginal:0} },
+  { id:"i6", date:"2026-01-15", cid:"c2", t:{passiveAnal:1,activeOral:1,kissing:1,activeAnal:0,vaginal:0,passiveOral:0,manual:0}, p:{passiveAnal:1,activeOral:0,kissing:0,activeAnal:0,vaginal:0,passiveOral:0,manual:0} },
+  { id:"i7", date:"2026-01-22", cid:null, t:{activeAnal:1,kissing:1,passiveAnal:0,vaginal:0,activeOral:0,passiveOral:0,manual:0}, p:{activeAnal:0,kissing:0,passiveAnal:0,vaginal:0,activeOral:0,passiveOral:0,manual:0} },
+  { id:"i8", date:"2026-02-01", cid:"c3", t:{passiveOral:1,activeOral:1,manual:1,passiveAnal:0,activeAnal:0,vaginal:0,kissing:0}, p:{passiveOral:0,activeOral:0,manual:0,passiveAnal:0,activeAnal:0,vaginal:0,kissing:0} },
+  { id:"i9", date:"2026-02-20", cid:"c1", t:{passiveAnal:1,activeOral:1,kissing:1,activeAnal:0,vaginal:0,passiveOral:0,manual:0}, p:{passiveAnal:0,activeOral:0,kissing:0,activeAnal:0,vaginal:0,passiveOral:0,manual:0} },
+  { id:"i10",date:"2026-03-01", cid:"c2", t:{activeAnal:1,passiveOral:1,manual:1,kissing:1,passiveAnal:0,vaginal:0,activeOral:0}, p:{activeAnal:1,passiveOral:0,manual:0,kissing:0,passiveAnal:0,vaginal:0,activeOral:0} },
+  { id:"i11",date:"2026-03-05", cid:"c4", t:{vaginal:1,kissing:1,passiveAnal:0,activeAnal:0,passiveOral:0,activeOral:0,manual:0}, p:{vaginal:0,kissing:0,passiveAnal:0,activeAnal:0,passiveOral:0,activeOral:0,manual:0} },
+];
+const INIT_TESTS = [
+  { id:"t1", date:"2026-01-03", num:"T-2026-001", fac:"City Health Clinic", ts:{HIV:1,Gonorrhea:1,Chlamydia:1,Syphilis:1,"Hep B":0,"HSV-2":0,Mpox:0}, results:{HIV:"negative",Gonorrhea:"negative",Chlamydia:"negative",Syphilis:"negative"} },
+  { id:"t2", date:"2026-02-10", num:"T-2026-002", fac:"QuickTest Center", ts:{HIV:1,Gonorrhea:1,Chlamydia:1,Syphilis:1,"Hep B":1,"HSV-2":0,Mpox:0}, results:{HIV:"negative",Gonorrhea:"negative",Chlamydia:"negative",Syphilis:"negative","Hep B":"negative"} },
+];
+const INIT_VACCINATIONS = [
+  { id:"v1", kind:"vaccine", type:"Hep B", manufacturer:"Engerix-B", date:"2024-03-10", dose:1 },
+  { id:"v2", kind:"vaccine", type:"Hep B", manufacturer:"Engerix-B", date:"2024-04-10", dose:2 },
+  { id:"v3", kind:"vaccine", type:"Hep B", manufacturer:"Engerix-B", date:"2024-09-10", dose:3 },
+  { id:"v4", kind:"vaccine", type:"Mpox", manufacturer:"Jynneos", date:"2025-06-01", dose:1 },
+  { id:"v5", kind:"doxypep", date:"2026-01-15" },
+  { id:"v6", kind:"prep", startDate:"2026-02-01", endDate:null },
+];
+
+// ═══════════════════════════════════════════════════════════════
+// PROPHYLAXIS UTILS
+// ═══════════════════════════════════════════════════════════════
+function getVaccineProtection(vacc) {
+  const p = {};
+  if (vacc.filter(v=>v.kind==="vaccine"&&v.type==="Hep B").length>=3) p["Hep B"]=true;
+  if (vacc.filter(v=>v.kind==="vaccine"&&v.type==="Mpox").length>=2) p.Mpox=true;
+  return p;
+}
+function isPrEPActiveOn(vacc, dateStr) {
+  const d = toDate(dateStr);
+  for (const v of vacc) {
+    if (v.kind!=="prep") continue;
+    if (d < new Date(toDate(v.startDate).getTime()+7*86400000)) continue;
+    if (v.endDate && d > toDate(v.endDate)) continue;
+    return true;
+  }
+  return false;
+}
+function isDoxyPEPFor(vacc, dateStr) {
+  const d = toDate(dateStr);
+  for (const v of vacc) {
+    if (v.kind!=="doxypep") continue;
+    if (Math.abs(d - toDate(v.date))/3600000 <= 72) return true;
+  }
+  return false;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RISK CALCULATION
+// ═══════════════════════════════════════════════════════════════
+function calcRisks(intercourse, tests, vacc, country) {
+  const today = new Date();
+  const sortedTests = [...tests].sort((a,b)=>toDate(b.date)-toDate(a.date));
+  const lastTest = sortedTests[0]||null;
+  const cut = lastTest ? new Date(toDate(lastTest.date).getTime()+86400000-1) : null;
+  const rel = intercourse.filter(e=>!cut||toDate(e.date)>cut);
+  const vacProt = getVaccineProtection(vacc);
+  const hp = HIGH_PREV[country]||[];
+
+  const lastTestedMap = {};
+  for (const sti of STI_NAMES) {
+    for (const t of sortedTests) { if (t.ts[sti]) { lastTestedMap[sti] = { date:t.date, result:t.results?.[sti]||"negative" }; break; } }
+  }
+
+  const risks = {};
+  for (const [sn, si] of Object.entries(STI_DB)) {
+    if (vacProt[sn]) { risks[sn]={exposed:false,vaccinated:true}; continue; }
+    const exps = [];
+    for (const e of rel) {
+      for (const [type, active] of Object.entries(e.t)) {
+        if (!active) continue;
+        const tr = si.tx[type]; if (!tr||tr.p===0) continue;
+        let rate = e.p[type] ? tr.p*(1-tr.c) : tr.p;
+        if (sn==="HIV"&&isPrEPActiveOn(vacc,e.date)) continue;
+        if (["Gonorrhea","Chlamydia","Syphilis"].includes(sn)&&isDoxyPEPFor(vacc,e.date)) rate*=0.25;
+        if (rate>0.00001) exps.push({date:toDate(e.date),type,isP:!!e.p[type],rl:tr.r,rate,cid:e.cid});
+      }
+    }
+    if (!exps.length) { risks[sn]={exposed:false}; continue; }
+    const lat = exps.reduce((a,b)=>a.date>b.date?a:b);
+    const days = Math.floor((today-lat.date)/86400000);
+    const mr = exps.reduce((m,e)=>RO[e.rl]>RO[m]?e.rl:m,"none");
+    const isPositive = lastTestedMap[sn]?.result==="positive";
+    risks[sn] = { exposed:true, testable:days>=si.wd, wPct:Math.min(days/si.wd,1), days, mr, sym:si.sym, wd:si.wd, n:exps.length, allP:exps.every(e=>e.isP), highPrev:hp.includes(sn), isPositive, contactIds:[...new Set(exps.map(e=>e.cid).filter(Boolean))] };
+  }
+  return { lastTest, risks, lastTestedMap };
+}
+
+// Compute contacts to notify per positive STI (contacts between prev negative and positive test)
+function getNotifiableContacts(tests, intercourse, contacts) {
+  const sorted = [...tests].sort((a,b)=>toDate(a.date)-toDate(b.date));
+  const alerts = []; // [{sti, testDate, contacts: [{contact, status}]}]
+  for (const test of sorted) {
+    if (!test.results) continue;
+    for (const [sti, result] of Object.entries(test.results)) {
+      if (result !== "positive") continue;
+      const prevNeg = sorted.filter(t=>toDate(t.date)<toDate(test.date)&&t.results?.[sti]==="negative").sort((a,b)=>toDate(b.date)-toDate(a.date))[0];
+      const afterDate = prevNeg ? prevNeg.date : "2000-01-01";
+      const cids = [...new Set(intercourse.filter(e=>e.date>afterDate&&e.date<=test.date&&e.cid).map(e=>e.cid))];
+      const cs = cids.map(cid=>contacts.find(c=>c.id===cid)).filter(Boolean);
+      if (cs.length || cids.length === 0) {
+        alerts.push({ sti, testDate: test.date, contacts: cs, hasAnonymous: intercourse.some(e=>e.date>afterDate&&e.date<=test.date&&!e.cid) });
+      }
+    }
+  }
+  return alerts;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SHARED COMPONENTS
+// ═══════════════════════════════════════════════════════════════
+const Tag = ({color,children,small,filled}) => <span style={{ display:"inline-flex",alignItems:"center", padding:small?"2px 8px":"3px 10px", borderRadius:20, background:filled?color:color+"18", border:`1px solid ${color}44`, color:filled?"#fff":color, fontSize:small?10:11, fontWeight:600, letterSpacing:"0.03em", whiteSpace:"nowrap", fontFamily:fnt }}>{children}</span>;
+const Dot = ({color,size=7}) => <span style={{width:size,height:size,borderRadius:"50%",background:color,flexShrink:0,display:"inline-block"}}/>;
+const Pill = ({active,onClick,children}) => <button onClick={onClick} style={{ padding:"8px 16px",borderRadius:20, background:active?P.teal:"transparent", border:`1.5px solid ${active?P.teal:P.border}`, color:active?"#fff":P.muted, fontFamily:fnt, fontSize:13, fontWeight:500, cursor:"pointer", transition:"all .2s" }}>{children}</button>;
+const Toggle = ({value,onChange}) => <div onClick={()=>onChange(!value)} style={{ width:46,height:28,borderRadius:14, background:value?P.teal:P.border, position:"relative", cursor:"pointer",transition:"background .2s",flexShrink:0 }}><div style={{ width:22,height:22,borderRadius:"50%",background:"#fff", position:"absolute",top:3,left:value?21:3, transition:"left .2s",boxShadow:"0 1px 4px rgba(0,0,0,.15)" }}/></div>;
+const Checkbox = ({checked,onChange,label,color=P.teal}) => (
+  <label style={{display:"flex",alignItems:"center",gap:10,cursor:"pointer",padding:"6px 0"}}>
+    <div onClick={e=>{e.preventDefault();onChange(!checked);}} style={{ width:22,height:22,borderRadius:6, border:`2px solid ${checked?color:P.border}`, background:checked?color:"transparent", display:"flex",alignItems:"center",justifyContent:"center", transition:"all .15s",flexShrink:0 }}>
+      {checked&&<span style={{color:"#fff",fontSize:13,lineHeight:1}}>✓</span>}
+    </div>
+    {label&&<span style={{fontFamily:fnt,fontSize:13,color:P.text}}>{label}</span>}
+  </label>
+);
+const Input = ({value,onChange,placeholder,type="text",style:sx}) => (
+  <input type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder}
+    style={{ width:"100%",padding:"10px 14px",borderRadius:10, border:`1.5px solid ${P.border}`,background:P.cardEl, fontFamily:fnt,fontSize:14,color:P.text, outline:"none",transition:"border .2s",boxSizing:"border-box",...sx }}
+    onFocus={e=>e.target.style.borderColor=P.teal} onBlur={e=>e.target.style.borderColor=P.border} />
+);
+const Select = ({value,onChange,options,placeholder}) => (
+  <select value={value} onChange={e=>onChange(e.target.value)} style={{ width:"100%",padding:"10px 14px",borderRadius:10, border:`1.5px solid ${P.border}`,background:P.cardEl, fontFamily:fnt,fontSize:14,color:value?P.text:P.muted, outline:"none",cursor:"pointer",boxSizing:"border-box" }}>
+    {placeholder&&<option value="">{placeholder}</option>}
+    {options.map(o=>typeof o==="string"?<option key={o} value={o}>{o}</option>:<option key={o.value} value={o.value}>{o.label}</option>)}
+  </select>
+);
+const Btn = ({onClick,children,color=P.teal,variant="filled",danger,full,small,disabled,style:sx}) => {
+  const c=danger?P.rose:color; const isFilled=variant==="filled";
+  return <button onClick={onClick} disabled={disabled} style={{ padding:small?"8px 14px":"12px 20px", borderRadius:12, background:isFilled?c:"transparent", border:`1.5px solid ${c}`, color:isFilled?"#fff":c, fontFamily:fnt, fontSize:small?12:14, fontWeight:600, cursor:disabled?"not-allowed":"pointer", opacity:disabled?.5:1, transition:"all .15s", width:full?"100%":"auto", textAlign:"center", ...sx }}>{children}</button>;
+};
+
+function BottomSheet({onClose,children,title}) {
+  return <>
+    <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.35)",zIndex:50,backdropFilter:"blur(3px)"}}/>
+    <div style={{ position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)", width:"100%",maxWidth:430,background:"#fff", borderRadius:"22px 22px 0 0",zIndex:51, paddingBottom:"max(24px, env(safe-area-inset-bottom, 24px))", animation:"slideUp .3s cubic-bezier(.32,.72,0,1)", maxHeight:"88vh",display:"flex",flexDirection:"column" }}>
+      <div style={{display:"flex",justifyContent:"center",padding:"12px 0 4px",flexShrink:0}}>
+        <div style={{width:36,height:4,borderRadius:2,background:P.border}}/>
+      </div>
+      {title&&<div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"4px 20px 12px",flexShrink:0}}>
+        <span style={{fontFamily:fnt,fontSize:17,fontWeight:700,color:P.text}}>{title}</span>
+        <button onClick={onClose} style={{background:"none",border:"none",color:P.muted,fontSize:24,cursor:"pointer",lineHeight:1,padding:"4px"}}>×</button>
+      </div>}
+      <div style={{flex:1,overflowY:"auto",padding:"0 20px 20px"}}>{children}</div>
+    </div>
+  </>;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DAY SHEET
+// ═══════════════════════════════════════════════════════════════
+function DaySheet({date,intercourse,tests,vaccinations,contacts,onClose,onEdit,lang}) {
+  const {t}=useLang();
+  const getC=id=>contacts.find(c=>c.id===id)||null;
+  const ic=intercourse.filter(e=>e.date===date);
+  const ts=tests.filter(e=>e.date===date);
+  const vx=vaccinations.filter(e=>e.date===date||e.startDate===date);
+  const hasAny=ic.length||ts.length||vx.length;
+  return <BottomSheet onClose={onClose} title={fdFull(date,lang)}>
+    {!hasAny&&<p style={{color:P.muted,fontSize:14,fontFamily:fnt}}>{t("noEntries")}</p>}
+    {ts.map(te=><div key={te.id} style={{background:P.cardEl,borderRadius:14,padding:"14px 16px",marginBottom:10}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+        <Dot color={P.teal}/><span style={{fontFamily:fnt,fontWeight:600,fontSize:13,color:P.teal}}>{t("testEntry")}</span>
+        <span style={{fontFamily:fnt,fontSize:11,color:P.muted,marginLeft:"auto"}}>{te.num}</span>
+        <button onClick={()=>onEdit("test",te)} style={{background:"none",border:"none",color:P.teal,fontFamily:fnt,fontSize:11,fontWeight:600,cursor:"pointer"}}>{t("edit")}</button>
+      </div>
+      <div style={{fontFamily:fnt,fontSize:12,color:P.muted,marginBottom:6}}>{te.fac}</div>
+      <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
+        {Object.entries(te.ts).filter(([,v])=>v).map(([k])=><Tag key={k} color={te.results?.[k]==="positive"?P.rose:P.teal} small>{k}{te.results?.[k]==="positive"?" +":""}</Tag>)}
+      </div>
+    </div>)}
+    {vx.map(ve=><div key={ve.id} style={{background:P.cardEl,borderRadius:14,padding:"14px 16px",marginBottom:10}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+        <Dot color={P.amber}/>
+        <span style={{fontFamily:fnt,fontWeight:600,fontSize:13,color:P.amber}}>{ve.kind==="vaccine"?`${ve.type} ${t("vaccine")}`:ve.kind==="prep"?"PrEP":"Doxy-PEP"}</span>
+        <button onClick={()=>onEdit("vaccination",ve)} style={{background:"none",border:"none",color:P.amber,fontFamily:fnt,fontSize:11,fontWeight:600,cursor:"pointer",marginLeft:"auto"}}>{t("edit")}</button>
+      </div>
+      {ve.kind==="vaccine"&&<div style={{fontFamily:fnt,fontSize:12,color:P.muted}}>{ve.manufacturer} · {t("dose")} {ve.dose}</div>}
+      {ve.kind==="prep"&&<div style={{fontFamily:fnt,fontSize:12,color:P.muted}}>{fdFull(ve.startDate,lang)}{ve.endDate?` — ${fdFull(ve.endDate,lang)}`:` (${t("ongoing")})`}</div>}
+    </div>)}
+    {ic.map(e=>{const c=getC(e.cid);const at=Object.entries(e.t).filter(([,v])=>v);return <div key={e.id} style={{background:P.cardEl,borderRadius:14,padding:"14px 16px",marginBottom:10}}>
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+        <Dot color={P.rose}/><span style={{fontFamily:fnt,fontWeight:600,fontSize:13,color:P.rose}}>{c?c.name:t("anonymousPartner")}</span>
+        <button onClick={()=>onEdit("intercourse",e)} style={{background:"none",border:"none",color:P.rose,fontFamily:fnt,fontSize:11,fontWeight:600,cursor:"pointer",marginLeft:"auto"}}>{t("edit")}</button>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:6}}>
+        {at.map(([type])=><div key={type} style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <span style={{fontFamily:fnt,fontSize:12,color:P.text}}>{t(type)}</span>
+          <Tag color={e.p[type]?P.green:P.rose} small>{e.p[type]?t("protected"):t("unprotected")}</Tag>
+        </div>)}
+      </div>
+    </div>;})}
+  </BottomSheet>;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ADD / EDIT SHEET
+// ═══════════════════════════════════════════════════════════════
+function AddEditSheet({onClose,onSave,onDelete,contacts,editType,editData,initialTab}) {
+  const {t}=useLang();
+  const isEdit=!!editData;
+  const [tab,setTab]=useState(editType||initialTab||"intercourse");
+  const [icDate,setIcDate]=useState(editData?.date||ds(new Date()));
+  const [icAnon,setIcAnon]=useState(isEdit?!editData.cid:false);
+  const [icContact,setIcContact]=useState(editData?.cid||"");
+  const [icActs,setIcActs]=useState(editData?.t?{...editData.t}:EMPTY_ACTS());
+  const [icProt,setIcProt]=useState(editData?.p?{...editData.p}:EMPTY_ACTS());
+  const [teDate,setTeDate]=useState(editData?.date||ds(new Date()));
+  const [teFac,setTeFac]=useState(editData?.fac||"");
+  const [teNum,setTeNum]=useState(editData?.num||"");
+  const [teStis,setTeStis]=useState(editData?.ts?{...editData.ts}:Object.fromEntries(STI_NAMES.map(s=>[s,0])));
+  const [teResults,setTeResults]=useState(editData?.results?{...editData.results}:{});
+  const [cName,setCName]=useState(editData?.name||"");
+  const [cNotes,setCNotes]=useState(editData?.notes||"");
+  const [cToken,setCToken]=useState(editData?.token||genToken());
+  const [cCx,setCCx]=useState(editData?.cx?{...editData.cx}:{});
+  const [vKind,setVKind]=useState(editData?.kind||"vaccine");
+  const [vType,setVType]=useState(editData?.type||"Hep B");
+  const [vDate,setVDate]=useState(editData?.date||ds(new Date()));
+  const [vMfr,setVMfr]=useState(editData?.manufacturer||"");
+  const [vDose,setVDose]=useState(editData?.dose||1);
+  const [vStart,setVStart]=useState(editData?.startDate||ds(new Date()));
+  const [vEnd,setVEnd]=useState(editData?.endDate||"");
+  const [vOngoing,setVOngoing]=useState(editData?!editData.endDate:true);
+  useEffect(()=>{if(editType)setTab(editType);},[editType]);
+
+  const handleSave = () => {
+    let saved = null;
+    if (tab==="intercourse") { saved = {...(editData||{}),id:editData?.id||genId("i"),date:icDate,cid:icAnon?null:(icContact||null),t:{...icActs},p:{...icProt}}; onSave("intercourse",saved); }
+    else if (tab==="test") { const res={}; Object.entries(teStis).forEach(([k,v])=>{if(v)res[k]=teResults[k]||"negative";}); saved={...(editData||{}),id:editData?.id||genId("t"),date:teDate,fac:teFac,num:teNum,ts:{...teStis},results:res}; onSave("test",saved); }
+    else if (tab==="contact") { saved={...(editData||{}),id:editData?.id||genId("c"),name:cName,notes:cNotes||null,token:cToken,cx:{...cCx}}; onSave("contact",saved); }
+    else if (tab==="vaccination") {
+      const base={id:editData?.id||genId("v"),kind:vKind};
+      if (vKind==="vaccine") Object.assign(base,{type:vType,date:vDate,manufacturer:vMfr,dose:vDose});
+      else if (vKind==="prep") Object.assign(base,{startDate:vStart,endDate:vOngoing?null:vEnd});
+      else if (vKind==="doxypep") Object.assign(base,{date:vDate});
+      saved=base; onSave("vaccination",base);
+    }
+    onClose(saved, tab);
+  };
+  const handleDelete = () => { if (editData&&confirm(t("confirmDelete"))) { onDelete(tab,editData.id); onClose(null,null); } };
+  const fl = text => <label style={{fontFamily:fnt,fontSize:12,fontWeight:600,color:P.muted,display:"block",marginBottom:6}}>{text}</label>;
+
+  return <BottomSheet onClose={()=>onClose(null,null)} title={isEdit?t("editEntry"):t("addEntry")}>
+    {!isEdit&&<button onClick={()=>alert(t("qrAlert"))} style={{ width:"100%",padding:"10px",borderRadius:10,marginBottom:16, background:P.cardEl,border:`1.5px dashed ${P.border}`, fontFamily:fnt,fontSize:13,color:P.muted,cursor:"pointer",textAlign:"center" }}>📱 {t("addViaQR")}</button>}
+    <div style={{display:"flex",gap:8,marginBottom:20,overflowX:"auto",flexWrap:"nowrap"}}>
+      {(isEdit?[tab]:["intercourse","test","contact","vaccination"]).map(id=>{
+        const labels={intercourse:t("intercourse"),test:t("testEntry"),contact:t("contact"),vaccination:t("vaccination")};
+        return <Pill key={id} active={tab===id} onClick={()=>setTab(id)}>{labels[id]}</Pill>;
+      })}
+    </div>
+    {tab==="intercourse"&&<div style={{display:"flex",flexDirection:"column",gap:16}}>
+      <div>{fl(t("date"))}<Input type="date" value={icDate} onChange={setIcDate}/></div>
+      <Checkbox checked={icAnon} onChange={setIcAnon} label={t("anonymousPartner")}/>
+      {!icAnon&&<div>{fl(t("selectContact"))}<Select value={icContact} onChange={setIcContact} placeholder={t("selectContact")} options={contacts.map(c=>({value:c.id,label:c.name}))}/></div>}
+      <div>{fl(t("activities"))}
+        {ACT_KEYS.map(k=><div key={k} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"4px 0"}}>
+          <Checkbox checked={!!icActs[k]} onChange={v=>setIcActs(a=>({...a,[k]:v?1:0}))} label={t(k)}/>
+          {!!icActs[k]&&<Checkbox checked={!!icProt[k]} onChange={v=>setIcProt(a=>({...a,[k]:v?1:0}))} label={t("protected")} color={P.green}/>}
+        </div>)}
+      </div>
+    </div>}
+    {tab==="test"&&<div style={{display:"flex",flexDirection:"column",gap:16}}>
+      <div>{fl(t("date"))}<Input type="date" value={teDate} onChange={setTeDate}/></div>
+      <div>{fl(t("facility"))}<Input value={teFac} onChange={setTeFac} placeholder={t("facility")}/></div>
+      <div>{fl(t("testNumber"))}<Input value={teNum} onChange={setTeNum} placeholder="T-2026-003"/></div>
+      <div>{fl(t("testedFor"))}
+        {STI_NAMES.map(s=><div key={s} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"3px 0"}}>
+          <Checkbox checked={!!teStis[s]} onChange={v=>{setTeStis(a=>({...a,[s]:v?1:0}));if(!v)setTeResults(r=>{const n={...r};delete n[s];return n;});else setTeResults(r=>({...r,[s]:"negative"}));}} label={s} color={P.teal}/>
+          {!!teStis[s]&&<div style={{display:"flex",gap:6}}>
+            {["negative","positive"].map(res=><button key={res} onClick={()=>setTeResults(r=>({...r,[s]:res}))} style={{ padding:"3px 10px",borderRadius:12, background:teResults[s]===res?(res==="positive"?P.rose:P.green):"transparent", border:`1px solid ${res==="positive"?P.rose:P.green}`, color:teResults[s]===res?"#fff":(res==="positive"?P.rose:P.green), fontFamily:fnt,fontSize:11,fontWeight:600,cursor:"pointer" }}>{res==="negative"?"−":"+"}</button>)}
+          </div>}
+        </div>)}
+      </div>
+    </div>}
+    {tab==="contact"&&<div style={{display:"flex",flexDirection:"column",gap:16}}>
+      <div>{fl(t("name"))}<Input value={cName} onChange={setCName} placeholder={t("name")}/></div>
+      <div>{fl(`${t("notes")} (${t("optional")})`)}<Input value={cNotes} onChange={setCNotes} placeholder={t("notes")}/></div>
+      <div>{fl(t("anonymousToken"))}
+        <div style={{display:"flex",gap:8}}>
+          <div style={{flex:1,padding:"10px 14px",borderRadius:10,background:P.cardEl,border:`1.5px solid ${P.border}`,fontFamily:"monospace",fontSize:11,color:P.muted,wordBreak:"break-all",lineHeight:1.4}}>{cToken}</div>
+          <button onClick={()=>setCToken(genToken())} style={{padding:"0 14px",borderRadius:10,background:P.cardEl,border:`1.5px solid ${P.border}`,color:P.muted,fontFamily:fnt,fontSize:18,cursor:"pointer",flexShrink:0}}>↻</button>
+        </div>
+        <div style={{fontFamily:fnt,fontSize:11,color:P.muted,marginTop:4,lineHeight:1.4}}>
+          {STRINGS.en.anonymousToken === t("anonymousToken") ? "Used to notify this person anonymously via the server. Neither party sees the other's contact data." : "Wird verwendet, um diese Person anonym über den Server zu benachrichtigen. Keine Partei sieht die Kontaktdaten der anderen."}
+        </div>
+      </div>
+      <div>{fl(`${t("contactHandles")} (${t("optional")})`)}
+        {["instagram","telegram","signal","whatsapp","snapchat"].map(s=><div key={s} style={{marginBottom:8}}>
+          <span style={{fontFamily:fnt,fontSize:11,color:P.muted,textTransform:"capitalize",display:"block",marginBottom:4}}>{s}</span>
+          <Input value={cCx[s]||""} onChange={v=>setCCx(cx=>v?{...cx,[s]:v}:(()=>{const n={...cx};delete n[s];return n;})())} placeholder={`${s} handle`}/>
+        </div>)}
+      </div>
+    </div>}
+    {tab==="vaccination"&&<div style={{display:"flex",flexDirection:"column",gap:16}}>
+      <div>{fl(t("kind"))}
+        <div style={{display:"flex",gap:8}}>
+          {[["vaccine",t("vaccine")],["prep","PrEP"],["doxypep","Doxy-PEP"]].map(([k,l])=><Pill key={k} active={vKind===k} onClick={()=>setVKind(k)}>{l}</Pill>)}
+        </div>
+      </div>
+      {vKind==="vaccine"&&<>
+        <div>{fl(t("vaccineType"))}<Select value={vType} onChange={setVType} options={["Hep B","Hep A","Mpox","HPV"]}/></div>
+        <div>{fl(t("date"))}<Input type="date" value={vDate} onChange={setVDate}/></div>
+        <div>{fl(`${t("manufacturer")} (${t("optional")})`)}<Input value={vMfr} onChange={setVMfr} placeholder={t("manufacturer")}/></div>
+        <div>{fl(t("doseNumber"))}<Select value={String(vDose)} onChange={v=>setVDose(Number(v))} options={[1,2,3,4].map(n=>({value:String(n),label:`${t("dose")} ${n}`}))}/></div>
+      </>}
+      {vKind==="prep"&&<>
+        <div>{fl(t("startDate"))}<Input type="date" value={vStart} onChange={setVStart}/></div>
+        <Checkbox checked={vOngoing} onChange={setVOngoing} label={t("ongoing")}/>
+        {!vOngoing&&<div>{fl(t("endDate"))}<Input type="date" value={vEnd} onChange={setVEnd}/></div>}
+      </>}
+      {vKind==="doxypep"&&<div>{fl(t("dateTaken"))}<Input type="date" value={vDate} onChange={setVDate}/></div>}
+    </div>}
+    <div style={{display:"flex",gap:10,marginTop:24}}>
+      {isEdit&&<Btn onClick={handleDelete} danger variant="outline" style={{flex:1}}>{t("delete")}</Btn>}
+      <Btn onClick={handleSave} full style={{flex:isEdit?2:1}}>{t("save")}</Btn>
+    </div>
+  </BottomSheet>;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// POSITIVE RESULT POPUP
+// ═══════════════════════════════════════════════════════════════
+function PositiveResultPopup({stis, onGoToAlerts, onDismiss}) {
+  const {t} = useLang();
+  return <>
+    <div onClick={onDismiss} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.5)",zIndex:60,backdropFilter:"blur(4px)"}}/>
+    <div style={{position:"fixed",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:"calc(100% - 48px)",maxWidth:380,background:"#fff",borderRadius:20,zIndex:61,padding:"28px 24px",boxShadow:"0 8px 32px rgba(0,0,0,.18)",animation:"popIn .25s ease"}}>
+      <div style={{width:56,height:56,borderRadius:16,background:`${P.rose}15`,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px",fontSize:28}}>⚠</div>
+      <div style={{fontFamily:fnt,fontSize:18,fontWeight:700,color:P.text,textAlign:"center",marginBottom:8}}>{t("positiveResultTitle")}</div>
+      <div style={{fontFamily:fnt,fontSize:13,color:P.muted,textAlign:"center",lineHeight:1.6,marginBottom:24}}>{t("positiveResultBody",{stis:stis.join(", ")})}</div>
+      <Btn onClick={onGoToAlerts} color={P.rose} full style={{marginBottom:10}}>{t("goToPartnerAlerts")}</Btn>
+      <button onClick={onDismiss} style={{width:"100%",padding:"12px",background:"none",border:"none",fontFamily:fnt,fontSize:13,color:P.muted,cursor:"pointer",fontWeight:500}}>{t("dismissForNow")}</button>
+    </div>
+  </>;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PARTNER ALERTS PAGE
+// ═══════════════════════════════════════════════════════════════
+function PartnerAlertsView({alerts, onBack}) {
+  const {t, lang} = useLang();
+  // Per-contact notification status: pending → notified → confirmed → testedNegative
+  const [statuses, setStatuses] = useState({}); // { "sti:contactId": "pending"|"notified"|"confirmed"|"testedNegative" }
+  const [personal, setPersonal] = useState({}); // { "sti:contactId": true }
+
+  const statusKey = (sti, cid) => `${sti}:${cid}`;
+  const getStatus = (sti, cid) => statuses[statusKey(sti,cid)] || "pending";
+
+  const sendNotify = (sti, contact) => {
+    const key = statusKey(sti, contact.id);
+    // Simulated: POST to server with contact.token + sti info
+    console.log(`[SERVER] POST /notify { token: "${contact.token}", sti: "${sti}" }`);
+    setStatuses(s => ({...s, [key]: "notified"}));
+    // Simulate: server confirms the person acknowledged after 3s
+    setTimeout(() => setStatuses(s => ({...s, [key]: "confirmed"})), 3000);
+    // Simulate: tested negative after 8s
+    setTimeout(() => setStatuses(s => ({...s, [key]: "testedNegative"})), 8000);
+  };
+
+  const statusColors = { pending: P.muted, notified: P.amber, confirmed: P.teal, testedNegative: P.green };
+  const statusLabels = { pending: t("pending"), notified: t("awaitingResponse"), confirmed: t("contactConfirmed"), testedNegative: t("testedNegative") };
+  const statusIcons = { pending: "○", notified: "◔", confirmed: "◑", testedNegative: "●" };
+
+  return <div style={{flex:1,overflowY:"auto",padding:"28px 16px 100px"}}>
+    <button onClick={onBack} style={{background:"none",border:"none",fontFamily:fnt,fontSize:14,color:P.teal,fontWeight:600,cursor:"pointer",padding:"0 0 16px",display:"block"}}>{t("back")}</button>
+    <h1 style={{fontFamily:fnt,fontSize:28,fontWeight:700,color:P.text,margin:"0 0 8px"}}>{t("partnerAlertsPage")}</h1>
+
+    {alerts.length === 0 && <p style={{fontFamily:fnt,fontSize:14,color:P.muted,marginTop:16}}>No positive results to report.</p>}
+
+    {alerts.map((alert, ai) => (
+      <div key={ai} style={{marginTop:20}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+          <Tag color={P.rose} filled>{alert.sti} +</Tag>
+          <span style={{fontFamily:fnt,fontSize:12,color:P.muted}}>{fdFull(alert.testDate, lang)}</span>
+        </div>
+        <div style={{fontFamily:fnt,fontSize:13,color:P.muted,lineHeight:1.6,marginBottom:16}}>
+          {t("partnerAlertsExplain",{sti:alert.sti})}
+        </div>
+
+        {alert.contacts.length === 0 && (
+          <div style={{fontFamily:fnt,fontSize:13,color:P.muted,fontStyle:"italic",padding:"12px 0"}}>{t("noContactsToNotify")}</div>
+        )}
+
+        {alert.contacts.map(contact => {
+          const key = statusKey(alert.sti, contact.id);
+          const status = getStatus(alert.sti, contact.id);
+          const isPersonal = personal[key];
+          const sc = statusColors[status];
+
+          return <div key={contact.id} style={{background:P.card,borderRadius:16,padding:"16px 18px",marginBottom:10,border:`1px solid ${P.border}`,boxShadow:"0 1px 4px rgba(0,0,0,.04)"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
+              <div>
+                <div style={{fontFamily:fnt,fontWeight:700,fontSize:15,color:P.text}}>{contact.name}</div>
+                <div style={{fontFamily:"monospace",fontSize:10,color:P.muted,marginTop:2}}>{t("anonymousToken")}: {contact.token.slice(0,8)}…</div>
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:6}}>
+                <span style={{fontSize:14,color:sc}}>{statusIcons[status]}</span>
+                <span style={{fontFamily:fnt,fontSize:11,fontWeight:600,color:sc}}>{statusLabels[status]}</span>
+              </div>
+            </div>
+
+            {status === "pending" && !isPersonal && (
+              <Btn onClick={() => sendNotify(alert.sti, contact)} color={P.rose} full small>
+                {t("notifyAnonymously")}
+              </Btn>
+            )}
+
+            {status === "notified" && (
+              <div style={{padding:"10px 14px",borderRadius:10,background:`${P.amber}10`,border:`1px solid ${P.amber}30`,textAlign:"center"}}>
+                <span style={{fontFamily:fnt,fontSize:12,color:P.amber,fontWeight:600}}>{t("awaitingResponse")}</span>
+                <div style={{fontFamily:fnt,fontSize:11,color:P.muted,marginTop:4}}>
+                  {lang === "de" ? "Die Person wurde über den Server informiert" : "The person has been notified via the server"}
+                </div>
+              </div>
+            )}
+
+            {status === "confirmed" && (
+              <div style={{padding:"10px 14px",borderRadius:10,background:`${P.teal}10`,border:`1px solid ${P.teal}30`,textAlign:"center"}}>
+                <span style={{fontFamily:fnt,fontSize:12,color:P.teal,fontWeight:600}}>✓ {t("contactConfirmed")}</span>
+              </div>
+            )}
+
+            {status === "testedNegative" && (
+              <div style={{padding:"10px 14px",borderRadius:10,background:`${P.green}10`,border:`1px solid ${P.green}30`,textAlign:"center"}}>
+                <span style={{fontFamily:fnt,fontSize:12,color:P.green,fontWeight:600}}>✓ {t("testedNegative")}</span>
+              </div>
+            )}
+
+            <div style={{marginTop:10}}>
+              <Checkbox checked={!!isPersonal} onChange={v=>setPersonal(p=>({...p,[key]:v}))} label={t("notifiedPersonally")} color={P.green}/>
+            </div>
+          </div>;
+        })}
+
+        {alert.hasAnonymous && (
+          <div style={{fontFamily:fnt,fontSize:12,color:P.muted,fontStyle:"italic",padding:"8px 0"}}>
+            {lang === "de" ? "Hinweis: Einige Einträge waren anonym und können nicht benachrichtigt werden." : "Note: Some entries were anonymous and cannot be notified."}
+          </div>
+        )}
+      </div>
+    ))}
+  </div>;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RISK CARD
+// ═══════════════════════════════════════════════════════════════
+function RiskCard({name,data}) {
+  const {t}=useLang();
+  const [open,setOpen]=useState(false);
+  const [reminded,setReminded]=useState(false);
+  const color=riskColor(data.mr);
+  return <div style={{background:P.card,borderRadius:14,border:`1px solid ${P.border}`,overflow:"hidden",marginBottom:10,boxShadow:"0 1px 4px rgba(0,0,0,.04)"}}>
+    <div onClick={()=>setOpen(o=>!o)} style={{display:"flex",alignItems:"center",gap:12,padding:"14px 16px",cursor:"pointer"}}>
+      <div style={{width:3,height:42,borderRadius:2,background:color,flexShrink:0}}/>
+      <div style={{flex:1,minWidth:0}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:3,flexWrap:"wrap"}}>
+          <span style={{fontFamily:fnt,fontWeight:600,fontSize:14,color:P.text}}>{name}</span>
+          {data.isPositive&&<Tag color={P.rose} small filled>{t("positive")}</Tag>}
+          {data.highPrev&&<Tag color={P.amber} small>{t("highPrevalence")}</Tag>}
+        </div>
+        <div style={{fontFamily:fnt,fontSize:11,color:P.muted}}>
+          {data.testable?<span style={{color:P.green,fontWeight:600}}>{t("testableNow")}</span>:t("notYetMeaningful",{n:data.wd-data.days})}
+        </div>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:4}}>
+        <Tag color={color}>{t(data.mr)}</Tag>
+        {data.allP&&<span style={{fontFamily:fnt,fontSize:10,color:P.green}}>{t("allProtected")}</span>}
+      </div>
+      <span style={{color:P.muted,fontSize:12,marginLeft:4,transition:"transform .2s",transform:open?"rotate(180deg)":"none"}}>▾</span>
+    </div>
+    {!data.testable&&<div style={{padding:"0 16px 12px"}}>
+      <div style={{position:"relative",height:6,borderRadius:3,background:P.cardEl,overflow:"visible"}}>
+        <div style={{height:"100%",width:`${data.wPct*100}%`,background:color,borderRadius:3,transition:"width .4s ease"}}/>
+        <div style={{position:"absolute",right:-1,top:-3,width:12,height:12,borderRadius:"50%",background:P.green,border:`2.5px solid ${P.card}`,boxShadow:"0 0 0 1px "+P.green+"40"}}/>
+      </div>
+      <div style={{display:"flex",justifyContent:"space-between",marginTop:6}}>
+        <span style={{fontFamily:fnt,fontSize:10,color:P.muted}}>{data.days}d / {data.wd}d</span>
+        <span style={{fontFamily:fnt,fontSize:10,color:P.muted}}>{t("exposures",{n:data.n,s:data.n>1?"s":""})}</span>
+      </div>
+    </div>}
+    {!data.testable&&!open&&<div style={{padding:"0 16px 12px"}}>
+      <button onClick={e=>{e.stopPropagation();setReminded(true);}} style={{ width:"100%",padding:"8px",borderRadius:8, background:reminded?`${P.green}12`:P.cardEl, border:`1px solid ${reminded?P.green:P.border}`, fontFamily:fnt,fontSize:12,color:reminded?P.green:P.muted,fontWeight:500,cursor:"pointer" }}>{reminded?t("reminderSet"):t("notifyWhenReady")}</button>
+    </div>}
+    {open&&<div style={{padding:"0 16px 16px",borderTop:`1px solid ${P.border}`}}>
+      <div style={{fontFamily:fnt,fontSize:12,color:P.muted,margin:"12px 0 4px"}}>{t("exposures",{n:data.n,s:data.n>1?"s":""})}</div>
+      <div style={{fontFamily:fnt,fontSize:11,fontWeight:600,color:P.muted,marginTop:14,marginBottom:8,letterSpacing:"0.06em",textTransform:"uppercase"}}>{t("symptoms")}</div>
+      {data.sym.map((s,i)=><div key={i} style={{display:"flex",gap:8,alignItems:"flex-start",marginBottom:7}}>
+        <span style={{color,fontSize:8,marginTop:4,flexShrink:0}}>●</span>
+        <span style={{fontFamily:fnt,fontSize:12,color:P.text,lineHeight:1.55}}>{s}</span>
+      </div>)}
+      <a href={WIKI_LINKS[name]} target="_blank" rel="noopener noreferrer" style={{fontFamily:fnt,fontSize:12,color:P.teal,fontWeight:600,textDecoration:"none",display:"inline-block",marginTop:6}}>{t("moreInfo")}</a>
+    </div>}
+  </div>;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════════
+function DashboardView({intercourse,tests,vaccinations,contacts,country,onOpenAlerts}) {
+  const {t,lang}=useLang();
+  const {lastTest,risks,lastTestedMap}=calcRisks(intercourse,tests,vaccinations,country);
+  const exposed=Object.entries(risks).filter(([,r])=>r.exposed&&RO[r.mr]>RO["negligible"]);
+  const testNow=exposed.filter(([,r])=>r.testable);
+  const daysSinceTest=lastTest?Math.floor((new Date()-toDate(lastTest.date))/86400000):null;
+  const alerts = getNotifiableContacts(tests, intercourse, contacts);
+  const hasAlerts = alerts.length > 0;
+
+  return <div style={{flex:1,overflowY:"auto",padding:"28px 16px 100px"}}>
+    <div style={{marginBottom:24}}>
+      <h1 style={{fontFamily:fnt,fontSize:28,fontWeight:700,color:P.text,margin:"0 0 4px"}}>{t("dashboard")}</h1>
+      <p style={{fontFamily:fnt,fontSize:13,color:P.muted,margin:0}}>{new Date().toLocaleDateString(lang==="de"?"de-DE":"en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}</p>
+    </div>
+
+    {/* Status banner */}
+    {(()=>{
+      if(testNow.length>0) return <div style={{background:`${P.rose}0C`,border:`1px solid ${P.rose}35`,borderRadius:16,padding:"16px 18px",marginBottom:18,display:"flex",alignItems:"center",gap:14}}>
+        <div style={{width:40,height:40,borderRadius:12,background:`${P.rose}18`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>⚠</div>
+        <div><div style={{fontFamily:fnt,fontWeight:700,fontSize:15,color:P.rose,marginBottom:2}}>{t("testingRecommended")}</div>
+        <div style={{fontFamily:fnt,fontSize:12,color:P.muted}}>{t("testingRecommendedSub",{n:testNow.length,s:testNow.length>1?"s":""})}</div></div>
+      </div>;
+      if(exposed.length>0) return <div style={{background:`${P.amber}0C`,border:`1px solid ${P.amber}35`,borderRadius:16,padding:"16px 18px",marginBottom:18,display:"flex",alignItems:"center",gap:14}}>
+        <div style={{width:40,height:40,borderRadius:12,background:`${P.amber}18`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>⏳</div>
+        <div><div style={{fontFamily:fnt,fontWeight:700,fontSize:15,color:P.amber,marginBottom:2}}>{t("windowPeriod")}</div>
+        <div style={{fontFamily:fnt,fontSize:12,color:P.muted}}>{t("windowPeriodSub")}</div></div>
+      </div>;
+      return <div style={{background:`${P.green}0C`,border:`1px solid ${P.green}35`,borderRadius:16,padding:"16px 18px",marginBottom:18,display:"flex",alignItems:"center",gap:14}}>
+        <div style={{width:40,height:40,borderRadius:12,background:`${P.green}18`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0}}>✓</div>
+        <div><div style={{fontFamily:fnt,fontWeight:700,fontSize:15,color:P.green,marginBottom:2}}>{t("allClear")}</div>
+        <div style={{fontFamily:fnt,fontSize:12,color:P.muted}}>{t("allClearSub")}</div></div>
+      </div>;
+    })()}
+
+    {/* Partner Alerts button */}
+    {hasAlerts && (
+      <button onClick={onOpenAlerts} style={{
+        width:"100%", padding:"14px 18px", borderRadius:16, marginBottom:18,
+        background:`${P.rose}08`, border:`1.5px solid ${P.rose}40`,
+        display:"flex", alignItems:"center", gap:14, cursor:"pointer",
+        transition:"background .15s"
+      }}>
+        <div style={{width:40,height:40,borderRadius:12,background:`${P.rose}18`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+          <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={P.rose} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/></svg>
+        </div>
+        <div style={{flex:1,textAlign:"left"}}>
+          <div style={{fontFamily:fnt,fontWeight:700,fontSize:14,color:P.rose}}>{t("partnerAlerts")}</div>
+          <div style={{fontFamily:fnt,fontSize:12,color:P.muted}}>{t("partnerAlertsSub")}</div>
+        </div>
+        <span style={{color:P.rose,fontSize:18}}>›</span>
+      </button>
+    )}
+
+    {/* Last test */}
+    <div style={{fontFamily:fnt,fontSize:11,fontWeight:600,color:P.muted,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:10}}>{t("lastTest")}</div>
+    {lastTest?<div style={{background:P.card,borderRadius:16,padding:"16px 18px",marginBottom:24,border:`1px solid ${P.border}`,boxShadow:"0 1px 4px rgba(0,0,0,.04)"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
+        <div><div style={{fontFamily:fnt,fontWeight:700,fontSize:15,color:P.text,marginBottom:3}}>{lastTest.fac}</div>
+        <div style={{fontFamily:fnt,fontSize:12,color:P.muted}}>{fdFull(lastTest.date,lang)} · #{lastTest.num}</div></div>
+        <div style={{fontFamily:fnt,fontSize:12,color:P.teal,fontWeight:600}}>{t("daysAgo",{n:daysSinceTest})}</div>
+      </div>
+      <div style={{display:"flex",flexDirection:"column",gap:6}}>
+        {STI_NAMES.map(sti=>{const info=lastTestedMap[sti];const isR=risks[sti]?.exposed&&RO[risks[sti]?.mr]>RO["negligible"];
+          return <div key={sti} style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <span style={{fontFamily:fnt,fontSize:12,color:isR?P.text:P.muted,fontWeight:isR?600:400}}>{sti}</span>
+            <span style={{fontFamily:fnt,fontSize:11,color:info?(info.result==="positive"?P.rose:P.muted):P.muted}}>{info?fdFull(info.date,lang):t("notTested")}{info?.result==="positive"&&" ⚠"}</span>
+          </div>;
+        })}
+      </div>
+    </div>:<div style={{background:P.card,borderRadius:16,padding:"16px 18px",marginBottom:24,border:`1px solid ${P.border}`}}>
+      <div style={{fontFamily:fnt,fontSize:13,color:P.muted}}>{t("noTests")}</div>
+    </div>}
+
+    {/* Risk cards */}
+    {exposed.length>0&&<>
+      <div style={{fontFamily:fnt,fontSize:11,fontWeight:600,color:P.muted,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:10}}>
+        {t("riskAssessment")} · <span style={{fontWeight:400}}>{t("sinceLastTest")} · {t("tapExpand")}</span>
+      </div>
+      {exposed.sort(([,a],[,b])=>RO[b.mr]-RO[a.mr]).map(([name,data])=><RiskCard key={name} name={name} data={data}/>)}
+    </>}
+  </div>;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CALENDAR
+// ═══════════════════════════════════════════════════════════════
+function CalendarView({intercourse,tests,vaccinations,contacts,onEdit}) {
+  const {t,lang}=useLang();
+  const today=new Date();
+  const [yr,setYr]=useState(today.getFullYear());
+  const [mo,setMo]=useState(today.getMonth());
+  const [animKey,setAnimKey]=useState(0);
+  const [selected,setSelected]=useState(null);
+  const txRef=useRef(null);
+  const months=t("months"); const daysShort=t("daysShort");
+  const changeMonth=dir=>{setAnimKey(k=>k+1);if(dir>0){if(mo===11){setMo(0);setYr(y=>y+1);}else setMo(m=>m+1);}else{if(mo===0){setMo(11);setYr(y=>y-1);}else setMo(m=>m-1);}};
+  const daysInMonth=new Date(yr,mo+1,0).getDate();
+  let startDow=new Date(yr,mo,1).getDay(); startDow=startDow===0?6:startDow-1;
+  const cells=[...Array(startDow).fill(null),...Array.from({length:daysInMonth},(_,i)=>i+1)];
+  const dateStr=d=>`${yr}-${String(mo+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+  const isToday=d=>d===today.getDate()&&mo===today.getMonth()&&yr===today.getFullYear();
+  const dayHas=d=>{const s=dateStr(d);return{ic:intercourse.some(e=>e.date===s),te:tests.some(e=>e.date===s),vx:vaccinations.some(e=>e.date===s||e.startDate===s)};};
+
+  return <div style={{flex:1,overflowY:"auto",padding:"28px 16px 100px"}}>
+    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:24}}>
+      <h1 style={{margin:0,fontFamily:fnt,fontSize:28,fontWeight:700,color:P.text}}>{months[mo]}<span style={{color:P.muted,fontWeight:300}}> {yr}</span></h1>
+      <div style={{display:"flex",gap:6}}>
+        {["←","→"].map((a,i)=><button key={a} onClick={()=>changeMonth(i===0?-1:1)} style={{ width:36,height:36,borderRadius:10,background:P.card,border:`1px solid ${P.border}`, color:P.text,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center", boxShadow:"0 1px 3px rgba(0,0,0,.04)" }}>{a}</button>)}
+      </div>
+    </div>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(7, 1fr)",marginBottom:6}}>
+      {daysShort.map(d=><div key={d} style={{textAlign:"center",fontFamily:fnt,fontSize:11,fontWeight:600,color:P.muted,letterSpacing:"0.05em",paddingBottom:8}}>{d}</div>)}
+    </div>
+    <div key={animKey} style={{display:"grid",gridTemplateColumns:"repeat(7, 1fr)",gap:3,animation:"calIn .22s ease"}}
+      onTouchStart={e=>{txRef.current=e.touches[0].clientX;}}
+      onTouchEnd={e=>{if(!txRef.current)return;const dx=e.changedTouches[0].clientX-txRef.current;if(Math.abs(dx)>45)changeMonth(dx<0?1:-1);txRef.current=null;}}>
+      {cells.map((d,i)=>{
+        if(!d) return <div key={`e${i}`}/>;
+        const evs=dayHas(d); const hasAny=evs.ic||evs.te||evs.vx;
+        return <div key={dateStr(d)} onClick={()=>hasAny&&setSelected(dateStr(d))} style={{
+          aspectRatio:"1",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
+          borderRadius:12,cursor:hasAny?"pointer":"default",position:"relative",
+          background:isToday(d)?P.teal+"12":"transparent",
+          border:isToday(d)?`1.5px solid ${P.teal}50`:"1.5px solid transparent",transition:"background .15s"
+        }}>
+          <span style={{fontFamily:fnt,fontSize:13,fontWeight:isToday(d)?700:400,color:isToday(d)?P.teal:P.text}}>{d}</span>
+          {hasAny&&<div style={{display:"flex",gap:2,position:"absolute",bottom:4}}>
+            {evs.ic&&<Dot color={P.rose} size={5}/>}{evs.te&&<Dot color={P.teal} size={5}/>}{evs.vx&&<Dot color={P.amber} size={5}/>}
+          </div>}
+        </div>;
+      })}
+    </div>
+    <div style={{display:"flex",gap:20,marginTop:20,padding:"12px 16px",background:P.card,borderRadius:14,border:`1px solid ${P.border}`}}>
+      {[[P.rose,t("legend_intercourse")],[P.teal,t("legend_test")],[P.amber,t("legend_vaccination")]].map(([color,label])=>
+        <div key={label} style={{display:"flex",alignItems:"center",gap:7}}><Dot color={color} size={8}/><span style={{fontFamily:fnt,fontSize:12,color:P.muted}}>{label}</span></div>
+      )}
+    </div>
+    {selected&&<DaySheet date={selected} intercourse={intercourse} tests={tests} vaccinations={vaccinations} contacts={contacts} onClose={()=>setSelected(null)} onEdit={(type,data)=>{setSelected(null);onEdit(type,data);}} lang={lang}/>}
+  </div>;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SETTINGS
+// ═══════════════════════════════════════════════════════════════
+function SettingsView({country,setCountry,lang,setLang,notifs,setNotifs,lock,setLock,onExport,onDeleteAll}) {
+  const {t}=useLang();
+  const sections=[
+    {label:t("general"),items:[
+      {type:"select",label:t("language"),value:lang,onChange:setLang,options:[{value:"en",label:"English"},{value:"de",label:"Deutsch"}]},
+      {type:"select",label:t("region"),sub:t("regionSub"),value:country,onChange:setCountry,options:COUNTRIES.map(c=>({value:c,label:c}))},
+      {type:"toggle",label:t("testReminders"),sub:t("testRemindersSub"),value:notifs,onChange:setNotifs},
+      {type:"toggle",label:t("appLock"),sub:t("appLockSub"),value:lock,onChange:setLock},
+    ]},
+    {label:t("data"),items:[
+      {type:"action",label:t("exportData"),sub:t("exportDataSub"),icon:"↓",onClick:onExport},
+      {type:"action",label:t("deleteAllData"),sub:t("deleteAllDataSub"),icon:"⊗",danger:true,onClick:onDeleteAll},
+    ]},
+    {label:t("about"),items:[
+      {type:"info",label:t("version"),value:"0.2.0 prototype"},
+      {type:"info",label:t("storage"),value:t("storageValue")},
+      {type:"action",label:t("medicalDisclaimer"),sub:t("medicalDisclaimerSub"),icon:"›"},
+    ]},
+  ];
+  return <div style={{flex:1,overflowY:"auto",padding:"28px 16px 100px"}}>
+    <h1 style={{fontFamily:fnt,fontSize:28,fontWeight:700,color:P.text,margin:"0 0 24px"}}>{t("settings")}</h1>
+    {sections.map(section=><div key={section.label} style={{marginBottom:24}}>
+      <div style={{fontFamily:fnt,fontSize:11,fontWeight:600,color:P.muted,letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:10}}>{section.label}</div>
+      <div style={{background:P.card,borderRadius:16,overflow:"hidden",border:`1px solid ${P.border}`,boxShadow:"0 1px 4px rgba(0,0,0,.04)"}}>
+        {section.items.map((item,i)=><div key={item.label} onClick={item.onClick} style={{
+          padding:"14px 18px",borderBottom:i<section.items.length-1?`1px solid ${P.border}`:"none",
+          display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,
+          cursor:item.onClick?"pointer":"default"
+        }}>
+          <div style={{flex:1}}>
+            <div style={{fontFamily:fnt,fontSize:14,fontWeight:500,color:item.danger?P.rose:P.text}}>{item.label}</div>
+            {item.sub&&<div style={{fontFamily:fnt,fontSize:12,color:P.muted,marginTop:2,lineHeight:1.4}}>{item.sub}</div>}
+          </div>
+          {item.type==="select"&&<select value={item.value} onChange={e=>item.onChange(e.target.value)} style={{
+            background:P.cardEl,border:`1px solid ${P.border}`,borderRadius:8,
+            color:P.text,fontFamily:fnt,fontSize:12,padding:"6px 10px",cursor:"pointer",outline:"none",maxWidth:150
+          }}>{item.options.map(o=>typeof o==="string"?<option key={o} value={o}>{o}</option>:<option key={o.value} value={o.value}>{o.label}</option>)}</select>}
+          {item.type==="toggle"&&<Toggle value={item.value} onChange={item.onChange}/>}
+          {item.type==="info"&&<span style={{fontFamily:fnt,fontSize:12,color:P.muted,textAlign:"right",maxWidth:160}}>{item.value}</span>}
+          {item.type==="action"&&<span style={{color:item.danger?P.rose:P.muted,fontSize:16,flexShrink:0}}>{item.icon}</span>}
+        </div>)}
+      </div>
+    </div>)}
+  </div>;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// FAB — expandable with 4 sub-actions
+// ═══════════════════════════════════════════════════════════════
+function FAB({onAdd}) {
+  const {t} = useLang();
+  const [open, setOpen] = useState(false);
+  const items = [
+    { id:"intercourse", color:P.rose, label:t("intercourse"), icon:<svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> },
+    { id:"test", color:P.teal, label:t("testEntry"), icon:<svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> },
+    { id:"contact", color:"#6B6B80", label:t("contact"), icon:<svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
+    { id:"vaccination", color:P.amber, label:t("vaccination"), icon:<svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> },
+  ];
+
+  return <>
+    {/* Backdrop when open */}
+    {open && <div onClick={()=>setOpen(false)} style={{position:"fixed",inset:0,zIndex:38,background:"rgba(0,0,0,.15)"}}/>}
+
+    {/* Sub-buttons */}
+    {open && items.map((item, i) => (
+      <button key={item.id} onClick={()=>{setOpen(false);onAdd(item.id);}}
+        style={{
+          position:"fixed", bottom: 80 + (i+1)*58, right:"calc(50% - 195px)",
+          width:44, height:44, borderRadius:14,
+          background:item.color, border:"none", color:"#fff",
+          cursor:"pointer", boxShadow:`0 3px 12px ${item.color}40`,
+          zIndex:39, display:"flex", alignItems:"center", justifyContent:"center",
+          animation:`fabItem .2s ease ${i*0.04}s both`,
+        }}>
+        {item.icon}
+      </button>
+    ))}
+    {/* Labels */}
+    {open && items.map((item, i) => (
+      <div key={`l-${item.id}`} style={{
+        position:"fixed", bottom: 80 + (i+1)*58 + 10, right:"calc(50% - 195px + 54px)",
+        fontFamily:fnt, fontSize:12, fontWeight:600, color:P.text,
+        background:P.card, padding:"4px 10px", borderRadius:8,
+        boxShadow:"0 2px 8px rgba(0,0,0,.1)", zIndex:39,
+        animation:`fabItem .2s ease ${i*0.04}s both`, whiteSpace:"nowrap",
+      }}>
+        {item.label}
+      </div>
+    ))}
+
+    {/* Main FAB */}
+    <button onClick={()=>setOpen(o=>!o)} style={{
+      position:"fixed", bottom:76, right:"calc(50% - 195px)", width:52, height:52, borderRadius:16,
+      background:P.teal, border:"none", color:"#fff", fontSize:26, fontWeight:300,
+      cursor:"pointer", boxShadow:"0 4px 16px rgba(42,149,153,.35)", zIndex:39,
+      display:"flex", alignItems:"center", justifyContent:"center", lineHeight:1,
+      transition:"transform .25s cubic-bezier(.32,.72,0,1)",
+      transform: open ? "rotate(45deg)" : "rotate(0deg)",
+    }}>
+      +
+    </button>
+  </>;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BOTTOM NAV
+// ═══════════════════════════════════════════════════════════════
+function BottomNav({view,setView}) {
+  const {t}=useLang();
+  const tabs=[
+    {id:"dashboard",label:t("dashboard"),icon:<svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>},
+    {id:"calendar",label:t("calendar"),icon:<svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>},
+    {id:"settings",label:t("settings"),icon:<svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>},
+  ];
+  return <nav style={{ position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)", width:"100%",maxWidth:430,background:P.bg+"F0", borderTop:`1px solid ${P.border}`,display:"flex", paddingBottom:"env(safe-area-inset-bottom, 8px)",zIndex:40,backdropFilter:"blur(20px)" }}>
+    {tabs.map(tab=><button key={tab.id} onClick={()=>setView(tab.id)} style={{
+      flex:1,padding:"10px 0 8px",background:"none",border:"none",
+      display:"flex",flexDirection:"column",alignItems:"center",gap:4,
+      cursor:"pointer",color:view===tab.id?P.teal:P.muted,transition:"color .2s"
+    }}>{tab.icon}<span style={{fontFamily:fnt,fontSize:10,letterSpacing:"0.05em",fontWeight:view===tab.id?600:400}}>{tab.label}</span></button>)}
+  </nav>;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// APP
+// ═══════════════════════════════════════════════════════════════
+function App() {
+  const [view,setView]=useState("dashboard");
+  const [lang,setLang]=useState("en");
+  const [country,setCountry]=useState("Germany");
+  const [notifs,setNotifs]=useState(false);
+  const [lock,setLock]=useState(true);
+  const [contacts,setContacts]=useState(INIT_CONTACTS);
+  const [intercourse,setIntercourse]=useState(INIT_INTERCOURSE);
+  const [tests,setTests]=useState(INIT_TESTS);
+  const [vaccinations,setVaccinations]=useState(INIT_VACCINATIONS);
+  const [showAdd,setShowAdd]=useState(null); // null | { tab } for new, or { type, data } for edit
+  const [positivePopup,setPositivePopup]=useState(null); // null or {stis:[...]}
+  const [showAlerts,setShowAlerts]=useState(false);
+  const t=tFn(lang);
+
+  useEffect(()=>{
+    const link=document.createElement("link");link.rel="stylesheet";
+    link.href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap";
+    document.head.appendChild(link);
+    const style=document.createElement("style");
+    style.textContent=`*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}body{background:${P.bg};overflow:hidden;font-family:'DM Sans',sans-serif;}::-webkit-scrollbar{display:none;}button:focus{outline:none;}select option{background:${P.card};}@keyframes calIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@keyframes slideUp{from{transform:translate(-50%,100%)}to{transform:translate(-50%,0)}}@keyframes popIn{from{opacity:0;transform:translate(-50%,-50%) scale(.92)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}@keyframes fabItem{from{opacity:0;transform:translateY(10px) scale(.8)}to{opacity:1;transform:translateY(0) scale(1)}}`;
+    document.head.appendChild(style);
+  },[]);
+
+  const handleSave=(type,data)=>{
+    const update=setter=>setter(prev=>{const idx=prev.findIndex(e=>e.id===data.id);if(idx>=0){const n=[...prev];n[idx]=data;return n;}return[...prev,data];});
+    if(type==="intercourse")update(setIntercourse);else if(type==="test")update(setTests);else if(type==="contact")update(setContacts);else if(type==="vaccination")update(setVaccinations);
+  };
+  const handleDelete=(type,id)=>{
+    const rm=setter=>setter(prev=>prev.filter(e=>e.id!==id));
+    if(type==="intercourse")rm(setIntercourse);else if(type==="test")rm(setTests);else if(type==="contact")rm(setContacts);else if(type==="vaccination")rm(setVaccinations);
+  };
+
+  // Called when AddEditSheet closes (savedData, savedType)
+  const handleSheetClose = (savedData, savedType) => {
+    setShowAdd(null);
+    // Check if a test was just saved with positive results → show popup
+    if (savedType === "test" && savedData?.results) {
+      const positiveStis = Object.entries(savedData.results).filter(([,r])=>r==="positive").map(([k])=>k);
+      if (positiveStis.length > 0) {
+        setPositivePopup({ stis: positiveStis });
+      }
+    }
+  };
+
+  const handleExport=()=>{const d=JSON.stringify({contacts,intercourse,tests,vaccinations},null,2);const b=new Blob([d],{type:"application/json"});const u=URL.createObjectURL(b);const a=document.createElement("a");a.href=u;a.download="sexual-health-data.json";a.click();URL.revokeObjectURL(u);};
+  const handleDeleteAll=()=>{if(confirm(lang==="de"?"Alle Daten unwiderruflich löschen?":"Permanently delete all data?")){setContacts([]);setIntercourse([]);setTests([]);setVaccinations([]);}};
+
+  const alerts = getNotifiableContacts(tests, intercourse, contacts);
+
+  return <LangContext.Provider value={{lang,t}}>
+    <div style={{display:"flex",flexDirection:"column",height:"100vh",maxWidth:430,margin:"0 auto",background:P.bg,position:"relative",overflow:"hidden"}}>
+      {/* Partner Alerts is a full-page overlay */}
+      {showAlerts ? (
+        <PartnerAlertsView alerts={alerts} onBack={()=>setShowAlerts(false)}/>
+      ) : (<>
+        {view==="dashboard"&&<DashboardView intercourse={intercourse} tests={tests} vaccinations={vaccinations} contacts={contacts} country={country} onOpenAlerts={()=>setShowAlerts(true)}/>}
+        {view==="calendar"&&<CalendarView intercourse={intercourse} tests={tests} vaccinations={vaccinations} contacts={contacts} onEdit={(type,data)=>setShowAdd({type,data})}/>}
+        {view==="settings"&&<SettingsView country={country} setCountry={setCountry} lang={lang} setLang={setLang} notifs={notifs} setNotifs={setNotifs} lock={lock} setLock={setLock} onExport={handleExport} onDeleteAll={handleDeleteAll}/>}
+      </>)}
+      <BottomNav view={view} setView={(v)=>{setShowAlerts(false);setView(v);}}/>
+      {view!=="settings"&&!showAlerts&&<FAB onAdd={(tab)=>setShowAdd({tab})}/>}
+
+      {/* Add/Edit sheet */}
+      {showAdd&&<AddEditSheet
+        onClose={handleSheetClose}
+        onSave={handleSave}
+        onDelete={handleDelete}
+        contacts={contacts}
+        editType={showAdd.type||null}
+        editData={showAdd.data||null}
+        initialTab={showAdd.tab||null}
+      />}
+
+      {/* Positive result popup */}
+      {positivePopup && <PositiveResultPopup
+        stis={positivePopup.stis}
+        onGoToAlerts={()=>{setPositivePopup(null);setView("dashboard");setShowAlerts(true);}}
+        onDismiss={()=>setPositivePopup(null)}
+      />}
+    </div>
+  </LangContext.Provider>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>
