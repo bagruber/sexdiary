@@ -1,3 +1,4 @@
+import { Check } from "lucide-react";
 import { FONT } from "../../theme/tokens";
 import { useApp } from "../../state/store";
 
@@ -43,7 +44,7 @@ export function Checkbox({ checked, onChange, label, color, dim }: Props) {
           flexShrink: 0,
         }}
       >
-        {checked && <span style={{ color: "#fff", fontSize: 13, lineHeight: 1 }}>✓</span>}
+        {checked && <Check size={14} strokeWidth={3} color="#fff" />}
       </div>
       {label && (
         <span style={{ fontFamily: FONT, fontSize: 14, color: palette.text }}>{label}</span>

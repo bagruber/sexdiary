@@ -1,3 +1,4 @@
+import { Stethoscope, Clock, CheckCircle2, type LucideIcon } from "lucide-react";
 import { FONT } from "../../theme/tokens";
 import { useApp } from "../../state/store";
 
@@ -7,16 +8,17 @@ interface Props {
   secondary: string;
 }
 
-const ICONS = {
-  testable: "🩺",
-  window: "⏳",
-  clear: "✓",
-} as const;
+const ICONS: Record<Props["state"], LucideIcon> = {
+  testable: Stethoscope,
+  window: Clock,
+  clear: CheckCircle2,
+};
 
 export function StatusBanner({ state, primary, secondary }: Props) {
   const { palette } = useApp();
   const color =
     state === "testable" ? palette.green : state === "window" ? palette.amber : palette.green;
+  const Icon = ICONS[state];
   return (
     <div
       style={{
@@ -39,11 +41,10 @@ export function StatusBanner({ state, primary, secondary }: Props) {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: 20,
           flexShrink: 0,
         }}
       >
-        {ICONS[state]}
+        <Icon size={22} color={color} strokeWidth={2} />
       </div>
       <div style={{ minWidth: 0 }}>
         <div

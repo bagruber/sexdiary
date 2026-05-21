@@ -11,12 +11,12 @@ interface Props {
 export function OnboardingView({ onDone }: Props) {
   const { data, dispatch, palette, t } = useApp();
   const [step, setStep] = useState(0);
-  const [lang, setLang] = useState<Lang>(data.prefs.lang);
   const [age, setAge] = useState(data.profile.age);
   const [pa, setPa] = useState<PartnerAnatomy>(data.profile.pa);
+  const lang = data.prefs.lang;
+  const setLang = (l: Lang) => dispatch({ type: "updatePrefs", patch: { lang: l } });
 
   const finish = () => {
-    dispatch({ type: "updatePrefs", patch: { lang } });
     dispatch({ type: "updateProfile", patch: { age, pa } });
     dispatch({ type: "setOnboarded", value: true });
     onDone();

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ChevronDown, Check, ExternalLink } from "lucide-react";
 import { FONT, shadow } from "../../theme/tokens";
 import { riskColor } from "../../theme/palette";
 import { Tag } from "../ui";
@@ -92,9 +93,12 @@ export function RiskCard({ name, data }: Props) {
               fontWeight: isT ? 700 : 400,
             }}
           >
-            {isT
-              ? t("testableNow")
-              : t("notYetMeaningful", { n: (data.wd ?? 0) - (data.days ?? 0) })}
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+              {isT && <Check size={12} strokeWidth={3} />}
+              {isT
+                ? t("testableNow")
+                : t("notYetMeaningful", { n: (data.wd ?? 0) - (data.days ?? 0) })}
+            </span>
           </div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
@@ -115,13 +119,13 @@ export function RiskCard({ name, data }: Props) {
         <span
           style={{
             color: palette.muted,
-            fontSize: 12,
             marginLeft: 4,
+            display: "inline-flex",
             transition: "transform .2s",
             transform: open ? "rotate(180deg)" : "none",
           }}
         >
-          ▾
+          <ChevronDown size={16} />
         </span>
       </div>
       {!isT && (
@@ -221,7 +225,16 @@ export function RiskCard({ name, data }: Props) {
                 marginBottom: 8,
               }}
             >
-              <span style={{ color, fontSize: 8, marginTop: 5, flexShrink: 0 }}>●</span>
+              <span
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: "50%",
+                  background: color,
+                  marginTop: 6,
+                  flexShrink: 0,
+                }}
+              />
               <span style={{ fontFamily: FONT, fontSize: 13, color: palette.text, lineHeight: 1.55 }}>
                 {s}
               </span>
@@ -237,11 +250,14 @@ export function RiskCard({ name, data }: Props) {
               color: palette.teal,
               fontWeight: 600,
               textDecoration: "none",
-              display: "inline-block",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
               marginTop: 4,
             }}
           >
             {t("moreInfo")}
+            <ExternalLink size={12} />
           </a>
         </div>
       )}

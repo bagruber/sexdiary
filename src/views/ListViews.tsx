@@ -1,3 +1,4 @@
+import { ChevronLeft } from "lucide-react";
 import { FONT, shadow } from "../theme/tokens";
 import { Tag } from "../components/ui";
 import { useApp } from "../state/store";
@@ -9,7 +10,7 @@ interface BaseProps {
 }
 
 function BackHeader({ onBack, title }: { onBack: () => void; title: string }) {
-  const { palette } = useApp();
+  const { palette, t } = useApp();
   return (
     <>
       <button
@@ -23,11 +24,14 @@ function BackHeader({ onBack, title }: { onBack: () => void; title: string }) {
           fontWeight: 600,
           cursor: "pointer",
           padding: "0 0 16px",
-          display: "block",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 4,
           minHeight: 44,
         }}
       >
-        ← Back
+        <ChevronLeft size={16} />
+        {t("back")}
       </button>
       <h1
         style={{

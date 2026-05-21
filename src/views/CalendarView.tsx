@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { FONT, shadow } from "../theme/tokens";
 import { Dot } from "../components/ui";
 import { DaySheet } from "../components/sheets/DaySheet";
@@ -81,28 +82,30 @@ export function CalendarView({ onEdit }: Props) {
           <span style={{ color: palette.muted, fontWeight: 300 }}> {yr}</span>
         </h1>
         <div style={{ display: "flex", gap: 6 }}>
-          {(["←", "→"] as const).map((a, i) => (
-            <button
-              key={a}
-              onClick={() => changeMonth(i === 0 ? -1 : 1)}
-              style={{
-                width: 38,
-                height: 38,
-                borderRadius: 10,
-                background: palette.card,
-                border: `1px solid ${palette.border}`,
-                color: palette.text,
-                fontSize: 14,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                boxShadow: shadow(isDark),
-              }}
-            >
-              {a}
-            </button>
-          ))}
+          {[-1, 1].map((dir) => {
+            const Icon = dir === -1 ? ChevronLeft : ChevronRight;
+            return (
+              <button
+                key={dir}
+                onClick={() => changeMonth(dir as 1 | -1)}
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: 10,
+                  background: palette.card,
+                  border: `1px solid ${palette.border}`,
+                  color: palette.text,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: shadow(isDark),
+                }}
+              >
+                <Icon size={18} />
+              </button>
+            );
+          })}
         </div>
       </div>
 

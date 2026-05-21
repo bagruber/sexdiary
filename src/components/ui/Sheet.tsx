@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { X } from "lucide-react";
 import { FONT, shadowLg } from "../../theme/tokens";
 import { useApp } from "../../state/store";
 
@@ -85,9 +86,7 @@ export function Sheet({ onClose, children, title }: Props) {
                 background: "none",
                 border: "none",
                 color: palette.muted,
-                fontSize: 24,
                 cursor: "pointer",
-                lineHeight: 1,
                 padding: 8,
                 minWidth: 44,
                 minHeight: 44,
@@ -96,7 +95,7 @@ export function Sheet({ onClose, children, title }: Props) {
                 justifyContent: "center",
               }}
             >
-              ×
+              <X size={22} />
             </button>
           </div>
         )}

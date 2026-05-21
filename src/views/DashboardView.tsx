@@ -1,3 +1,4 @@
+import { AlertTriangle, Bell, ChevronRight } from "lucide-react";
 import { FONT, shadow } from "../theme/tokens";
 import { useApp } from "../state/store";
 import { calcRisk, getAlerts, type RiskData } from "../lib/risk";
@@ -20,6 +21,7 @@ export function DashboardView({ onAlerts }: Props) {
     data.tests,
     data.vaccinations,
     data.prefs.country,
+    data.profile.conditions,
   );
   const lang = data.prefs.lang;
 
@@ -116,18 +118,7 @@ export function DashboardView({ onAlerts }: Props) {
               flexShrink: 0,
             }}
           >
-            <svg
-              width={20}
-              height={20}
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke={palette.rose}
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0" />
-            </svg>
+            <Bell size={20} color={palette.rose} strokeWidth={2} />
           </div>
           <div style={{ flex: 1, textAlign: "left" }}>
             <div
@@ -144,7 +135,7 @@ export function DashboardView({ onAlerts }: Props) {
               {t("partnerAlertsSub")}
             </div>
           </div>
-          <span style={{ color: palette.rose, fontSize: 18 }}>›</span>
+          <ChevronRight size={18} color={palette.rose} />
         </button>
       )}
 
@@ -235,6 +226,9 @@ export function DashboardView({ onAlerts }: Props) {
                     </span>
                     <span
                       style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 4,
                         fontFamily: FONT,
                         fontSize: 11,
                         color: info
@@ -245,7 +239,9 @@ export function DashboardView({ onAlerts }: Props) {
                       }}
                     >
                       {info ? formatDate(info.date, lang) : t("notTested")}
-                      {info?.result === "positive" && " ⚠"}
+                      {info?.result === "positive" && (
+                        <AlertTriangle size={11} color={palette.rose} />
+                      )}
                     </span>
                   </div>
                 );

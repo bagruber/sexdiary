@@ -1,3 +1,4 @@
+import { Pill, Zap, Shield, ShieldCheck, type LucideIcon } from "lucide-react";
 import { FONT, shadow } from "../../theme/tokens";
 import { useApp } from "../../state/store";
 import { summarizeProtections } from "../../lib/risk";
@@ -7,11 +8,11 @@ import { SectionLabel } from "../ui/Labels";
 export function ProtectionsStrip() {
   const { data, palette, isDark, t } = useApp();
   const summary = summarizeProtections(data.vaccinations, today());
-  const items: { icon: string; label: string; sub: string; color: string }[] = [];
+  const items: { Icon: LucideIcon; label: string; sub: string; color: string }[] = [];
 
   if (summary.prep.active) {
     items.push({
-      icon: "💊",
+      Icon: Pill,
       label: t("prepActive"),
       sub: summary.prep.since ? t("prepActiveSub", { date: summary.prep.since }) : "",
       color: palette.teal,
@@ -19,7 +20,7 @@ export function ProtectionsStrip() {
   }
   if (summary.doxy.recent) {
     items.push({
-      icon: "⚡",
+      Icon: Zap,
       label: t("doxyRecent"),
       sub: t("doxyRecentSub"),
       color: palette.amber,
@@ -27,7 +28,7 @@ export function ProtectionsStrip() {
   }
   for (const v of summary.vaccines) {
     items.push({
-      icon: "🛡",
+      Icon: v.status === "immune" ? ShieldCheck : Shield,
       label: v.sti,
       sub: v.status === "immune" ? t("immune") : `${t("partial")} (${v.doses})`,
       color: v.status === "immune" ? palette.green : palette.amber,
@@ -73,11 +74,10 @@ export function ProtectionsStrip() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: 16,
                 flexShrink: 0,
               }}
             >
-              {it.icon}
+              <it.Icon size={16} color={it.color} strokeWidth={2.2} />
             </div>
             <div style={{ minWidth: 0 }}>
               <div

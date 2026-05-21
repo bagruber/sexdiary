@@ -17,6 +17,7 @@ import { toDate } from "./date";
 export interface RiskData {
   exposed: boolean;
   vaccinated?: boolean;
+  preexisting?: boolean;
   testable?: boolean;
   wPct?: number;
   days?: number;
@@ -76,6 +77,7 @@ export function calcRisk(
   te: TestRecord[],
   vx: Vaccination[],
   country: string,
+  conditions: string[] = [],
 ): RiskReport {
   const todayDate = new Date();
   const sorted = [...te].sort(
@@ -102,8 +104,13 @@ export function calcRisk(
     }
   }
 
+  const condSet = new Set(conditions);
   const risks: Record<string, RiskData> = {};
   for (const [sn, si] of Object.entries(STI_DB)) {
+    if (condSet.has(sn)) {
+      risks[sn] = { exposed: false, preexisting: true };
+      continue;
+    }
     if (vp[sn]) {
       risks[sn] = { exposed: false, vaccinated: true };
       continue;

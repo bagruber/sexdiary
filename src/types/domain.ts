@@ -85,7 +85,7 @@ export interface Vaccination {
 export interface Profile {
   age: string;
   pa: PartnerAnatomy;
-  cond: string;
+  conditions: string[];
 }
 
 export type Lang = "en" | "de";

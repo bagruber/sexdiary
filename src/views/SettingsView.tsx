@@ -1,8 +1,9 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { FONT, shadow } from "../theme/tokens";
-import { SectionLabel, Toggle } from "../components/ui";
+import { SectionLabel, Toggle, Sheet, Checkbox, Button } from "../components/ui";
 import { useApp } from "../state/store";
-import { COUNTRIES } from "../data/stis";
+import { COUNTRIES, STI_NAMES } from "../data/stis";
+import { ChevronRight, Download, Upload, Trash2 } from "lucide-react";
 import type {
   Lang,
   PartnerAnatomy,
@@ -42,6 +43,7 @@ export function SettingsView({
 }: Props) {
   const { data, dispatch, palette, isDark, t } = useApp();
   const { prefs, profile } = data;
+  const [condOpen, setCondOpen] = useState(false);
 
   const updPrefs = (patch: Partial<Preferences>) =>
     dispatch({ type: "updatePrefs", patch });
@@ -217,12 +219,14 @@ export function SettingsView({
           ],
         },
         {
-          type: "input",
+          type: "action",
           label: t("knownConditions"),
-          sub: t("knownConditionsSub"),
-          value: profile.cond === "none" ? "" : profile.cond,
-          onChange: (v) => updProfile({ cond: v || "none" }),
-          placeholder: t("noConditions"),
+          sub:
+            profile.conditions.length > 0
+              ? profile.conditions.join(", ")
+              : t("knownConditionsSub"),
+          icon: <ChevronRight size={16} />,
+          onClick: () => setCondOpen(true),
         },
       ])}
 
@@ -335,35 +339,35 @@ export function SettingsView({
           type: "action",
           label: t("testsList"),
           sub: t("testsListSub"),
-          icon: "›",
+          icon: <ChevronRight size={16} />,
           onClick: onTestsList,
         },
         {
           type: "action",
           label: t("contactsList"),
           sub: t("contactsListSub"),
-          icon: "›",
+          icon: <ChevronRight size={16} />,
           onClick: onContactsList,
         },
         {
           type: "action",
           label: t("exportData"),
           sub: t("exportDataSub"),
-          icon: "↓",
+          icon: <Download size={16} />,
           onClick: onExport,
         },
         {
           type: "action",
           label: t("importData"),
           sub: t("importDataSub"),
-          icon: "↑",
+          icon: <Upload size={16} />,
           onClick: onImport,
         },
         {
           type: "action",
           label: t("deleteAllData"),
           sub: t("deleteAllDataSub"),
-          icon: "⊗",
+          icon: <Trash2 size={16} />,
           danger: true,
           onClick: onDelAll,
         },
@@ -376,9 +380,41 @@ export function SettingsView({
           type: "action",
           label: t("medicalDisclaimer"),
           sub: t("medicalDisclaimerSub"),
-          icon: "›",
+          icon: <ChevronRight size={16} />,
         },
       ])}
+
+      {condOpen && (
+        <Sheet onClose={() => setCondOpen(false)} title={t("knownConditionsTitle")}>
+          <p
+            style={{
+              fontFamily: FONT,
+              fontSize: 13,
+              color: palette.muted,
+              lineHeight: 1.5,
+              marginBottom: 14,
+            }}
+          >
+            {t("knownConditionsHint")}
+          </p>
+          {STI_NAMES.map((s) => (
+            <Checkbox
+              key={s}
+              checked={profile.conditions.includes(s)}
+              onChange={(v) => {
+                const set = new Set(profile.conditions);
+                if (v) set.add(s);
+                else set.delete(s);
+                updProfile({ conditions: [...set] });
+              }}
+              label={s}
+            />
+          ))}
+          <Button onClick={() => setCondOpen(false)} full style={{ marginTop: 18 }}>
+            {t("save")}
+          </Button>
+        </Sheet>
+      )}
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { AlertTriangle } from "lucide-react";
 import { FONT } from "../../theme/tokens";
 import { Modal, Button } from "../ui";
 import { useApp } from "../../state/store";
@@ -22,10 +23,9 @@ export function PositiveResultModal({ stis, onGo, onDismiss }: Props) {
           alignItems: "center",
           justifyContent: "center",
           margin: "0 auto 16px",
-          fontSize: 28,
         }}
       >
-        ⚠
+        <AlertTriangle size={30} color={palette.rose} strokeWidth={2} />
       </div>
       <div
         style={{

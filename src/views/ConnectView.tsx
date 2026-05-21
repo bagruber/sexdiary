@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Camera, Link2, Lock } from "lucide-react";
 import { FONT, shadow } from "../theme/tokens";
 import { Pill, Button } from "../components/ui";
 import { QRCode } from "../components/widgets/QRCode";
@@ -137,7 +138,11 @@ export function ConnectView() {
             }}
           >
             <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-              <span style={{ fontSize: 16, marginTop: 1 }}>{isHandle ? "🔗" : "🔒"}</span>
+              {isHandle ? (
+                <Link2 size={16} color={palette.teal} />
+              ) : (
+                <Lock size={16} color={palette.muted} />
+              )}
               <div>
                 <div
                   style={{
@@ -177,7 +182,10 @@ export function ConnectView() {
             {t("importSub")}
           </p>
           <Button onClick={() => setScannerOpen(true)} full>
-            📷 {t("importScan")}
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+              <Camera size={16} />
+              {t("importScan")}
+            </span>
           </Button>
           <Button onClick={() => setPasteOpen((o) => !o)} outline full>
             {t("importPaste")}

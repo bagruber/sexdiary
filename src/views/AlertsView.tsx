@@ -1,4 +1,12 @@
 import { useEffect, useState } from "react";
+import {
+  Circle,
+  CircleDashed,
+  CircleDot,
+  CheckCircle2,
+  ChevronLeft,
+  type LucideIcon,
+} from "lucide-react";
 import { FONT, shadow } from "../theme/tokens";
 import { Tag, Checkbox, Button } from "../components/ui";
 import { useApp } from "../state/store";
@@ -10,11 +18,11 @@ interface Props {
   onBack: () => void;
 }
 
-const STATUS_ICON: Record<AlertStatus, string> = {
-  pending: "○",
-  notified: "◔",
-  confirmed: "◑",
-  testedNegative: "●",
+const STATUS_ICON: Record<AlertStatus, LucideIcon> = {
+  pending: Circle,
+  notified: CircleDashed,
+  confirmed: CircleDot,
+  testedNegative: CheckCircle2,
 };
 
 export function AlertsView({ onBack }: Props) {
@@ -57,10 +65,13 @@ export function AlertsView({ onBack }: Props) {
           fontWeight: 600,
           cursor: "pointer",
           padding: "0 0 16px",
-          display: "block",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 4,
           minHeight: 44,
         }}
       >
+        <ChevronLeft size={16} />
         {t("back")}
       </button>
       <h1
@@ -118,6 +129,7 @@ export function AlertsView({ onBack }: Props) {
             const status = statusFor(c.token, al.sti);
             const col = STATUS_COLOR[status];
             const pk = personalKey(al.sti, c.id);
+            const Icon = STATUS_ICON[status];
             return (
               <div
                 key={c.id}
@@ -161,9 +173,7 @@ export function AlertsView({ onBack }: Props) {
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <span style={{ fontSize: 14, color: col }}>
-                      {STATUS_ICON[status]}
-                    </span>
+                    <Icon size={14} color={col} strokeWidth={2.2} />
                     <span
                       style={{
                         fontFamily: FONT,
@@ -196,9 +206,13 @@ export function AlertsView({ onBack }: Props) {
                       borderRadius: 12,
                       background: col + "0C",
                       border: `1px solid ${col}30`,
-                      textAlign: "center",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 6,
                     }}
                   >
+                    <Icon size={14} color={col} strokeWidth={2.2} />
                     <span
                       style={{
                         fontFamily: FONT,
@@ -207,7 +221,7 @@ export function AlertsView({ onBack }: Props) {
                         fontWeight: 600,
                       }}
                     >
-                      {STATUS_ICON[status]} {STATUS_LABEL[status]}
+                      {STATUS_LABEL[status]}
                     </span>
                   </div>
                 )}

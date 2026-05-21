@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { RefreshCw } from "lucide-react";
 import { FONT } from "../../theme/tokens";
 import {
   Sheet,
@@ -420,13 +421,15 @@ export function AddEditSheet({
                   background: palette.cardEl,
                   border: `1.5px solid ${palette.border}`,
                   color: palette.muted,
-                  fontSize: 18,
                   cursor: "pointer",
                   flexShrink: 0,
                   minWidth: 44,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                ↻
+                <RefreshCw size={16} />
               </button>
             </div>
           </div>
