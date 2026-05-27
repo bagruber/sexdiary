@@ -158,7 +158,7 @@ function AppShell() {
       style={{
         display: "flex",
         flexDirection: "column",
-        height: "100vh",
+        height: "100dvh",
         maxWidth: 430,
         margin: "0 auto",
         background: palette.bg,
