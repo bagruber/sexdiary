@@ -9,6 +9,7 @@
 export * from "./domain";
 export * from "./stis";
 export * from "./risk";
+export * from "./reducer";
 export * from "./schema";
 export * from "./seed";
 export * from "./storage";
