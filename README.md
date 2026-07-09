@@ -8,6 +8,19 @@ lower the social friction of telling recent contacts to get tested.
 This is a single-person research prototype. It is **not** a product, not
 medically validated, not maintained on a release schedule, and not open
 for outside contribution. There is no license — all rights reserved.
+It is not a medical device and provides no medical advice.
+
+## Repository layout
+
+npm-workspaces monorepo:
+
+| Path | What |
+|------|------|
+| `packages/core` | Platform-free domain logic: risk engine, STI data, import/export schemas, storage envelope (versioning + migrations), i18n. Zero runtime dependencies, unit-tested. This is the audit surface. |
+| `apps/web` | Vite + React web app (UI, localStorage adapter, QR camera/render). |
+| `apps/mobile` | Expo (React Native) app for Android/iOS sharing the same core; encrypted-at-rest storage. |
+| `docs/` | **Build output** of the web app, served by GitHub Pages from `main`. Not documentation. |
+| `notes/` | Project knowledge base: decision log, refactor audit, public-sector compliance notes, roadmap, mobile architecture. |
 
 ## What's inside
 
@@ -24,20 +37,20 @@ for outside contribution. There is no license — all rights reserved.
   for contact exchange or test-result import
 - Mock partner-alert flow with status progression
   (pending → notified → confirmed → tested negative)
-- All data stored locally in `localStorage`; nothing leaves the device
-
-## Stack
-
-- Vite + React + TypeScript
-- `qrcode` for generation, `jsqr` + `getUserMedia` for scanning
-- No server. The "partner alert server" is a localStorage mock.
+- All data stored locally; nothing leaves the device. No third-party
+  requests at runtime (fonts are a system stack by design).
 
 ## Running it
 
 ```bash
-npm install
-npm run dev      # local dev server
-npm run build    # builds to ./docs for GitHub Pages
+npm install          # once, at the repo root (installs all workspaces)
+npm run dev          # web dev server
+npm run build        # typecheck + build web app into ./docs
+npm test             # core unit tests (risk engine, schemas, storage)
+npm run typecheck    # typecheck all workspaces
+
+# mobile (see apps/mobile/README.md)
+npm run start -w @sexdiary/mobile
 ```
 
 GitHub Pages is served from `main` branch, `/docs` folder.
@@ -45,7 +58,9 @@ GitHub Pages is served from `main` branch, `/docs` folder.
 ## QR import schema
 
 External providers can hand a user a QR that imports a test result
-directly. The payload is JSON:
+directly. Payloads are validated (dates, tokens, enum values, size
+caps) before anything enters the store — see
+`packages/core/src/schema.ts`. The payload is JSON:
 
 ```json
 {
