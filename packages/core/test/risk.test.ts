@@ -3,8 +3,10 @@ import {
   calcRisk,
   doxyCoverage,
   getAlerts,
+  nextAction,
   prepActiveOn,
   vaccineProtection,
+  vaccineSeries,
 } from "../src/risk";
 import { dateString, emptyActs } from "../src/index";
 import type {
@@ -152,6 +154,100 @@ describe("calcRisk", () => {
     const { risks } = calcRisk(ic, [], [], "Germany");
     expect(risks.HIV.contactIds).toEqual(["c9"]);
     expect(risks.HIV.n).toBe(2);
+  });
+});
+
+describe("calcRisk — rating explanation", () => {
+  it("reports contributing encounters newest first with their acts", () => {
+    const ic = [
+      encounter("i1", daysAgo(20), ["recAnal", "kissing"], [], "c1"),
+      encounter("i2", daysAgo(3), ["recVag"], ["recVag"], null),
+    ];
+    const { risks } = calcRisk(ic, [], [], "Germany");
+    const c = risks.Gonorrhea.contributions ?? [];
+    expect(c).toHaveLength(2);
+    // newest first
+    expect(c[0].date > c[1].date).toBe(true);
+    // kissing cannot transmit gonorrhea, so it is not listed
+    expect(c[1].acts).toEqual(["recAnal"]);
+    expect(c[1].cid).toBe("c1");
+    expect(c[0].acts).toEqual(["recVag"]);
+    expect(c[0].protectedActs).toEqual(["recVag"]);
+    expect(c[0].level).toBe("high");
+  });
+
+  it("flags doxy-PEP reduction on the encounters it covered", () => {
+    const day = daysAgo(10);
+    const vx = [{ id: "d1", kind: "doxypep" as const, date: day }];
+    const ic = [encounter("i1", day, ["recAnal"])];
+    const { risks } = calcRisk(ic, [], vx, "Germany");
+    expect(risks.Gonorrhea.contributions?.[0].doxyReduced).toBe(true);
+    // HIV is unaffected by doxy-PEP
+    expect(risks.HIV.contributions?.[0].doxyReduced).toBe(false);
+  });
+
+  it("counts PrEP-excluded encounters instead of hiding them", () => {
+    const vx = [
+      { id: "p1", kind: "prep" as const, startDate: daysAgo(60), endDate: null },
+    ];
+    const ic = [encounter("i1", daysAgo(5), ["recAnal"])];
+    const { risks } = calcRisk(ic, [], vx, "Germany");
+    expect(risks.HIV.exposed).toBe(false);
+    expect(risks.HIV.prepExcluded).toBe(1);
+  });
+
+  it("leaves contributions empty when nothing contributed", () => {
+    const { risks } = calcRisk([], [], [], "Germany");
+    expect(risks.HIV.contributions).toBeUndefined();
+  });
+});
+
+describe("nextAction", () => {
+  it("recommends testing when anything is past its window", () => {
+    const ic = [encounter("i1", daysAgo(10), ["recAnal"])];
+    const na = nextAction(calcRisk(ic, [], [], "Germany"));
+    expect(na.kind).toBe("testNow");
+    expect(na.testable).toContain("Gonorrhea");
+  });
+
+  it("reports the soonest closing window when nothing is testable yet", () => {
+    const ic = [encounter("i1", daysAgo(1), ["recAnal"])];
+    const na = nextAction(calcRisk(ic, [], [], "Germany"));
+    expect(na.kind).toBe("wait");
+    // Gonorrhea has the shortest window (7 days)
+    expect(na.soonestSti).toBe("Gonorrhea");
+    expect(na.soonestDays).toBeGreaterThanOrEqual(1);
+    expect(na.soonestDays).toBeLessThanOrEqual(7);
+  });
+
+  it("is all-clear with no exposures", () => {
+    expect(nextAction(calcRisk([], [], [], "Germany")).kind).toBe("allClear");
+  });
+});
+
+describe("vaccineSeries", () => {
+  it("tracks progress toward the recommended dose count", () => {
+    const vx = [
+      { id: "v1", kind: "vaccine" as const, type: "Hep B", date: "2024-01-01" },
+      { id: "v2", kind: "vaccine" as const, type: "Hep B", date: "2024-02-01" },
+    ];
+    const series = vaccineSeries(vx);
+    const hepB = series.find((s) => s.sti === "Hep B");
+    expect(hepB).toEqual({ sti: "Hep B", doses: 2, target: 3, complete: false });
+    const mpox = series.find((s) => s.sti === "Mpox");
+    expect(mpox).toEqual({ sti: "Mpox", doses: 0, target: 2, complete: false });
+  });
+
+  it("caps displayed doses at the target once complete", () => {
+    const vx = [1, 2, 3, 4].map((i) => ({
+      id: `v${i}`,
+      kind: "vaccine" as const,
+      type: "Hep B",
+      date: "2024-01-01",
+    }));
+    const hepB = vaccineSeries(vx).find((s) => s.sti === "Hep B");
+    expect(hepB?.doses).toBe(3);
+    expect(hepB?.complete).toBe(true);
   });
 });
 

@@ -1,7 +1,11 @@
-import { Alert, ScrollView, Text, View } from "react-native";
+import { useState } from "react";
+import { Alert, Modal, ScrollView, Switch, Text, View } from "react-native";
 import type { Lang, Theme } from "@sexdiary/core";
 import { useApp } from "../state/store";
-import { Card, Chip, PrimaryButton, Screen, SectionTitle, Title } from "../ui";
+import { APP_NAME } from "../branding";
+import { Card, Chip, PrimaryButton, Row, Screen, SectionTitle, Title } from "../ui";
+import { DataScreen } from "./DataScreen";
+import { LockScreen } from "./LockScreen";
 
 const THEMES: Theme[] = ["system", "light", "dark"];
 const LANGS: { value: Lang; label: string }[] = [
@@ -11,12 +15,19 @@ const LANGS: { value: Lang; label: string }[] = [
 
 export function SettingsScreen() {
   const { data, dispatch, t, palette } = useApp();
+  const [showData, setShowData] = useState(false);
+  const [settingPin, setSettingPin] = useState(false);
   const lang = data.prefs.lang;
 
   const themeLabel: Record<Theme, string> = {
     system: t("themeSystem"),
     light: t("themeLight"),
     dark: t("themeDark"),
+  };
+
+  const toggleLock = (on: boolean) => {
+    if (on) setSettingPin(true);
+    else dispatch({ type: "updatePrefs", patch: { lockPin: null, lock: false } });
   };
 
   const confirmDeleteAll = () => {
@@ -72,17 +83,52 @@ export function SettingsScreen() {
           </View>
         </Card>
 
+        <SectionTitle>{t("privacy")}</SectionTitle>
+        <Row
+          label={t("appLockSim")}
+          sub={t("appLockSimSub")}
+          right={
+            <Switch
+              value={data.prefs.lockPin !== null}
+              onValueChange={toggleLock}
+              accessibilityLabel={t("appLockSim")}
+            />
+          }
+        />
+        {data.prefs.lockPin !== null && (
+          <Card>
+            <Text style={{ color: palette.sub, fontSize: 12, lineHeight: 17 }}>
+              {t("lockSimWarning")}
+            </Text>
+          </Card>
+        )}
+        <Row
+          label={t("disguiseMode")}
+          sub={t("disguiseModeSub")}
+          right={
+            <Switch
+              value={data.prefs.disguise}
+              onValueChange={(v) =>
+                dispatch({ type: "updatePrefs", patch: { disguise: v } })
+              }
+              accessibilityLabel={t("disguiseMode")}
+            />
+          }
+        />
+        {data.prefs.disguise && (
+          <Card>
+            <Text style={{ color: palette.sub, fontSize: 12, lineHeight: 17 }}>
+              {t("disguiseNote")}
+            </Text>
+          </Card>
+        )}
+
         <SectionTitle>{t("data")}</SectionTitle>
-        <Card>
-          <Text style={{ color: palette.text, fontWeight: "600" }}>
-            {t("storage")}
-          </Text>
-          <Text style={{ color: palette.sub, marginTop: 4, fontSize: 13 }}>
-            {lang === "de"
-              ? "Lokal, AES-256-verschlüsselt. Schlüssel im Geräte-Keystore. Keine Cloud, keine Server."
-              : "Local, AES-256 encrypted. Key held in the device keystore. No cloud, no servers."}
-          </Text>
-        </Card>
+        <Row
+          label={t("yourData")}
+          sub={t("yourDataSub")}
+          onPress={() => setShowData(true)}
+        />
         <PrimaryButton label={t("deleteAllData")} onPress={confirmDeleteAll} danger />
 
         <SectionTitle>{t("about")}</SectionTitle>
@@ -98,11 +144,24 @@ export function SettingsScreen() {
         </Card>
         <Card>
           <Text style={{ color: palette.sub, fontSize: 13 }}>
-            {t("version")} 0.1.0
+            {APP_NAME} · {t("version")} 0.2.0
           </Text>
         </Card>
         <View style={{ height: 24 }} />
       </ScrollView>
+
+      {showData && <DataScreen onClose={() => setShowData(false)} />}
+
+      <Modal visible={settingPin} animationType="slide" onRequestClose={() => setSettingPin(false)}>
+        <LockScreen
+          initialMode="set"
+          onPinSet={(pin) => {
+            dispatch({ type: "updatePrefs", patch: { lockPin: pin, lock: true } });
+            setSettingPin(false);
+          }}
+          onCancel={() => setSettingPin(false)}
+        />
+      </Modal>
     </Screen>
   );
 }

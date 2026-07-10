@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  AppState,
   Pressable,
   ScrollView,
   Text,
@@ -10,9 +11,13 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import type { Lang } from "@sexdiary/core";
 import { AppProvider, useApp } from "./src/state/store";
+import { APP_NAME } from "./src/branding";
+import { tapMedium } from "./src/haptics";
 import { DashboardScreen } from "./src/screens/DashboardScreen";
 import { LogScreen } from "./src/screens/LogScreen";
 import { SettingsScreen } from "./src/screens/SettingsScreen";
+import { LockScreen } from "./src/screens/LockScreen";
+import { DecoyScreen } from "./src/screens/DecoyScreen";
 import { Card, Chip, GhostButton, PrimaryButton, Screen, Title } from "./src/ui";
 
 type Tab = "dashboard" | "log" | "settings";
@@ -31,7 +36,7 @@ function Onboarding() {
           {t("welcomeBody")}
         </Text>
         <Card>
-          <Text style={{ color: palette.sub, fontSize: 13 }}>
+          <Text style={{ color: palette.sub, fontSize: 13, lineHeight: 19 }}>
             {lang === "de"
               ? "Kein Medizinprodukt. Ersetzt keine ärztliche Beratung. Alle Daten werden ausschließlich verschlüsselt auf diesem Gerät gespeichert."
               : "Not a medical device. Does not replace professional medical advice. All data is stored encrypted on this device only."}
@@ -66,6 +71,41 @@ function Onboarding() {
         </View>
       </ScrollView>
     </Screen>
+  );
+}
+
+/** App name plus, in disguise mode, a one-tap escape to the decoy screen. */
+function TopBar({ onHide }: { onHide: () => void }) {
+  const { data, t, palette } = useApp();
+  const name = data.prefs.disguise ? t("neutralAppName") : APP_NAME;
+
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingHorizontal: 16,
+        paddingTop: 6,
+      }}
+    >
+      <Text style={{ color: palette.sub, fontSize: 13, fontWeight: "600" }}>
+        {name}
+      </Text>
+      {data.prefs.disguise && (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("hideNow")}
+          onPress={() => {
+            tapMedium();
+            onHide();
+          }}
+          hitSlop={12}
+        >
+          <Text style={{ color: palette.sub, fontSize: 13 }}>{t("hideNow")}</Text>
+        </Pressable>
+      )}
+    </View>
   );
 }
 
@@ -111,6 +151,42 @@ function TabBar({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
 function Shell() {
   const { data, palette, isDark } = useApp();
   const [tab, setTab] = useState<Tab>("dashboard");
+  const [decoy, setDecoy] = useState(false);
+
+  const hasPin = data.prefs.lockPin !== null;
+  const [locked, setLocked] = useState(hasPin);
+
+  // Re-lock whenever the app leaves the foreground, so the interface is
+  // never left open in the task switcher or after a handover.
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state !== "active" && data.prefs.lockPin !== null) setLocked(true);
+    });
+    return () => sub.remove();
+  }, [data.prefs.lockPin]);
+
+  // Enabling the lock in Settings should not immediately lock the user out.
+  useEffect(() => {
+    if (!hasPin) setLocked(false);
+  }, [hasPin]);
+
+  if (locked && hasPin) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: palette.bg }}>
+        <StatusBar style={isDark ? "light" : "dark"} />
+        <LockScreen onUnlock={() => setLocked(false)} />
+      </SafeAreaView>
+    );
+  }
+
+  if (decoy) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: palette.bg }}>
+        <StatusBar style={isDark ? "light" : "dark"} />
+        <DecoyScreen onExit={() => setDecoy(false)} />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: palette.bg }}>
@@ -119,6 +195,7 @@ function Shell() {
         <Onboarding />
       ) : (
         <>
+          <TopBar onHide={() => setDecoy(true)} />
           <View style={{ flex: 1 }}>
             {tab === "dashboard" && <DashboardScreen />}
             {tab === "log" && <LogScreen />}

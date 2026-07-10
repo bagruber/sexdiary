@@ -104,6 +104,18 @@ export interface Preferences {
   shareMode: ShareMode;
   sharePlatform: ContactHandlePlatform;
   shareHandle: string;
+  /**
+   * Present the app under a neutral identity (name, lock screen, and a
+   * one-tap decoy screen). Defends against shoulder-surfing, which for
+   * this app is a likelier threat than a remote attacker.
+   */
+  disguise: boolean;
+  /**
+   * Simulated app lock. The PIN gates the UI only — data at rest is
+   * encrypted independently of it. Not a security boundary until the
+   * biometric/keystore milestone lands.
+   */
+  lockPin: string | null;
 }
 
 export interface AppData {

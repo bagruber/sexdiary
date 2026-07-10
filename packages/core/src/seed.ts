@@ -171,6 +171,8 @@ const BASE_PREFS: Preferences = {
   shareMode: "token",
   sharePlatform: "instagram",
   shareHandle: "",
+  disguise: false,
+  lockPin: null,
 };
 
 /**

@@ -6,6 +6,7 @@ import {
 } from "./stis";
 import {
   RISK_ORDER,
+  type ActKey,
   type Contact,
   type Intercourse,
   type RiskLevel,
@@ -13,6 +14,25 @@ import {
   type Vaccination,
 } from "./domain";
 import { toDate } from "./date";
+
+/**
+ * One encounter that contributed to an STI's rating, with the reasons.
+ * This is what makes a rating explainable: the UI can show the user
+ * exactly which encounters drove the number and which protections were
+ * applied, rather than an opaque score.
+ */
+export interface RiskContribution {
+  date: string;
+  cid: string | null;
+  /** Acts from this encounter that could transmit this STI. */
+  acts: ActKey[];
+  /** Subset of `acts` where protection was recorded. */
+  protectedActs: ActKey[];
+  /** Doxy-PEP was active and reduced this encounter's transmission rate. */
+  doxyReduced: boolean;
+  /** Highest risk level among the contributing acts. */
+  level: RiskLevel;
+}
 
 export interface RiskData {
   exposed: boolean;
@@ -29,6 +49,10 @@ export interface RiskData {
   highPrev?: boolean;
   isPositive?: boolean;
   contactIds?: string[];
+  /** Encounter-level breakdown, newest first. Empty when not exposed. */
+  contributions?: RiskContribution[];
+  /** Encounters excluded because PrEP was active (HIV only). */
+  prepExcluded?: number;
 }
 
 export interface LastTestEntry {
@@ -121,19 +145,33 @@ export function calcRisk(
       isP: boolean;
       cid: string | null;
     }[] = [];
+    const contributions: RiskContribution[] = [];
+    let prepExcluded = 0;
 
     for (const e of relevant) {
+      if (sn === "HIV" && prepActiveOn(vx, e.date)) {
+        // PrEP suppresses HIV acquisition; the encounter still happened,
+        // so surface it as excluded rather than dropping it silently.
+        if (Object.values(e.t).some((v) => v)) prepExcluded++;
+        continue;
+      }
+      const acts: ActKey[] = [];
+      const protectedActs: ActKey[] = [];
+      let doxyReduced = false;
+      let level: RiskLevel = "none";
+
       for (const key of Object.keys(e.t) as (keyof typeof e.t)[]) {
         if (!e.t[key]) continue;
         const tr = si.tx[key] as StiTx | undefined;
         if (!tr || tr.p === 0) continue;
         let rate = e.p[key] ? tr.p * (1 - tr.c) : tr.p;
-        if (sn === "HIV" && prepActiveOn(vx, e.date)) continue;
+        let reduced = false;
         if (
           ["Gonorrhea", "Chlamydia", "Syphilis"].includes(sn) &&
           doxyCoverage(vx, e.date)
         ) {
           rate *= 0.25;
+          reduced = true;
         }
         if (rate > 0.00001) {
           exposures.push({
@@ -142,12 +180,30 @@ export function calcRisk(
             isP: !!e.p[key],
             cid: e.cid,
           });
+          acts.push(key);
+          if (e.p[key]) protectedActs.push(key);
+          if (reduced) doxyReduced = true;
+          if (RISK_ORDER[tr.r] > RISK_ORDER[level]) level = tr.r;
         }
+      }
+
+      if (acts.length) {
+        contributions.push({
+          date: e.date,
+          cid: e.cid,
+          acts,
+          protectedActs,
+          doxyReduced,
+          level,
+        });
       }
     }
 
     if (!exposures.length) {
-      risks[sn] = { exposed: false };
+      risks[sn] = {
+        exposed: false,
+        ...(prepExcluded ? { prepExcluded } : {}),
+      };
       continue;
     }
     const latest = exposures.reduce((a, b) => (a.date > b.date ? a : b));
@@ -174,10 +230,74 @@ export function calcRisk(
       contactIds: [
         ...new Set(exposures.map((e) => e.cid).filter((x): x is string => !!x)),
       ],
+      contributions: contributions.sort((a, b) => (a.date < b.date ? 1 : -1)),
+      ...(prepExcluded ? { prepExcluded } : {}),
     };
   }
 
   return { lastTest: last, risks, lastMap };
+}
+
+// ─── Derived guidance ─────────────────────────────────────────────────
+
+export type NextActionKind = "testNow" | "wait" | "allClear";
+
+/**
+ * The single most useful sentence to put in front of the user. The
+ * per-STI cards are the detail view; this is the summary that answers
+ * "what should I actually do?".
+ */
+export interface NextAction {
+  kind: NextActionKind;
+  /** STIs that are past their window period and worth testing for now. */
+  testable: string[];
+  /** STI whose window closes soonest, when nothing is testable yet. */
+  soonestSti?: string;
+  /** Days until that window closes (>= 1). */
+  soonestDays?: number;
+}
+
+export function nextAction(report: RiskReport): NextAction {
+  const testable: string[] = [];
+  let soonestSti: string | undefined;
+  let soonestDays = Infinity;
+
+  for (const [sti, r] of Object.entries(report.risks)) {
+    if (!r.exposed) continue;
+    if (r.testable) {
+      testable.push(sti);
+      continue;
+    }
+    const remaining = Math.max((r.wd ?? 0) - (r.days ?? 0), 1);
+    if (remaining < soonestDays) {
+      soonestDays = remaining;
+      soonestSti = sti;
+    }
+  }
+
+  if (testable.length) return { kind: "testNow", testable };
+  if (soonestSti) {
+    return { kind: "wait", testable, soonestSti, soonestDays };
+  }
+  return { kind: "allClear", testable };
+}
+
+export interface VaccineSeries {
+  sti: string;
+  doses: number;
+  target: number;
+  complete: boolean;
+}
+
+/** Dose counts against the recommended series, for progress display. */
+export function vaccineSeries(vx: Vaccination[]): VaccineSeries[] {
+  const targets: Record<string, number> = { "Hep B": 3, Mpox: 2 };
+  return Object.entries(targets).map(([sti, target]) => {
+    const doses = vx.filter(
+      (v) => v.kind === "vaccine" && v.type === sti,
+    ).length;
+    return { sti, doses: Math.min(doses, target), target, complete: doses >= target };
+  });
 }
 
 export interface AlertGroup {

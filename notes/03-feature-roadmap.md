@@ -3,11 +3,30 @@
 Priorities: P1 = next, P2 = after refactor settles, P3 = later/idea.
 Updated 2026-07-10.
 
+## Done (2026-07-10)
+
+- ✅ Rating explanation ("Why this rating?") — core `contributions[]`.
+- ✅ Next-action summary — core `nextAction()`.
+- ✅ Vaccination series completion — core `vaccineSeries()`.
+- ✅ "Your data" screen with raw inspector.
+- ✅ Disguise mode + panic-hide decoy (mobile).
+- ✅ Simulated app lock w/ PIN + re-lock on background (mobile).
+- ✅ Demo mode: explicit "explore with sample data" in onboarding
+  (mobile only — **web still seeds by default**, audit Q11 open there).
+
+**Port these four to web**: explanation, next action, vaccine series,
+your-data. All logic already lives in core.
+
 ## P1 — round out the core loop
 
-- **Demo mode**: seed data only behind an explicit "explore with sample
-  data" choice in onboarding; real users start empty. (Safety issue,
-  see audit Q11.)
+- **Demo mode on web**: seed data only behind an explicit "explore with
+  sample data" choice; real users start empty. (Audit Q11.)
+- **Real app lock**: replace the simulation with
+  `expo-local-authentication` (biometric) + keystore-bound gating, and
+  screen-capture / recent-apps blurring. Remove the "simulated" label
+  only when it is a genuine boundary.
+- **Native disguise**: alternate app icon + OS-level app name (requires
+  a native build; in-app disguise already ships).
 - **Test reminders**: local notifications when a window period closes
   ("HIV testable from Friday") and periodic routine-test nudges.
   Mobile: expo-notifications; web: best-effort.

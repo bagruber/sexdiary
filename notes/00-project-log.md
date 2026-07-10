@@ -3,6 +3,64 @@
 Reverse-chronological decision log. Read this first each session; append
 before ending one. `docs/` is GitHub Pages build output — notes live here.
 
+## 2026-07-10 (later) — Trust & discretion feature batch (mobile)
+
+Shipped as one batch on `apps/mobile` (v0.2.0), with the shared logic in
+core so the web app can reuse it:
+
+- **Rating explanation.** `calcRisk` now emits `contributions[]` per STI:
+  the exact encounters that drove the rating, which acts contributed,
+  whether protection was recorded, and whether Doxy-PEP reduced it. Also
+  `prepExcluded` — PrEP-suppressed encounters are *counted and shown*
+  rather than silently dropped. Tapping any risk card opens the
+  breakdown. This is the highest-leverage trust feature and it softens
+  the MDR posture: transparent education reads less like a diagnostic
+  device than an opaque score.
+- **Next action.** New core `nextAction(report)` reduces the whole engine
+  to one sentence at the top of the dashboard ("Time to get tested" /
+  "Too early to test — {sti} in {n} days" / "Nothing to do right now").
+- **Vaccination completion.** New core `vaccineSeries(vx)` (Hep B 3,
+  Mpox 2) drives a progress card. Public-health value shaped as a
+  satisfying progress bar; no streaks (streaks shame lapses, wrong tool
+  for sexual health).
+- **Your data screen.** Plain-language data-flow statement + record
+  counts + raw-record inspector (PIN redacted). Trust what you can
+  inspect, don't ask users to believe.
+- **Disguise mode** (opt-in): neutral app name in-app and on the lock
+  screen, plus a one-tap "Hide" that swaps the whole UI for a neutral
+  notes decoy (exit = triple-tap the title). Shoulder-surfing is the
+  realistic threat model here.
+- **App lock: simulated, and labelled as such** in the UI. 4-digit PIN
+  keypad, re-locks on backgrounding via AppState, plus a "use biometrics
+  (simulated)" affordance where `expo-local-authentication` will go. The
+  PIN gates the interface only — it derives no key, and the store is
+  encrypted at rest regardless. `Preferences.lockPin` documents this.
+- Interaction polish: haptics on all controls, accessible progress
+  meters, chevron affordances on tappable rows.
+
+**Not done:** the four portable features (explanation, next action,
+vaccine series, your-data) are **mobile-only so far**; core exposes
+everything needed to port them to `apps/web`. Mobile still hasn't been
+run on a device — verified by typecheck + Metro bundle export only.
+
+**i18n note:** `{s}` plural suffixes don't survive German ("1 Tags").
+Added `plurals(t, n)` in core which injects the noun itself
+(`{dayWord}`, `{encWord}`, `{doseWord}`). Use it for any new counted
+string. `de.ts` is typed `: Dict`, so missing keys fail the build.
+
+## 2026-07-10 (later) — Decisions from Benedict
+
+- **License: moving to an open license.** Concrete license (EUPL-1.2 vs
+  MIT/Apache-2.0) still to be picked; EUPL-1.2 recommended for the
+  public-administration audience. Action: add LICENSE file + update
+  README "all rights reserved" wording once picked.
+- **MDR strategy: explicitly unsettled.** Keep the disclaimer prominent,
+  keep risk wording informational, don't block work on it, revisit
+  before any public-sector pitch.
+- Build question clarified: local Gradle/Xcode has no technical issue —
+  the open question was only whether Expo's cloud build service (EAS)
+  is acceptable. See UX/feature brainstorm discussed same day.
+
 ## 2026-07-10 — Grand refactor kickoff + mobile app start
 
 Scope set by Benedict: refactor the whole app (quality, design,

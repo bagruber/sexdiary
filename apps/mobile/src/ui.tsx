@@ -8,6 +8,7 @@ import {
   type ViewStyle,
 } from "react-native";
 import { useApp } from "./state/store";
+import { tapLight, tapMedium } from "./haptics";
 
 export function Screen({ children }: { children: ReactNode }) {
   const { palette } = useApp();
@@ -65,7 +66,10 @@ export function Chip({
   const { palette } = useApp();
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        tapLight();
+        onPress();
+      }}
       accessibilityRole="button"
       accessibilityState={{ selected: active }}
       style={[
@@ -83,6 +87,168 @@ export function Chip({
   );
 }
 
+/** Horizontal progress meter with an accessible value. */
+export function Meter({
+  pct,
+  color,
+  label,
+}: {
+  pct: number;
+  color: string;
+  label?: string;
+}) {
+  const { palette } = useApp();
+  const clamped = Math.max(0, Math.min(100, Math.round(pct)));
+  return (
+    <View
+      accessibilityRole="progressbar"
+      accessibilityLabel={label}
+      accessibilityValue={{ min: 0, max: 100, now: clamped }}
+      style={{
+        height: 6,
+        borderRadius: 3,
+        backgroundColor: palette.border,
+        overflow: "hidden",
+      }}
+    >
+      <View style={{ width: `${clamped}%`, height: 6, backgroundColor: color }} />
+    </View>
+  );
+}
+
+/** Tappable settings/navigation row with a chevron affordance. */
+export function Row({
+  label,
+  sub,
+  onPress,
+  right,
+  danger,
+}: {
+  label: string;
+  sub?: string;
+  onPress?: () => void;
+  right?: ReactNode;
+  danger?: boolean;
+}) {
+  const { palette } = useApp();
+  const body = (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}
+    >
+      <View style={{ flex: 1, paddingRight: 12 }}>
+        <Text
+          style={{
+            color: danger ? palette.bad : palette.text,
+            fontSize: 15,
+            fontWeight: "500",
+          }}
+        >
+          {label}
+        </Text>
+        {sub ? (
+          <Text style={{ color: palette.sub, fontSize: 12, marginTop: 3 }}>
+            {sub}
+          </Text>
+        ) : null}
+      </View>
+      {right ?? (onPress ? <Text style={{ color: palette.sub }}>›</Text> : null)}
+    </View>
+  );
+  if (!onPress) return <Card>{body}</Card>;
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={() => {
+        tapLight();
+        onPress();
+      }}
+    >
+      <Card>{body}</Card>
+    </Pressable>
+  );
+}
+
+/** 4-digit PIN pad. Purely a UI gate — see Preferences.lockPin. */
+export function Keypad({
+  value,
+  onChange,
+  deleteLabel,
+}: {
+  value: string;
+  onChange: (next: string) => void;
+  deleteLabel: string;
+}) {
+  const { palette } = useApp();
+  const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "del"];
+
+  return (
+    <View>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          marginBottom: 28,
+        }}
+      >
+        {[0, 1, 2, 3].map((i) => (
+          <View
+            key={i}
+            style={{
+              width: 14,
+              height: 14,
+              borderRadius: 7,
+              marginHorizontal: 8,
+              borderWidth: 1,
+              borderColor: palette.sub,
+              backgroundColor: i < value.length ? palette.text : "transparent",
+            }}
+          />
+        ))}
+      </View>
+      <View
+        style={{
+          flexDirection: "row",
+          flexWrap: "wrap",
+          width: 260,
+          alignSelf: "center",
+        }}
+      >
+        {keys.map((k, i) => {
+          if (k === "") return <View key={i} style={styles.key} />;
+          const isDel = k === "del";
+          return (
+            <Pressable
+              key={i}
+              accessibilityRole="button"
+              accessibilityLabel={isDel ? deleteLabel : k}
+              onPress={() => {
+                tapLight();
+                if (isDel) onChange(value.slice(0, -1));
+                else if (value.length < 4) onChange(value + k);
+              }}
+              style={({ pressed }) => [
+                styles.key,
+                {
+                  backgroundColor: pressed ? palette.border : "transparent",
+                  borderRadius: 40,
+                },
+              ]}
+            >
+              <Text style={{ color: palette.text, fontSize: isDel ? 16 : 26 }}>
+                {isDel ? "⌫" : k}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
 export function PrimaryButton({
   label,
   onPress,
@@ -97,7 +263,10 @@ export function PrimaryButton({
   const { palette } = useApp();
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        tapMedium();
+        onPress();
+      }}
       disabled={disabled}
       accessibilityRole="button"
       style={[
@@ -125,7 +294,10 @@ export function GhostButton({
   const { palette } = useApp();
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        tapLight();
+        onPress();
+      }}
       accessibilityRole="button"
       style={[styles.button, { borderWidth: 1, borderColor: palette.border }]}
     >
@@ -164,5 +336,11 @@ const styles = StyleSheet.create({
     paddingVertical: 13,
     alignItems: "center",
     marginTop: 10,
+  },
+  key: {
+    width: 80,
+    height: 68,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

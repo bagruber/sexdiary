@@ -241,4 +241,99 @@ export const de: Dict = {
   contactsHeading: "Kontakte",
   noContacts: "Keine Kontakte gespeichert.",
   noTestsLong: "Keine Tests gespeichert.",
+
+  // Nächster Schritt
+  nextAction: "Was als Nächstes zu tun ist",
+  naTestNow: "Zeit für einen Test",
+  naTestNowSub: "{names} lassen sich jetzt zuverlässig nachweisen.",
+  naWait: "Noch zu früh zum Testen",
+  naWaitSub:
+    "Ein Test auf {sti} ist in {n} {dayWord} aussagekräftig. Früher zu testen kann eine Infektion übersehen.",
+  dayOne: "Tag",
+  dayMany: "Tagen",
+  encounterOne: "Begegnung",
+  encounterMany: "Begegnungen",
+  doseOne: "Dosis",
+  doseMany: "Dosen",
+  naAllClear: "Im Moment nichts zu tun",
+  naAllClearSub: "Keine Expositionen seit deinem letzten Test.",
+  naBookTest: "Teststelle finden",
+
+  // Erklärung der Bewertung
+  whyThisRating: "Wie kommt diese Bewertung zustande?",
+  explainIntro:
+    "Diese Bewertung beruht ausschließlich auf deinen Einträgen. Hier ist jede Begegnung, die dazu beigetragen hat.",
+  explainWindow:
+    "{sti} kann bis zu {n} Tage nach einer Exposition brauchen, um in einem Test sichtbar zu werden. Das ist das diagnostische Fenster.",
+  explainWindowOpen: "Noch {n} {dayWord}, bis ein Test aussagekräftig ist.",
+  explainWindowClosed:
+    "Das diagnostische Fenster ist vorbei — ein Test ist jetzt zuverlässig.",
+  explainNoExposure:
+    "Nichts, was du seit deinem letzten Test eingetragen hast, kann {sti} übertragen.",
+  explainVaccinated:
+    "Deine Impfserie ist vollständig, daher wird {sti} nicht bewertet.",
+  explainPreexisting:
+    "Du hast {sti} als bestehende Infektion markiert, daher wird sie nicht bewertet.",
+  explainPrepExcluded:
+    "{n} {encWord} nicht gezählt, weil PrEP aktiv war.",
+  contributingEncounters: "Beitragende Begegnungen",
+  factorProtection: "Schutz erfasst",
+  factorNoProtection: "Kein Schutz erfasst",
+  factorDoxy: "Doxy-PEP hat dieses Risiko gesenkt",
+  explainSources:
+    "Risikowerte sind statistische Schätzwerte, keine Diagnose.",
+  riskLevelLabel: "Risikostufe",
+
+  // Impfserie
+  vaccineSeriesTitle: "Impfserie",
+  vaccineDoses: "{have} von {target} Dosen",
+  vaccineComplete: "Vollständig — du bist geschützt",
+  vaccineNextDose: "Noch {n} {doseWord}",
+  vaccineNotStarted: "Nicht begonnen",
+
+  // Deine Daten
+  yourData: "Deine Daten",
+  yourDataSub: "Genau was gespeichert wird — und wo",
+  dataFlowTitle: "Wo deine Daten liegen",
+  dataFlowBody:
+    "Alles, was du einträgst, wird verschlüsselt und ausschließlich auf diesem Gerät gespeichert. Der Schlüssel verlässt die sichere Hardware deines Telefons nie. Die App stellt keine Netzwerkanfragen — du kannst das im Flugmodus überprüfen.",
+  dataNeverLeaves:
+    "Nichts wird hochgeladen. Es gibt keine Konten und keine Server.",
+  dataCounts: "Was gespeichert ist",
+  dataEncounters: "Begegnungen",
+  dataTests: "Tests",
+  dataContacts: "Kontakte",
+  dataVaccinations: "Impfungen",
+  dataInspect: "Rohdaten ansehen",
+  dataInspectSub: "Den exakten Inhalt deines Datensatzes einsehen",
+  dataHideRaw: "Rohdaten ausblenden",
+  dataEncryption: "Verschlüsselung",
+  dataEncryptionValue: "AES-256-GCM · Schlüssel im Geräte-Keystore",
+
+  // Privatsphäre / Tarnung / Sperre
+  privacy: "Privatsphäre",
+  disguiseMode: "Tarnmodus",
+  disguiseModeSub: "Diese App unter einem neutralen Namen anzeigen",
+  disguiseNote:
+    "Die App erscheint in der App und auf dem Sperrbildschirm als „Journal“, und ein Tippen auf die Überschrift zeigt sofort einen neutralen Täuschbildschirm. Das Symbol auf dem Startbildschirm zu ändern erfordert einen nativen Build.",
+  neutralAppName: "Journal",
+  decoyTitle: "Notizen",
+  decoyHint: "Dreimal auf den Titel tippen, um zurückzukehren",
+  decoyNote1: "Einkaufen",
+  decoyNote2: "Vermieter anrufen",
+  decoyNote3: "Zahnarzttermin vereinbaren",
+  hideNow: "Verbergen",
+  appLockSim: "App-Sperre (simuliert)",
+  appLockSimSub: "Beim Öffnen der App nach einer PIN fragen",
+  lockSimWarning:
+    "Dies ist eine Demonstration des Sperrbildschirms. Er verbirgt die Oberfläche, ist aber noch keine Sicherheitsgrenze — deine Daten sind ohnehin auf der Festplatte verschlüsselt.",
+  lockTitle: "Gesperrt",
+  lockEnterPin: "PIN eingeben",
+  lockSetPin: "Wähle eine 4-stellige PIN",
+  lockConfirmPin: "Noch einmal eingeben",
+  lockWrongPin: "Falsche PIN",
+  lockPinMismatch: "PINs stimmen nicht überein",
+  lockUnlock: "Entsperren",
+  lockSimBiometric: "Biometrie verwenden (simuliert)",
+  lockDelete: "Löschen",
 };

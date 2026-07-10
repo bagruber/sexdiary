@@ -255,6 +255,98 @@ export const en = {
   contactsHeading: "Contacts",
   noContacts: "No contacts saved.",
   noTestsLong: "No tests saved.",
+
+  // Next action
+  nextAction: "What to do next",
+  naTestNow: "Time to get tested",
+  naTestNowSub: "{names} can be reliably detected now.",
+  naWait: "Too early to test",
+  naWaitSub:
+    "A test for {sti} becomes meaningful in {n} {dayWord}. Testing sooner can miss an infection.",
+  // Plural words injected by the UI — {s} suffixes don't survive translation.
+  dayOne: "day",
+  dayMany: "days",
+  encounterOne: "encounter",
+  encounterMany: "encounters",
+  doseOne: "dose",
+  doseMany: "doses",
+  naAllClear: "Nothing to do right now",
+  naAllClearSub: "No exposures since your last test.",
+  naBookTest: "Find a test site",
+
+  // Rating explanation
+  whyThisRating: "Why this rating?",
+  explainIntro:
+    "This rating comes only from what you logged. Here is every encounter that contributed.",
+  explainWindow:
+    "{sti} can take up to {n} days after an exposure to show up in a test. That is the window period.",
+  explainWindowOpen: "{n} {dayWord} left until a test is meaningful.",
+  explainWindowClosed: "The window has passed — a test is reliable now.",
+  explainNoExposure: "Nothing you logged since your last test can transmit {sti}.",
+  explainVaccinated:
+    "Your vaccination series is complete, so {sti} is not scored.",
+  explainPreexisting:
+    "You marked {sti} as an existing infection, so it is not scored.",
+  explainPrepExcluded:
+    "{n} {encWord} not counted because PrEP was active.",
+  contributingEncounters: "Contributing encounters",
+  factorProtection: "Protection recorded",
+  factorNoProtection: "No protection recorded",
+  factorDoxy: "Doxy-PEP reduced this risk",
+  explainSources: "Risk figures are population estimates, not a diagnosis.",
+  riskLevelLabel: "Risk level",
+
+  // Vaccination series
+  vaccineSeriesTitle: "Vaccination series",
+  vaccineDoses: "{have} of {target} doses",
+  vaccineComplete: "Complete — you're protected",
+  vaccineNextDose: "{n} {doseWord} to go",
+  vaccineNotStarted: "Not started",
+
+  // Your data
+  yourData: "Your data",
+  yourDataSub: "Exactly what is stored, and where",
+  dataFlowTitle: "Where your data lives",
+  dataFlowBody:
+    "Everything you log is encrypted and stored on this device only. The encryption key never leaves your phone's secure hardware. The app makes no network requests — you can verify this by using it in airplane mode.",
+  dataNeverLeaves: "Nothing is uploaded. There are no accounts and no servers.",
+  dataCounts: "What's stored",
+  dataEncounters: "Encounters",
+  dataTests: "Tests",
+  dataContacts: "Contacts",
+  dataVaccinations: "Vaccinations",
+  dataInspect: "Inspect raw data",
+  dataInspectSub: "See the exact contents of your record",
+  dataHideRaw: "Hide raw data",
+  dataEncryption: "Encryption",
+  dataEncryptionValue: "AES-256-GCM · key in device keystore",
+
+  // Privacy / disguise / lock
+  privacy: "Privacy",
+  disguiseMode: "Disguise mode",
+  disguiseModeSub: "Show this app under a neutral name",
+  disguiseNote:
+    "The app appears as “Journal” inside the app and on the lock screen, and a tap on the header instantly shows a neutral decoy screen. Changing the home-screen icon needs a native build.",
+  neutralAppName: "Journal",
+  decoyTitle: "Notes",
+  decoyHint: "Tap the title three times to return",
+  decoyNote1: "Groceries",
+  decoyNote2: "Call the landlord",
+  decoyNote3: "Book dentist appointment",
+  hideNow: "Hide",
+  appLockSim: "App lock (simulated)",
+  appLockSimSub: "Ask for a PIN when opening the app",
+  lockSimWarning:
+    "This is a demonstration of the lock screen. It hides the interface but is not yet a security boundary — your data is encrypted on disk regardless.",
+  lockTitle: "Locked",
+  lockEnterPin: "Enter your PIN",
+  lockSetPin: "Choose a 4-digit PIN",
+  lockConfirmPin: "Enter it again",
+  lockWrongPin: "Wrong PIN",
+  lockPinMismatch: "PINs did not match",
+  lockUnlock: "Unlock",
+  lockSimBiometric: "Use biometrics (simulated)",
+  lockDelete: "Delete",
 };
 
 export type Dict = typeof en;
