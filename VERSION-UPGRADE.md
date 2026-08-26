@@ -8,7 +8,7 @@ Nach erledigtem Update loeschen.*
 Dieses Repo hat als einziges der bagruber-Familie **einen echten Versionskonflikt**,
 keine blosse Drift. Er muss aufgeloest werden, bevor das Repo auf pnpm kann.
 
-**Welle 4 von 4 — zuletzt.** Alle anderen Repos sind vorher dran, weil sie einfacher
+**Welle 4 von 4 — zuletzt.** Welle 1 (TypeScript ~7.0.2, @types/node ^26.3.0) ist am 26.08.2026 in dreizehn anderen Repos erledigt; sexdiary war nicht dabei, weil es noch auf npm liegt. Alle anderen Repos sind vorher dran, weil sie einfacher
 sind und das Muster etablieren.
 
 ## Der Konflikt
@@ -41,10 +41,10 @@ mit `node-linker=hoisted` (beides am 26.08.2026 erfolglos versucht).
 |---|---|---|
 | react / react-dom | `^18.3.1` | `^19.2.x` |
 | @types/react | `^18.3.12` | `^19.2.x` |
-| typescript | `^5.6.3` | `~5.9.x` |
+| typescript | `^5.6.3` | `~7.0.2` |
 | vite | `^5.4.11` | `^8.x` |
 
-`packages/core` hat kein React und braucht nur `vitest ^2.1.8 -> ^4.1.x`.
+`packages/core` hat kein React und braucht nur `vitest ^2.1.8 -> ^4.1.x` und `typescript ^5.6.3 -> ~7.0.2`.
 `apps/mobile` bleibt unangetastet — Expo gibt die Versionen vor.
 
 ## Danach: zurueck auf pnpm
