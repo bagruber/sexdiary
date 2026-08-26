@@ -16,6 +16,9 @@ Vollstaendiger Befund und der Weg zurueck auf pnpm stehen in
 `VERSION-UPGRADE.md`. Der Working Tree ist sauber, Build gruen, 45/45 Tests
 gruen — von diesem Stand aus starten.
 
+Diese Abweichung ist als bekannte Ausnahme in `hausbasis/baseline.json`
+hinterlegt, damit `node ../hausbasis/check.mjs` sie nicht als Versehen meldet.
+
 ## Beim Umstieg: `workspace:*` statt `*`
 
 Falls pnpm erneut versucht wird: `"@sexdiary/core": "*"` in `apps/web` und
