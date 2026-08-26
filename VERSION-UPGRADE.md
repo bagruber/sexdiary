@@ -87,3 +87,36 @@ darueber aus, ob Metro den Dependency-Baum aufloesen kann.
 
 Stand 26.08.2026 ist das Repo **auf npm zurueckgesetzt**, Working Tree sauber,
 `pnpm run build` gruen, 45/45 Tests gruen. Von diesem Stand aus starten.
+
+## Laufzeitprobe nicht vergessen
+
+**Ein gruener Build beweist bei einem React-Major wenig.** Der Bundler prueft nicht,
+ob React zur Laufzeit durchlaeuft; entfernte APIs und geaendertes ref-Verhalten
+zeigen sich erst im Browser. In pridemap (am 26.08.2026 als erstes Repo der Welle 3
+umgestellt) war der Build sofort gruen — verlassen habe ich mich aber erst auf die
+Probe im echten Browser.
+
+Vorgehen, das dort funktioniert hat:
+
+```bash
+pnpm run build
+pnpm exec vite preview --port 4173 &
+# dann ein kurzes Skript IM REPO (nicht ausserhalb, sonst findet es
+# playwright-core nicht) das die Seite laedt und auf Fehler achtet
+```
+
+Das Skript oeffnet die Seite mit `playwright-core`, sammelt `console`-Fehler und
+`pageerror`-Ereignisse und prueft, dass `#root` tatsaechlich gefuellt ist. Zwei
+Stolpersteine:
+
+- **Browser-Version.** `playwright-core` erwartet einen exakten Chromium-Build. Der
+  Cache unter `AppData/Local/ms-playwright` passte nicht (1223 statt 1234). Statt
+  ~150 MB nachzuladen: `chromium.launch({ channel: 'chrome' })` nutzt das
+  installierte Google Chrome.
+- **Base-Pfad.** Die Repos deployen unter einem Unterpfad. `vite preview` antwortet
+  auf `/` mit einem 302 auf z. B. `/pridemap/` — die Probe muss die Ziel-URL laden,
+  nicht die Wurzel.
+
+Als bestanden galt: `#root` gefuellt, null `pageerror`, und im sichtbaren Text
+stehen echte Inhalte (bei pridemap "Showing 95 events" plus die
+Karten-Attribution, womit auch belegt war, dass maplibre geladen hat).
