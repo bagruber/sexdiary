@@ -3,6 +3,84 @@
 Reverse-chronological decision log. Read this first each session; append
 before ending one. `docs/` is GitHub Pages build output — notes live here.
 
+## 2026-08-27 — Wave 0: version alignment, Expo 57, pnpm
+
+Scope set by Benedict: refactor across design, usability and code quality;
+think it through from the perspective of a public administration such as
+Stadt Muenchen (integrability, maintainability, data protection); and pull
+the versions up to `hausbasis/baseline.json` along the way. Full proposal in
+`notes/05-refactor-verwaltung-2026-08.md`, written in German because most of
+it concerns German administration.
+
+**The finding that reordered everything.** The React conflict documented in
+`VERSION-UPGRADE.md` no longer existed. That briefing was written when Expo
+SDK 54 was current; Expo is now at 57, and React Native 0.86.3 peers on
+`react ^19.2.3`. So pulling mobile to Expo 57 lands it on React 19.2.x by
+itself — exactly the hausbasis target. The plan changed from "lift web to 19
+and leave mobile at 19.1.0" (two minors) to "both apps on 19.2.8" (one), and
+the order flipped: Expo first, then web.
+
+Probed the one real unknown first — TypeScript 7 against React Native's type
+surface, since hausbasis wants `~7.0.2` while the Expo 57 template ships
+`~6.0.3`. It typechecks clean. Everything after that was mechanical.
+
+**Shipped, all verified:**
+
+- `apps/mobile`: Expo 54 -> 57, RN 0.81.5 -> 0.86.3, React 19.2.8, TS 7.0.2.
+  `app.json` migrated to the SDK 57 schema — `newArchEnabled` and
+  `android.edgeToEdgeEnabled` are gone (both defaults now), `splash` moved
+  into the `expo-splash-screen` plugin block. Security settings untouched:
+  `allowBackup=false`, `predictiveBackGestureEnabled=false`,
+  `updates.enabled=false`.
+- `expo.install.exclude` for typescript/react/@types/react. Those three
+  deliberately follow hausbasis rather than the SDK template; without the
+  entry `expo-doctor` reports it as an error forever.
+- `apps/web`: React 19.2.8, Vite 8.2.2, `@vitejs/plugin-react` 6.1.0
+  (4.x is incompatible with Vite 8), TS 7.0.2.
+- `packages/core`: Vitest 4.1.11, TS 7.0.2.
+- New `apps/web/src/vite-env.d.ts`. TS 7 requires a type declaration for
+  side-effect imports and fails with TS2882 on the CSS import in `main.tsx`.
+  The `vite/client` reference supplies it; the project never had one, TS 5
+  simply didn't complain.
+- Repo moved to pnpm: `pnpm-workspace.yaml`, `workspace:*` for
+  `@sexdiary/core`, root scripts on `pnpm --filter`. Metro resolves fine
+  under pnpm's strict layout — **no `node-linker=hoisted` needed**, contrary
+  to what the briefing anticipated.
+- Exception for sexdiary removed from `hausbasis/baseline.json` (uncommitted
+  there). `VERSION-UPGRADE.md` deleted; its runtime-probe recipe preserved as
+  the appendix of `notes/05`.
+
+**The bug the runtime probe caught.** Build green, 45/45 tests green, three
+clean typechecks — and the app still crashed in the browser the moment the
+dashboard rendered: *"A React Element from an older version of React was
+rendered."* npm had left `react@18.3.1` hoisted in the root `node_modules`
+while `apps/web` resolved 19.2.8 locally; `lucide-react` sits in the root and
+therefore pulled `react/jsx-runtime` from the 18 copy. The onboarding view
+renders no lucide icons, so the crash only appeared after clicking through
+it. Removing all `node_modules` and the lockfile left exactly one React copy.
+
+This is the same hoisting pathology `OFFENE-PUNKTE.md` described in July,
+surfacing at runtime instead of in the type checker. Two lessons worth
+keeping: after a major version change, do a clean install rather than an
+incremental one; and the runtime probe is not optional, it is the only step
+that found this.
+
+Incidental but worth noting: the web bundle hash was byte-identical between
+the npm and the pnpm install (`index-Cw5IuCLi.js`) — a small piece of
+evidence for the reproducible-build claim in `notes/02`, which is currently
+asserted but not verified anywhere.
+
+**Not done:** mobile still hasn't run on a device, and that now matters more
+than before — three SDK majors and the New Architecture, which SDK 57 no
+longer lets you turn off. Licence deliberately left open. Hostinger product
+unknown, so wave 5 isn't planned in detail yet. See `OFFENE-PUNKTE.md`.
+
+**Next up:** wave 1 of `notes/05` — the subtraction pass (dead `FONT`
+constant, palette to CSS custom properties, shared design tokens, lint +
+CI, `AlertTransport` interface). Highest-value single item across all waves
+is in wave 2 though: the web app still seeds fabricated sexual encounters as
+the default state for real users (audit Q11, fixed on mobile in July).
+
 ## 2026-07-10 (later) — Trust & discretion feature batch (mobile)
 
 Shipped as one batch on `apps/mobile` (v0.2.0), with the shared logic in

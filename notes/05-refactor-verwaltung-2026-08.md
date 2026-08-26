@@ -12,7 +12,7 @@ Dateien von 08/2026.
 **Der in `VERSION-UPGRADE.md` dokumentierte React-Konflikt existiert nicht mehr.**
 
 Das Briefing wurde geschrieben, als Expo SDK 54 aktuell war. Inzwischen steht
-Expo bei **57.0.17** mit React Native **0.87.1**, und dessen Peer-Requirement
+Expo bei **57.0.17** mit React Native **0.86.3**, und dessen Peer-Requirement
 lautet `react: ^19.2.3`. Das offizielle Expo-57-Template pinnt `react 19.2.3`,
 `react-dom 19.2.3`, `@types/react ~19.2.2`.
 
@@ -495,14 +495,23 @@ besseren Weg anbietet.
 Jede Welle mit ihrem Abnahmekriterium. Wellen sind sequenziell, innerhalb einer
 Welle ist die Reihenfolge frei.
 
-### Welle 0 — Versionen und pnpm
+### Welle 0 — Versionen und pnpm ✅ erledigt 27.08.2026
+
+Ergebnis: Expo 57 / RN 0.86.3, React 19.2.8 in web *und* mobile, TypeScript
+7.0.2 ueberall, Vite 8.2.2, Vitest 4.1.11, Repo auf pnpm. Die Ausnahme in
+`hausbasis/baseline.json` ist entfernt, `VERSION-UPGRADE.md` geloescht.
+Metro laeuft unter pnpms strikter Struktur ohne `node-linker=hoisted`.
+Details im Log, `notes/00`.
+
+Urspruenglicher Plan, zur Nachvollziehbarkeit:
+
 
 0. TS-7-Risiko zuerst probieren: `apps/mobile` mit `typescript ~7.0.2` gegen die
    RN-Typen typechecken. Faellt das durch, ist es besser hier bekannt als nach
    dem Expo-Upgrade. -> **verify:** `tsc --noEmit` in mobile
-1. `apps/mobile` auf Expo 57 (`react-native 0.87.1`, `react 19.2.8`,
-   expo-Module auf 57.x, `react-native-safe-area-context 5.9.1`,
-   `@react-native-async-storage/async-storage 3.1.1`)
+1. `apps/mobile` auf Expo 57 (`react-native 0.86.3`, `react 19.2.8`,
+   expo-Module auf 57.x, `react-native-safe-area-context ~5.7.0`,
+   async-storage bleibt bei 2.2.0 (Expo-Vorgabe))
    -> **verify:** `expo-doctor` sauber, Metro-Export gruen, **App laeuft auf
    einem echten Geraet** (ueberfaellig seit 10.07.)
 2. `apps/web` auf `react/react-dom ^19.2.8`, `@types/react ^19.2.18`,
@@ -587,3 +596,49 @@ Erinnerung feuert an einem Fenstergrenztag
    koennen muss — und das entscheidet man vor Welle 3, nicht danach.
 5. **Fuehrende Plattform.** `notes/04` fragt das seit 10.07. Solange web und
    mobile auseinanderlaufen (3.2), kostet jede Feature-Entscheidung doppelt.
+
+---
+
+## Anhang: Laufzeitprobe fuer React-Majors
+
+Uebernommen aus `VERSION-UPGRADE.md`, bevor die Datei geloescht wurde. Die
+Anleitung stammt aus pridemap und hat sich hier zum zweiten Mal bewaehrt — sie
+hat am 27.08.2026 einen Fehler gefunden, den drei gruene Builds, 45 gruene
+Tests und drei saubere Typechecks nicht gefunden haben.
+
+**Ein gruener Build beweist bei einem React-Major wenig.** Der Bundler prueft
+nicht, ob React zur Laufzeit durchlaeuft; entfernte APIs, geaendertes
+ref-Verhalten und doppelte React-Kopien zeigen sich erst im Browser.
+
+```bash
+pnpm run build
+pnpm exec vite preview --port 4173 --strictPort &
+# dann ein kurzes Skript, das die Seite laedt, console-Fehler und
+# pageerror-Ereignisse sammelt und prueft, dass #root gefuellt ist
+```
+
+Drei Stolpersteine:
+
+- **Browser-Version.** `playwright-core` erwartet einen exakten
+  Chromium-Build; der Cache unter `AppData/Local/ms-playwright` passt selten.
+  Statt ~150 MB nachzuladen: `chromium.launch({ channel: 'chrome' })` nutzt das
+  installierte Google Chrome.
+- **Base-Pfad.** Repos, die unter einem Unterpfad deployen, bekommen von
+  `vite preview` auf `/` ein 302. Die Probe muss die Ziel-URL laden. (In
+  sexdiary steht `base: "./"`, hier ist `/` richtig.)
+- **Port-Wiederverwendung.** Ein gestoppter Preview-Server gibt den Port nicht
+  sofort frei. Laeuft die Probe dann gegen den alten Prozess, prueft sie
+  moeglicherweise den alten Build. Gegenmittel: den ausgelieferten
+  Bundle-Dateinamen aus der `index.html` gegen den Build-Output vergleichen.
+
+Als bestanden gilt: `#root` gefuellt, null `pageerror`, und im sichtbaren Text
+stehen echte Inhalte. Fuer sexdiary heisst das konkret: Onboarding zeigt
+"Welcome", nach einem Klick auf "Skip" zeigt das Dashboard Risikoaussagen und
+den Schutzstreifen. Der Skip-Klick ist wichtig — die Onboarding-View rendert
+kein einziges `lucide-react`-Icon, und genau daran haengt der Fehler vom
+27.08.2026.
+
+Nicht ins Repo aufgenommen: `playwright-core` ist keine hausbasis-Abhaengigkeit,
+und ein einzelnes Repo soll sie nicht allein einfuehren (Arbeitsvereinbarung
+Punkt 5). Das Skript lebt ausserhalb des Repos. Wenn die CI aus Welle 1 kommt,
+ist das der Moment, das familienweit zu entscheiden.

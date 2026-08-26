@@ -31,10 +31,10 @@ biometric gate is milestone 3.
 ## Running
 
 ```bash
-npm install            # once, at the repo root
-npm run start -w @sexdiary/mobile    # Expo dev server (QR → Expo Go)
-npm run android -w @sexdiary/mobile  # launch on Android device/emulator
-npm run ios -w @sexdiary/mobile      # launch on iOS simulator (macOS)
+pnpm install                            # once, at the repo root
+pnpm --filter @sexdiary/mobile start    # Expo dev server (QR → Expo Go)
+pnpm --filter @sexdiary/mobile android  # launch on Android device/emulator
+pnpm --filter @sexdiary/mobile ios      # launch on iOS simulator (macOS)
 ```
 
 Native builds without any cloud service:

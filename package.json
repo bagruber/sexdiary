@@ -3,15 +3,11 @@
   "private": true,
   "version": "0.4.0",
   "type": "module",
-  "workspaces": [
-    "packages/*",
-    "apps/*"
-  ],
   "scripts": {
-    "dev": "npm run dev -w @sexdiary/web",
-    "build": "npm run build -w @sexdiary/web",
-    "preview": "npm run preview -w @sexdiary/web",
-    "test": "npm run test -w @sexdiary/core",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "dev": "pnpm --filter @sexdiary/web dev",
+    "build": "pnpm --filter @sexdiary/web build",
+    "preview": "pnpm --filter @sexdiary/web preview",
+    "test": "pnpm --filter @sexdiary/core test",
+    "typecheck": "pnpm -r --if-present typecheck"
   }
 }
