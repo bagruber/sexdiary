@@ -1,0 +1,351 @@
+/*
+ * The page is painted in the system it documents: every custom property
+ * below is injected at runtime from the tokens in @sexdiary/core, so a
+ * changed token repaints this page without anyone editing it.
+ *
+ * No webfont. System stack only, same rule as the app: no third-party
+ * requests (GDPR).
+ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  font-size: 16px;
+  padding: 0 24px 96px;
+}
+
+.page {
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+/* ── Kopf ─────────────────────────────────────────────────────────── */
+
+header {
+  padding: 72px 0 0;
+}
+
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--sub);
+  font-weight: 600;
+}
+
+h1 {
+  font-size: clamp(30px, 5vw, 42px);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  margin: 10px 0 14px;
+  max-width: 16ch;
+}
+
+.lede {
+  font-size: 18px;
+  color: var(--sub);
+  max-width: 58ch;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 32px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+button.theme {
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent-text);
+  background: var(--accent);
+  border: 0;
+  border-radius: 999px;
+  padding: 9px 18px;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+button.theme:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.controls .note {
+  font-size: 13px;
+  color: var(--sub);
+}
+
+/* ── Abschnitte ───────────────────────────────────────────────────── */
+
+section {
+  padding-top: 56px;
+}
+
+h2 {
+  font-size: 13px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--sub);
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+h3 {
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  margin-bottom: 10px;
+}
+
+p {
+  max-width: 62ch;
+  margin-bottom: 14px;
+}
+
+p + h3 {
+  margin-top: 30px;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.88em;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 1px 5px;
+}
+
+.aside {
+  border-left: 2px solid var(--border);
+  padding-left: 18px;
+  color: var(--sub);
+  margin: 22px 0;
+}
+
+.aside p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Die zwei Skalen ──────────────────────────────────────────────── */
+
+.rule {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 26px 0 6px;
+}
+
+.rule > div {
+  background: var(--card);
+  padding: 22px;
+}
+
+.rule h4 {
+  font-size: 15px;
+  margin-bottom: 6px;
+}
+
+.rule p {
+  font-size: 14px;
+  color: var(--sub);
+  margin: 0;
+}
+
+/* ── Tokentabelle ─────────────────────────────────────────────────── */
+
+.tokens {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 560px;
+  font-size: 14px;
+}
+
+th {
+  text-align: left;
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--sub);
+  font-weight: 600;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+tr:last-child td {
+  border-bottom: 0;
+}
+
+th.num,
+td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.swatch {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  display: block;
+}
+
+td .name {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+
+td .role {
+  display: block;
+  color: var(--sub);
+  font-size: 12px;
+  margin-top: 1px;
+}
+
+td .hex {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  color: var(--sub);
+  text-transform: uppercase;
+}
+
+.verdict {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+  margin-left: 8px;
+}
+
+.pass {
+  color: var(--good);
+}
+
+.fail {
+  color: var(--bad);
+}
+
+/* ── Risikoskala ──────────────────────────────────────────────────── */
+
+.scale {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 24px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+}
+
+.step:first-child {
+  border-radius: 12px 12px 0 0;
+}
+
+.step:last-child {
+  border-radius: 0 0 12px 12px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.step .lvl {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.step .key {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: var(--sub);
+  margin-left: auto;
+  padding-left: 12px;
+}
+
+/* ── Marke ────────────────────────────────────────────────────────── */
+
+.brand {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+  margin: 26px 0;
+}
+
+.brand figure {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.brand .demo {
+  padding: 30px 22px;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.brand figcaption {
+  padding: 13px 18px;
+  font-size: 13px;
+  color: var(--sub);
+  background: var(--card);
+  border-top: 1px solid var(--border);
+}
+
+footer {
+  margin-top: 72px;
+  padding-top: 26px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--sub);
+}
+
+footer p {
+  max-width: none;
+}
