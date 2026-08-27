@@ -85,3 +85,17 @@ openCode.de, F-Droid und Nachnutzung. Empfehlung EUPL-1.2. Kostet eine Datei.
 
 Vollständige Begründung aller Wellen:
 `notes/05-refactor-verwaltung-2026-08.md`.
+
+## Veröffentlichte Fassungen
+
+Zwei Artifacts, beide privat, beide aktualisierbar statt neu anzulegen. In
+einer neuen Sitzung mit `/artifacts` erreichbar; wer sie ändern will, gibt die
+URL als `url` mit, sonst entsteht ein zweites Exemplar.
+
+| Was | URL |
+|---|---|
+| Refactor- und Verwaltungsplan | `https://claude.ai/code/artifact/6e08b184-17ed-423a-87b3-92c74933107c` |
+| Screen-Entwürfe (Canvas, zwei Seiten) | `https://claude.ai/code/artifact/fa0b7d00-34f9-47b4-aa76-6f01876f8280` |
+
+Die Entwurfsquellen liegen in `design/` — daraus wird der Canvas neu
+zusammengesetzt, nicht aus der veröffentlichten Seite.
