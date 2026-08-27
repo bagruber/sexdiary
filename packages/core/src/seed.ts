@@ -164,7 +164,7 @@ const BASE_PREFS: Preferences = {
   theme: "system",
   country: "Germany",
   notifs: false,
-  lock: true,
+  lock: false,
   highPrev: true,
   reducedMotion: false,
   hideLowRisk: false,
@@ -172,7 +172,6 @@ const BASE_PREFS: Preferences = {
   sharePlatform: "instagram",
   shareHandle: "",
   disguise: false,
-  lockPin: null,
 };
 
 /**

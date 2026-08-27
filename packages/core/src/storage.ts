@@ -10,12 +10,14 @@
  * History:
  *   v1 — bare AppData object, no envelope (web prototype ≤ 0.3.x)
  *   v2 — envelope { v, savedAt, data }, same AppData shape
+ *   v3 — prefs.lockPin dropped: the app lock is the device's own
+ *        authentication now, so the app no longer keeps a PIN of its own
  */
 
 import type { AppData, Lang } from "./domain.js";
 import { freshAppData } from "./seed.js";
 
-export const CURRENT_SCHEMA_VERSION = 2;
+export const CURRENT_SCHEMA_VERSION = 3;
 
 export interface StorageEnvelope {
   v: number;
@@ -36,6 +38,15 @@ type Migration = (data: Record<string, unknown>) => Record<string, unknown>;
 const MIGRATIONS: Record<number, Migration> = {
   // v1 → v2: envelope introduced around an unchanged AppData shape.
   1: (data) => data,
+  // v2 → v3: the app-owned PIN is gone. Anyone who had one had the lock
+  // switched on, so carry that intent over to the real lock rather than
+  // silently unlocking them.
+  2: (data) => {
+    const prefs = data.prefs;
+    if (typeof prefs !== "object" || prefs === null) return data;
+    const { lockPin, ...rest } = prefs as Record<string, unknown>;
+    return { ...data, prefs: { ...rest, lock: lockPin != null } };
+  },
 };
 
 export function encodeAppData(data: AppData): string {

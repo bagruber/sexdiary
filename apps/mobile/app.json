@@ -30,6 +30,12 @@
       "expo-localization",
       "expo-status-bar",
       [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Sexdiary nutzt Face ID, um die App zu entsperren."
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/splash-icon.png",

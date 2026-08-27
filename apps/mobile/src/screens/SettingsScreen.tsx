@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { Alert, Modal, ScrollView, Switch, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Alert, ScrollView, Switch, Text, View } from "react-native";
 import type { Lang, Theme } from "@sexdiary/core";
 import { useApp } from "../state/store";
 import { APP_NAME } from "../branding";
 import { Card, Chip, PrimaryButton, Row, Screen, SectionTitle, Title } from "../ui";
 import { DataScreen } from "./DataScreen";
-import { LockScreen } from "./LockScreen";
+import { authenticate, lockAvailability, type LockAvailability } from "../lib/app-lock";
 
 const THEMES: Theme[] = ["system", "light", "dark"];
 const LANGS: { value: Lang; label: string }[] = [
@@ -16,8 +16,12 @@ const LANGS: { value: Lang; label: string }[] = [
 export function SettingsScreen() {
   const { data, dispatch, t, palette } = useApp();
   const [showData, setShowData] = useState(false);
-  const [settingPin, setSettingPin] = useState(false);
+  const [canLock, setCanLock] = useState<LockAvailability | null>(null);
   const lang = data.prefs.lang;
+
+  useEffect(() => {
+    void lockAvailability().then(setCanLock);
+  }, []);
 
   const themeLabel: Record<Theme, string> = {
     system: t("themeSystem"),
@@ -25,9 +29,19 @@ export function SettingsScreen() {
     dark: t("themeDark"),
   };
 
-  const toggleLock = (on: boolean) => {
-    if (on) setSettingPin(true);
-    else dispatch({ type: "updatePrefs", patch: { lockPin: null, lock: false } });
+  /**
+   * Switching the lock *off* is authenticated too. Otherwise the lock
+   * defends only against someone who never opens the settings — and the
+   * threat model is someone holding your unlocked phone.
+   */
+  const toggleLock = async (on: boolean) => {
+    if (on) {
+      dispatch({ type: "updatePrefs", patch: { lock: true } });
+      return;
+    }
+    if (await authenticate(t("lockPrompt"))) {
+      dispatch({ type: "updatePrefs", patch: { lock: false } });
+    }
   };
 
   const confirmDeleteAll = () => {
@@ -85,22 +99,31 @@ export function SettingsScreen() {
 
         <SectionTitle>{t("privacy")}</SectionTitle>
         <Row
-          label={t("appLockSim")}
-          sub={t("appLockSimSub")}
+          label={t("appLock")}
+          sub={t("appLockSub")}
           right={
             <Switch
-              value={data.prefs.lockPin !== null}
-              onValueChange={toggleLock}
-              accessibilityLabel={t("appLockSim")}
+              value={data.prefs.lock}
+              disabled={canLock === "none"}
+              onValueChange={(v) => void toggleLock(v)}
+              accessibilityLabel={t("appLock")}
             />
           }
         />
-        {data.prefs.lockPin !== null && (
+        {canLock === "none" ? (
           <Card>
-            <Text style={{ color: palette.sub, fontSize: 12, lineHeight: 17 }}>
-              {t("lockSimWarning")}
+            <Text style={{ color: palette.warn, fontSize: 12, lineHeight: 17 }}>
+              {t("appLockUnavailable")}
             </Text>
           </Card>
+        ) : (
+          data.prefs.lock && (
+            <Card>
+              <Text style={{ color: palette.sub, fontSize: 12, lineHeight: 17 }}>
+                {t("appLockNote")}
+              </Text>
+            </Card>
+          )
         )}
         <Row
           label={t("disguiseMode")}
@@ -152,16 +175,6 @@ export function SettingsScreen() {
 
       {showData && <DataScreen onClose={() => setShowData(false)} />}
 
-      <Modal visible={settingPin} animationType="slide" onRequestClose={() => setSettingPin(false)}>
-        <LockScreen
-          initialMode="set"
-          onPinSet={(pin) => {
-            dispatch({ type: "updatePrefs", patch: { lockPin: pin, lock: true } });
-            setSettingPin(false);
-          }}
-          onCancel={() => setSettingPin(false)}
-        />
-      </Modal>
     </Screen>
   );
 }

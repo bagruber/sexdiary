@@ -1,88 +1,51 @@
 /**
- * Simulated app lock.
+ * The lock screen.
  *
- * This gates the *interface*, not the data: the store is encrypted at
- * rest independently of the PIN, and the PIN is not used to derive any
- * key. It exists to demonstrate the interaction and to defend against
- * someone picking up an unlocked phone. Treat it as UX, not as a
- * security boundary, until the biometric/keystore milestone lands.
+ * It carries no PIN pad of its own any more. The app used to keep a
+ * four-digit code inside its own data, which looked like security and
+ * was not: the code sat in the same blob it was supposed to protect.
+ * Authentication is the device's job now — biometrics where enrolled,
+ * the device PIN or pattern otherwise.
+ *
+ * The prompt is raised once on mount, because a lock that needs a tap
+ * before it does anything is a lock people switch off.
  */
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { useApp } from "../state/store";
 import { notifyError, notifySuccess } from "../haptics";
 import { APP_NAME } from "../branding";
-import { Keypad } from "../ui";
+import { authenticate } from "../lib/app-lock";
 
-type Mode = "verify" | "set" | "confirm";
-
-export function LockScreen({
-  initialMode = "verify",
-  onUnlock,
-  onPinSet,
-  onCancel,
-}: {
-  initialMode?: "verify" | "set";
-  onUnlock?: () => void;
-  onPinSet?: (pin: string) => void;
-  onCancel?: () => void;
-}) {
+export function LockScreen({ onUnlock }: { onUnlock: () => void }) {
   const { data, t, palette } = useApp();
-  const [mode, setMode] = useState<Mode>(initialMode);
-  const [entry, setEntry] = useState("");
-  const [firstPin, setFirstPin] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+  const running = useRef(false);
 
   const appName = data.prefs.disguise ? t("neutralAppName") : APP_NAME;
 
-  // Judging the PIN in the keypad handler instead would batch the state
-  // updates into one render, so the fourth dot would never paint before
-  // a wrong PIN clears it. The extra render is the point, and [entry] is
-  // the intended dependency: this reacts to digits, not to t(). Kept as
-  // is because there is no device to verify a change on; the screen is
-  // replaced by the keystore-backed lock in wave 3.
-  /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
-  useEffect(() => {
-    if (entry.length !== 4) return;
-
-    if (mode === "verify") {
-      if (entry === data.prefs.lockPin) {
+  const prompt = useCallback(async () => {
+    // The OS shows one dialog at a time; a second call while the first
+    // is open is rejected on Android and silently queued on iOS.
+    if (running.current) return;
+    running.current = true;
+    try {
+      const ok = await authenticate(t("lockPrompt"));
+      if (ok) {
         notifySuccess();
-        onUnlock?.();
+        onUnlock();
       } else {
         notifyError();
-        setError(t("lockWrongPin"));
-        setEntry("");
+        setFailed(true);
       }
-      return;
+    } finally {
+      running.current = false;
     }
-    if (mode === "set") {
-      setFirstPin(entry);
-      setEntry("");
-      setError(null);
-      setMode("confirm");
-      return;
-    }
-    // confirm
-    if (entry === firstPin) {
-      notifySuccess();
-      onPinSet?.(entry);
-    } else {
-      notifyError();
-      setError(t("lockPinMismatch"));
-      setEntry("");
-      setFirstPin("");
-      setMode("set");
-    }
-  }, [entry]);
-  /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
+  }, [onUnlock, t]);
 
-  const prompt =
-    mode === "verify"
-      ? t("lockEnterPin")
-      : mode === "set"
-        ? t("lockSetPin")
-        : t("lockConfirmPin");
+  useEffect(() => {
+    void prompt();
+  }, [prompt]);
 
   return (
     <View
@@ -104,33 +67,27 @@ export function LockScreen({
       >
         {appName}
       </Text>
-      <Text style={{ color: palette.sub, marginBottom: 28 }}>
-        {error ?? prompt}
+      <Text style={{ color: palette.sub, marginBottom: 32 }}>
+        {failed ? t("lockFailed") : t("lockTitle")}
       </Text>
 
-      <Keypad value={entry} onChange={setEntry} deleteLabel={t("lockDelete")} />
-
-      {mode === "verify" && (
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => {
-            // Stands in for expo-local-authentication; always succeeds.
-            notifySuccess();
-            onUnlock?.();
-          }}
-          style={{ marginTop: 28 }}
-        >
-          <Text style={{ color: palette.sub, textDecorationLine: "underline" }}>
-            {t("lockSimBiometric")}
-          </Text>
-        </Pressable>
-      )}
-
-      {onCancel && mode !== "verify" && (
-        <Pressable accessibilityRole="button" onPress={onCancel} style={{ marginTop: 24 }}>
-          <Text style={{ color: palette.sub }}>{t("cancel")}</Text>
-        </Pressable>
-      )}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t("lockUnlock")}
+        onPress={() => void prompt()}
+        style={{
+          backgroundColor: palette.accent,
+          borderRadius: 999,
+          paddingVertical: 14,
+          paddingHorizontal: 32,
+          minHeight: 48,
+          justifyContent: "center",
+        }}
+      >
+        <Text style={{ color: palette.accentText, fontWeight: "700" }}>
+          {t("lockUnlock")}
+        </Text>
+      </Pressable>
     </View>
   );
 }

@@ -96,7 +96,13 @@ export interface Preferences {
   lang: Lang;
   theme: Theme;
   country: string;
+  /** Remind me when a diagnostic window closes. */
   notifs: boolean;
+  /**
+   * Require the device's own authentication (biometric, or the device
+   * PIN/pattern as fallback) before the interface is shown. Gates the
+   * *interface*: the data is encrypted at rest independently of it.
+   */
   lock: boolean;
   highPrev: boolean;
   reducedMotion: boolean;
@@ -110,12 +116,6 @@ export interface Preferences {
    * this app is a likelier threat than a remote attacker.
    */
   disguise: boolean;
-  /**
-   * Simulated app lock. The PIN gates the UI only — data at rest is
-   * encrypted independently of it. Not a security boundary until the
-   * biometric/keystore milestone lands.
-   */
-  lockPin: string | null;
 }
 
 export interface AppData {

@@ -123,7 +123,7 @@ export const de: Dict = {
   testReminders: "Testerinnerungen",
   testRemindersSub: "Benachrichtigen wenn Test empfohlen",
   appLock: "App-Sperre",
-  appLockSub: "Biometrie/PIN",
+  appLockSub: "Vor dem Öffnen die Entsperrung des Geräts verlangen",
   highPrevToggle: "Prävalenz-Flags anzeigen",
   highPrevToggleSub: "STIs mit hoher regionaler Verbreitung markieren",
   reducedMotion: "Reduzierte Bewegung",
@@ -323,17 +323,13 @@ export const de: Dict = {
   decoyNote2: "Vermieter anrufen",
   decoyNote3: "Zahnarzttermin vereinbaren",
   hideNow: "Verbergen",
-  appLockSim: "App-Sperre (simuliert)",
-  appLockSimSub: "Beim Öffnen der App nach einer PIN fragen",
-  lockSimWarning:
-    "Dies ist eine Demonstration des Sperrbildschirms. Er verbirgt die Oberfläche, ist aber noch keine Sicherheitsgrenze — deine Daten sind ohnehin auf der Festplatte verschlüsselt.",
+  appLockUnavailable:
+    "Auf diesem Gerät ist keine Entsperrung eingerichtet. Richte in den Systemeinstellungen eine PIN, ein Muster oder Biometrie ein, dann lässt sich die Sperre aktivieren.",
+  appLockNote:
+    "Die Sperre schützt die Oberfläche gegen jemanden, der das entsperrte Telefon in die Hand nimmt. Die Daten selbst sind unabhängig davon verschlüsselt.",
   lockTitle: "Gesperrt",
-  lockEnterPin: "PIN eingeben",
-  lockSetPin: "Wähle eine 4-stellige PIN",
-  lockConfirmPin: "Noch einmal eingeben",
-  lockWrongPin: "Falsche PIN",
-  lockPinMismatch: "PINs stimmen nicht überein",
+  lockPrompt: "Entsperren, um fortzufahren",
   lockUnlock: "Entsperren",
-  lockSimBiometric: "Biometrie verwenden (simuliert)",
-  lockDelete: "Löschen",
+  lockFailed: "Nicht entsperrt",
+  screenshotBlocked: "Bildschirmaufnahme ist in dieser App gesperrt",
 };

@@ -12,16 +12,7 @@ export function DataScreen({ onClose }: { onClose: () => void }) {
   const { data, t, palette } = useApp();
   const [showRaw, setShowRaw] = useState(false);
 
-  const raw = useMemo(
-    () =>
-      JSON.stringify(
-        // The PIN gates the UI; never render it back to the screen.
-        { ...data, prefs: { ...data.prefs, lockPin: data.prefs.lockPin ? "«redacted»" : null } },
-        null,
-        2,
-      ),
-    [data],
-  );
+  const raw = useMemo(() => JSON.stringify(data, null, 2), [data]);
 
   const counts: { label: string; n: number }[] = [
     { label: t("dataEncounters"), n: data.intercourse.length },

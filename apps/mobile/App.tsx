@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import { usePreventScreenCapture } from "expo-screen-capture";
 import type { Lang } from "@sexdiary/core";
 import { AppProvider, useApp } from "./src/state/store";
 import { APP_NAME } from "./src/branding";
@@ -109,6 +110,29 @@ function TopBar({ onHide }: { onHide: () => void }) {
   );
 }
 
+/**
+ * What the app switcher gets to see. On Android FLAG_SECURE already
+ * blanks the preview; on iOS nothing does, so the app covers itself
+ * the moment it stops being frontmost.
+ */
+function Cover() {
+  const { data, t, palette } = useApp();
+  return (
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: palette.bg,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <Text style={{ color: palette.sub, fontSize: 15, fontWeight: "600" }}>
+        {data.prefs.disguise ? t("neutralAppName") : APP_NAME}
+      </Text>
+    </View>
+  );
+}
+
 function TabBar({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
   const { t, palette } = useApp();
   const tabs: { id: Tab; label: string }[] = [
@@ -153,23 +177,42 @@ function Shell() {
   const [tab, setTab] = useState<Tab>("dashboard");
   const [decoy, setDecoy] = useState(false);
 
-  const hasPin = data.prefs.lockPin !== null;
-  const [locked, setLocked] = useState(hasPin);
+  // Android: FLAG_SECURE — no screenshots, no screen recording, and a
+  // blank tile in the recents switcher. iOS: blocks screen recording.
+  usePreventScreenCapture();
 
-  // Re-lock whenever the app leaves the foreground, so the interface is
-  // never left open in the task switcher or after a handover.
+  // Nothing to protect before there is data, and an auth prompt in front
+  // of a first-run screen only teaches people to switch the lock off.
+  const lockEnabled = data.prefs.lock && data.onboarded;
+  const [locked, setLocked] = useState(lockEnabled);
+  const [covered, setCovered] = useState(false);
+
   useEffect(() => {
     const sub = AppState.addEventListener("change", (state) => {
-      if (state !== "active" && data.prefs.lockPin !== null) setLocked(true);
+      // "inactive" is the app switcher and system dialogs; "background"
+      // is a real handover. Cover for the first, lock for the second —
+      // and no grace period, because the attacker in this threat model
+      // is standing next to you.
+      setCovered(state !== "active");
+      if (state === "background" && lockEnabled) setLocked(true);
     });
     return () => sub.remove();
-  }, [data.prefs.lockPin]);
+  }, [lockEnabled]);
 
-  if (locked && hasPin) {
+  if (locked) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: palette.bg }}>
         <StatusBar style={isDark ? "light" : "dark"} />
         <LockScreen onUnlock={() => setLocked(false)} />
+      </SafeAreaView>
+    );
+  }
+
+  if (covered) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: palette.bg }}>
+        <StatusBar style={isDark ? "light" : "dark"} />
+        <Cover />
       </SafeAreaView>
     );
   }

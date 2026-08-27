@@ -131,7 +131,7 @@ export const en = {
   testReminders: "Testing reminders",
   testRemindersSub: "Notify when testing becomes recommended",
   appLock: "App lock",
-  appLockSub: "Require biometrics or PIN",
+  appLockSub: "Require your device unlock before opening",
   highPrevToggle: "Show high-prevalence flags",
   highPrevToggleSub: "Highlight STIs prevalent in your region",
   reducedMotion: "Reduced motion",
@@ -334,19 +334,15 @@ export const en = {
   decoyNote2: "Call the landlord",
   decoyNote3: "Book dentist appointment",
   hideNow: "Hide",
-  appLockSim: "App lock (simulated)",
-  appLockSimSub: "Ask for a PIN when opening the app",
-  lockSimWarning:
-    "This is a demonstration of the lock screen. It hides the interface but is not yet a security boundary — your data is encrypted on disk regardless.",
+  appLockUnavailable:
+    "This device has no unlock set up. Add a PIN, pattern or biometrics in the system settings, then the lock can be switched on.",
+  appLockNote:
+    "The lock protects the interface against someone picking up the unlocked phone. The data itself is encrypted regardless.",
   lockTitle: "Locked",
-  lockEnterPin: "Enter your PIN",
-  lockSetPin: "Choose a 4-digit PIN",
-  lockConfirmPin: "Enter it again",
-  lockWrongPin: "Wrong PIN",
-  lockPinMismatch: "PINs did not match",
+  lockPrompt: "Unlock to continue",
   lockUnlock: "Unlock",
-  lockSimBiometric: "Use biometrics (simulated)",
-  lockDelete: "Delete",
+  lockFailed: "Not unlocked",
+  screenshotBlocked: "Screen capture is blocked in this app",
 };
 
 export type Dict = typeof en;

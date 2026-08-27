@@ -263,13 +263,6 @@ export function SettingsView({
         },
         {
           type: "toggle",
-          label: t("appLock"),
-          sub: t("appLockSub"),
-          value: prefs.lock,
-          onChange: (v) => updPrefs({ lock: v }),
-        },
-        {
-          type: "toggle",
           label: t("highPrevToggle"),
           sub: t("highPrevToggleSub"),
           value: prefs.highPrev,
