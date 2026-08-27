@@ -3,7 +3,115 @@
 Reverse-chronological decision log. Read this first each session; append
 before ending one. `docs/` is GitHub Pages build output — notes live here.
 
-## 2026-08-27 (latest) — Wave 2 shipped: tokens, a real package, lint, CI, sources
+## 2026-08-28 (latest) — Design-system page, and half of wave 3
+
+**The design-system page.** Benedict asked for the design system to be visible
+on the web presence, as part of a small doc — for showing, not necessarily for
+the public. It lives at `docs/design.html`: a second Vite entry, `noindex`,
+linked from nowhere. It shares nothing with the tracker but the build, so it
+survives wave 4.
+
+The point of it is that it writes nothing down. Colours, levels and contrast
+figures come out of `@sexdiary/core` at runtime and are computed with the same
+`contrast()` the test uses — which is now exported from core rather than living
+in the test file, since two callers need the same arithmetic.
+
+`page.ts` has no DOM and no stylesheet import, so the page can be rendered
+outside a browser and actually looked at. That paid off immediately: the brand
+tile labelled "So nicht" showed **9.93:1** in the dark theme — a pass. Munich
+yellow is perfectly readable on a dark ground; the contrast failure only
+happens on light. The tile is pinned to the light background now, and the
+section says which argument actually carries: yellow already means "elevated"
+on the risk scale, so a button in it would look like a warning in either theme.
+
+---
+
+**Wave 3, three features and a half.**
+
+**The lock was simulated and is not any more.** It used to be a four-digit code
+the app kept in its own data — inside the very blob it was supposed to protect.
+Authentication is the device's job now: biometrics where enrolled, the device
+PIN or pattern otherwise. `prefs.lockPin` is gone at schema v3.
+
+The migration was worth thinking about: anyone who had a PIN wanted a lock, so
+it carries over as `lock: true` rather than quietly unlocking an app somebody
+had deliberately protected. Three tests, checked by switching the migration off
+and watching them go red.
+
+Two lying switches became true in the process. `prefs.lock` had no reader
+(finding 1.4); it has one now, and it refuses to switch on when the device has
+no unlock configured — otherwise it would be the same lie in a new coat.
+Switching it *off* is authenticated too, or the lock only defends against
+someone who cannot find the settings screen. `prefs.notifs` had no reader
+either; it has one now, and it asks the OS before it promises anything.
+
+Both switches are gone from `apps/web`. What they promise, a browser cannot
+deliver (ADR-0001).
+
+**Screen capture**: FLAG_SECURE on Android, which also blanks the recents tile.
+iOS has no equivalent, so the app covers itself when it stops being frontmost.
+Locked on `background`, covered on `inactive`, and no grace period — the
+attacker in this threat model is standing next to you.
+
+**Reminders.** The decidable half is in core and tested: `reminderSchedule`
+derives from the same report the screen shows which day which windows close,
+grouped by date. Seven notifications on one morning is how a health app teaches
+people to switch notifications off.
+
+The wording is the security-relevant part, and it is deliberately empty: a
+notification is rendered on the lock screen, in front of exactly the person
+ADR-0001 is about. It names no infection, no count, no date. The settings
+screen says so, rather than leaving the user to work it out.
+
+**A real bug fell out of this.** A test broke when the session crossed
+midnight — and the reason was not the test. `calcRisk` measured "days since
+exposure" by dividing elapsed milliseconds, while dates in this app are days
+anchored at noon. Demonstrated rather than argued:
+
+    encounter logged today at 00:02
+    days = -1, wPct = -0.022
+    "testable in 46 days" for a 45-day window
+
+Anyone logging an encounter before noon saw a negative progress bar and a
+window one day too far away. `daysBetween` counts calendar days now, which also
+survives the two clock changes a year.
+
+**Signed results.** The interface spec left the signature scheme open; it is
+Ed25519, encoded JWS-style as `SXD1.<base64url payload>.<base64url signature>`,
+signing the *encoded* payload segment byte for byte. That removes
+canonicalisation from the verifying side entirely — there is exactly one byte
+sequence to check and it is the one that arrived.
+
+The signature check is injected, not implemented: core has no runtime
+dependencies and Ed25519 is not something to hand-roll. What core owns is
+everything that decides the outcome. base64url and UTF-8 are hand-written for
+the same reason — `btoa` is missing from some React Native runtimes and
+`Buffer` is Node-only.
+
+Tested against real Ed25519 from `node:crypto`, because a stub would only prove
+the stub was called. Both the signature check and the padding check were
+removed on purpose to confirm the tests notice.
+
+Also answered: ADR-0007's open question about expired keys. A key still
+verifies what it signed while it was valid — compared against the *sample*
+date. Otherwise a routine rotation would void everyone's stored history.
+
+The part that matters most is the cheapest: the timeline now labels every
+record "self-entered" or "signed by X". Per the ADR that is the larger half of
+the trust gain, and it works today, before a single test centre takes part.
+
+**Not built, and deliberately so.** The camera screen and the on-device
+verifier — unused crypto is worse than none. Backup (ADR-0009) and distribution
+(ADR-0010). And the key is *not* bound to authentication: Android discards it
+when enrolled biometrics change, which without a backup is a data-loss trap.
+That is why backup comes first in the next block of work.
+
+**The thing that has not changed since 10 July:** none of this has run on a
+phone. 104 tests, three typechecks, lint, `expo-doctor` 21/21 and a Metro
+export say the code is coherent. They say nothing about whether the lock holds
+across backgrounding or whether a reminder fires on the right morning.
+
+## 2026-08-27 — Wave 2 shipped: tokens, a real package, lint, CI, sources
 
 All five items. Nothing in this entry was decided by looking at code and
 guessing; each has a number behind it.

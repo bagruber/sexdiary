@@ -4,6 +4,30 @@
 Punkte bitte streichen, nicht abhaken — die Datei soll kurz bleiben.*
 
 
+## Welle 3 ist zur Hälfte gebaut
+
+Fertig: echter App-Lock, Bildschirmschutz, Erinnerungen, und das Format der
+signierten Befunde samt Vertrauensliste.
+
+Offen, in dieser Reihenfolge sinnvoll:
+
+1. **Backup ([ADR-0009](architecture/adr/0009-backup-modell.md)).** Kommt
+   zuerst, weil der nächste Härtungsschritt am Lock ohne Sicherung eine
+   Datenverlustfalle wäre — siehe unten.
+2. **QR-Scanner und Ed25519-Verifizierer auf dem Gerät.** Das Format steht und
+   ist getestet, gescannt wird noch nichts. Braucht einen Kamerabildschirm.
+3. **Verteilung ([ADR-0010](architecture/adr/0010-verteilung-erprobung.md)).**
+   Signiertes Paket, lokaler Build dokumentiert.
+4. **Alternatives Icon und OS-Name.** Ohne das verrät eine Benachrichtigung im
+   Tarnmodus auf dem Sperrbildschirm weiterhin den App-Namen.
+
+Bewusst nicht gebaut: der Schlüssel ist **nicht** an die Authentisierung
+gebunden (`SecureStore` mit `requireAuthentication`). Das wäre der stärkere
+Schutz, aber Android verwirft den Schlüssel, wenn sich die hinterlegte
+Biometrie ändert. Ohne Backup ist das ein Datenverlust ohne Ausweg. Nach
+Punkt 1 neu zu bewerten.
+
+
 ## Vier medizinische Befunde warten auf ärztliche Prüfung
 
 Aus Welle 2, ausführlich in `architecture/risikomodell-quellen.md`,

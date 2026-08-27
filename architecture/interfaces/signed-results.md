@@ -1,6 +1,7 @@
 # Schnittstelle: signierter Ergebnis-QR
 
-**Status:** Entwurf · 27.08.2026 · setzt [ADR-0007](../adr/0007-signierte-testergebnisse.md) um
+**Status:** Entwurf · 27.08.2026, Format festgelegt 28.08.2026 · setzt
+[ADR-0007](../adr/0007-signierte-testergebnisse.md) um
 
 Richtung: Teststelle ↔ App. **Zwei Wege, ein Nutzlastformat.** In keinem der
 beiden Fälle gibt es einen Netzweg zwischen Teststelle und *Betreiber*.
@@ -151,17 +152,52 @@ Bindende Eigenschaften:
 Die Adresse des Abrufendpunkts kommt aus derselben Vertrauensliste wie die
 Signaturschlüssel. Ein Verzeichnis, zwei Zwecke.
 
+## Festgelegt am 28.08.2026
+
+**Verfahren: Ed25519.** Kompakt genug für einen Kassenbon (64 Byte Signatur,
+32 Byte Schlüssel), schnell zu prüfen, und in derselben Familie wie das bereits
+eingesetzte `@noble/ciphers`.
+
+**Kodierung, JWS-förmig:**
+
+```
+SXD1.<base64url(Nutzlast als JSON)>.<base64url(Signatur)>
+```
+
+Signiert wird das **kodierte Nutzlastsegment**, Byte für Byte. Das nimmt die
+Kanonisierung vollständig von der prüfenden Seite: Es gibt genau eine Bytefolge
+zu prüfen, und es ist die übertragene. Nur der Aussteller braucht eine
+kanonische Serialisierung — Felder in fester Reihenfolge, Analyte sortiert —,
+und ein Fehler dort erzeugt eine Signatur, die laut scheitert, statt eines
+Befunds, der gegen andere Bytes prüft als er anzeigt.
+
+Gemessene Größe eines typischen Vierfach-Panels: unter 400 Zeichen, also etwa
+QR-Version 13 bei Fehlerkorrektur M. A5 ist damit erfüllt.
+
+**Abgelaufene Schlüssel** (vormals offener Punkt 4): Ein Schlüssel prüft die
+Befunde weiter, die er signiert hat, solange er gültig war — verglichen wird
+gegen das **Probendatum**, nicht gegen heute. Sonst entwertete jede
+Schlüsselrotation die gesamte gespeicherte Historie.
+
+**Prüfreihenfolge:** Format, Aussteller bekannt, Schlüssel gesperrt,
+Gültigkeit zum Probendatum, Signatur. Ein gesperrter Schlüssel wird als
+gesperrt gemeldet, auch wenn die Signatur rechnerisch stimmt.
+
+Implementierung in `packages/core/src/signed-result.ts`; die Signaturprüfung
+wird hineingereicht, damit der Kern dependency-frei bleibt (ADR-0002). Geprüft
+gegen echtes Ed25519 aus `node:crypto` in
+`packages/core/test/signed-result.test.ts`.
+
 ## Offen
 
-1. Signaturverfahren und konkrete Kodierung der Nutzlast.
-2. Codeformat: muss vom Tresenpersonal vorlesbar und vom Nutzer abtippbar sein,
-   falls der QR nicht scannt.
-3. Zweiter Faktor — PIN ist datensparsamer, Geburtsdatum ist gewohnt.
-4. Ob der Betreiber eine Referenzimplementierung der Teststellenseite
-   mitliefert. Vermutlich ja, sonst macht niemand mit.
-2. Wer das Schlüsselverzeichnis betreibt. Bei einer kommunalen Einführung
-   naheliegend die einführende Stelle.
-3. Werkzeug für die Teststelle, das QRs erzeugt — ohne das ist die ganze
+1. Der Kamerabildschirm in der App und der Ed25519-Verifizierer auf der
+   Geräteseite. Das Format steht, gescannt wird noch nichts.
+2. Werkzeug für die Teststelle, das QRs erzeugt — ohne das ist die ganze
    Schnittstelle theoretisch.
-4. Verhalten bei abgelaufenem, aber zum Probenzeitpunkt gültigem Schlüssel.
-   Vorschlag: gültig, wenn die Signatur zum Probendatum gültig war.
+3. Codeformat für den Abholweg: muss vom Tresenpersonal vorlesbar und vom
+   Nutzer abtippbar sein, falls der QR nicht scannt.
+4. Zweiter Faktor — PIN ist datensparsamer, Geburtsdatum ist gewohnt.
+5. Wer das Schlüsselverzeichnis betreibt. Bei einer kommunalen Einführung
+   naheliegend die einführende Stelle.
+6. Ob der Betreiber eine Referenzimplementierung der Teststellenseite
+   mitliefert. Vermutlich ja, sonst macht niemand mit.

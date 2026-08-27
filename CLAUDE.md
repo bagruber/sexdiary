@@ -40,7 +40,7 @@ Gerät bleiben?**
 | `architecture/` | arc42, ADRs, Threat Model, Schnittstellen, Risikomodell-Quellen | Auf Deutsch, echte Umlaute |
 | `notes/` | Entscheidungslog, Audits, Roadmap | Rohmaterial, nicht Lieferobjekt |
 | `design/` | Screen-Entwürfe als Quelldateien | Keine Produktivdateien. Zeigen noch die heutige Palette |
-| `docs/` | **Build-Output** der Webseite | Keine Dokumentation. Soll perspektivisch aus dem Repo |
+| `docs/` | **Build-Output** der Webseite | Keine Dokumentation. Soll perspektivisch aus dem Repo. Enthält `design.html`, die interne Designsystem-Seite |
 
 ## Arbeitsregeln in diesem Repo
 
@@ -63,7 +63,7 @@ Gerät bleiben?**
 
 In diesem Repo hat sich mehrfach gezeigt, dass grüne Builds wenig beweisen:
 
-- `pnpm run lint` · `pnpm run typecheck` · `pnpm run test` (70 Tests) ·
+- `pnpm run lint` · `pnpm run typecheck` · `pnpm run test` (104 Tests) ·
   `pnpm run build`. Dieselben vier Schritte laufen in der CI
   (`.github/workflows/pruefung.yml`), dazu die Prüfung, ob `docs/` dem
   Quellstand entspricht.
@@ -83,9 +83,14 @@ In diesem Repo hat sich mehrfach gezeigt, dass grüne Builds wenig beweisen:
 | 0 | Versionen, Expo 57, pnpm | erledigt 27.08.2026 |
 | 1 | Architektur festschreiben | erledigt 27.08.2026 |
 | 2 | Design-Tokens in den Kern, Lint und CI, tote Konstanten, Quellenangaben an den medizinischen Zahlen, Kern als echtes Paket | erledigt 27.08.2026 |
-| 3 | Mobile wird das Produkt: echter Lock, Screenshot-Schutz, Erinnerungen, signierte QRs, Backup, Verteilung | **als Nächstes** |
+| 3 | Mobile wird das Produkt: echter Lock, Screenshot-Schutz, Erinnerungen, signierte QRs, Backup, Verteilung | **teilweise**, siehe unten |
 | 4 | Infoseite ersetzt den Web-Tracker | offen |
 | 5 | Server: Alert-Relay, Schlüsselverzeichnis, Deployment-Artefakt | offen |
+
+Von Welle 3 stehen **Lock, Bildschirmschutz, Erinnerungen und das Format der
+signierten Befunde**. Offen sind **Backup (ADR-0009), Verteilung (ADR-0010)
+und der QR-Scanner**. Die drei gebauten Features sind auf keinem Gerät
+gelaufen — das ist in dieser Welle das Nadelöhr, nicht eine Randnotiz.
 
 Aus Welle 2 mitgenommen: die **vier medizinischen Befunde** in
 `architecture/risikomodell-quellen.md`, Abschnitt 7. Zwei diagnostische Fenster
