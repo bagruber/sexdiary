@@ -13,7 +13,7 @@ import {
   type TestRecord,
   type Vaccination,
 } from "./domain.js";
-import { toDate } from "./date.js";
+import { dateString, daysBetween, toDate } from "./date.js";
 
 /**
  * One encounter that contributed to an STI's rating, with the reasons.
@@ -111,7 +111,7 @@ export function calcRisk(
   country: string,
   conditions: string[] = [],
 ): RiskReport {
-  const todayDate = new Date();
+  const todayString = dateString(new Date());
   const sorted = [...te].sort(
     (a, b) => toDate(b.date).getTime() - toDate(a.date).getTime(),
   );
@@ -218,9 +218,8 @@ export function calcRisk(
       continue;
     }
     const latest = exposures.reduce((a, b) => (a.date > b.date ? a : b));
-    const days = Math.floor(
-      (todayDate.getTime() - latest.date.getTime()) / 86_400_000,
-    );
+    // Calendar days, not elapsed milliseconds: see daysBetween.
+    const days = daysBetween(latest.date, todayString);
     const mr = exposures.reduce<RiskLevel>(
       (m, e) => (RISK_ORDER[e.rl] > RISK_ORDER[m] ? e.rl : m),
       "none",
@@ -291,6 +290,58 @@ export function nextAction(report: RiskReport): NextAction {
     return { kind: "wait", testable, soonestSti, soonestDays };
   }
   return { kind: "allClear", testable };
+}
+
+/**
+ * One day on which one or more diagnostic windows close.
+ *
+ * Grouped by date on purpose: seven separate notifications on the same
+ * morning is how a health app teaches people to switch notifications
+ * off, and the app says one thing at a time anyway.
+ */
+export interface Reminder {
+  /** ISO date the window closes. */
+  date: string;
+  /** STIs that become testable that day, in the report's order. */
+  stis: string[];
+  /** Days from `today` — always >= 1. */
+  inDays: number;
+}
+
+/**
+ * When to remind, derived from the same report the screen shows.
+ *
+ * Only windows still ahead produce a reminder: something already
+ * testable needs no notification, it needs the user to open the app,
+ * and the main screen already says so.
+ *
+ * What the reminder *says* is deliberately not decided here. On a lock
+ * screen the text is visible to whoever is standing next to the phone,
+ * which is precisely the attacker this product is shaped around — so
+ * the wording stays with the host, and it names no infection.
+ */
+export function reminderSchedule(
+  report: RiskReport,
+  from: string = dateString(new Date()),
+): Reminder[] {
+  const byDate = new Map<string, { stis: string[]; inDays: number }>();
+  const start = toDate(from);
+
+  for (const [sti, r] of Object.entries(report.risks)) {
+    if (!r.exposed || r.testable) continue;
+    const inDays = (r.wd ?? 0) - (r.days ?? 0);
+    if (inDays < 1) continue;
+    const date = dateString(
+      new Date(start.getTime() + inDays * 86_400_000),
+    );
+    const entry = byDate.get(date) ?? { stis: [], inDays };
+    entry.stis.push(sti);
+    byDate.set(date, entry);
+  }
+
+  return [...byDate.entries()]
+    .map(([date, { stis, inDays }]) => ({ date, stis, inDays }))
+    .sort((a, b) => a.inDays - b.inDays);
 }
 
 export interface VaccineSeries {

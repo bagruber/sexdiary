@@ -327,6 +327,12 @@ export const de: Dict = {
     "Auf diesem Gerät ist keine Entsperrung eingerichtet. Richte in den Systemeinstellungen eine PIN, ein Muster oder Biometrie ein, dann lässt sich die Sperre aktivieren.",
   appLockNote:
     "Die Sperre schützt die Oberfläche gegen jemanden, der das entsperrte Telefon in die Hand nimmt. Die Daten selbst sind unabhängig davon verschlüsselt.",
+  reminderTitle: "Erinnerung",
+  reminderBody: "Es gibt etwas nachzusehen.",
+  remindersUnavailable:
+    "Benachrichtigungen sind für diese App im System abgeschaltet. Ohne sie kann nicht erinnert werden.",
+  remindersNote:
+    "Die Erinnerung nennt weder eine Infektion noch ein Datum — sie ist auf dem Sperrbildschirm für andere lesbar. Was gemeint ist, steht in der App.",
   lockTitle: "Gesperrt",
   lockPrompt: "Entsperren, um fortzufahren",
   lockUnlock: "Entsperren",

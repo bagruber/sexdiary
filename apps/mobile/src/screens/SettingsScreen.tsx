@@ -6,6 +6,7 @@ import { APP_NAME } from "../branding";
 import { Card, Chip, PrimaryButton, Row, Screen, SectionTitle, Title } from "../ui";
 import { DataScreen } from "./DataScreen";
 import { authenticate, lockAvailability, type LockAvailability } from "../lib/app-lock";
+import { cancelReminders, requestReminderPermission } from "../lib/reminders";
 
 const THEMES: Theme[] = ["system", "light", "dark"];
 const LANGS: { value: Lang; label: string }[] = [
@@ -19,9 +20,26 @@ export function SettingsScreen() {
   const [canLock, setCanLock] = useState<LockAvailability | null>(null);
   const lang = data.prefs.lang;
 
+  const [notifsDenied, setNotifsDenied] = useState(false);
+
   useEffect(() => {
     void lockAvailability().then(setCanLock);
   }, []);
+
+  /**
+   * Asking first, promising second. A switch that stays on while the OS
+   * refuses to deliver would be the same lie the lock used to be.
+   */
+  const toggleNotifs = async (on: boolean) => {
+    if (!on) {
+      dispatch({ type: "updatePrefs", patch: { notifs: false } });
+      await cancelReminders();
+      return;
+    }
+    const granted = await requestReminderPermission();
+    setNotifsDenied(!granted);
+    if (granted) dispatch({ type: "updatePrefs", patch: { notifs: true } });
+  };
 
   const themeLabel: Record<Theme, string> = {
     system: t("themeSystem"),
@@ -98,6 +116,32 @@ export function SettingsScreen() {
         </Card>
 
         <SectionTitle>{t("privacy")}</SectionTitle>
+        <Row
+          label={t("testReminders")}
+          sub={t("testRemindersSub")}
+          right={
+            <Switch
+              value={data.prefs.notifs}
+              onValueChange={(v) => void toggleNotifs(v)}
+              accessibilityLabel={t("testReminders")}
+            />
+          }
+        />
+        {notifsDenied ? (
+          <Card>
+            <Text style={{ color: palette.warn, fontSize: 12, lineHeight: 17 }}>
+              {t("remindersUnavailable")}
+            </Text>
+          </Card>
+        ) : (
+          data.prefs.notifs && (
+            <Card>
+              <Text style={{ color: palette.sub, fontSize: 12, lineHeight: 17 }}>
+                {t("remindersNote")}
+              </Text>
+            </Card>
+          )
+        )}
         <Row
           label={t("appLock")}
           sub={t("appLockSub")}

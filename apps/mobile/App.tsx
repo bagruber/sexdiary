@@ -10,6 +10,7 @@ import {
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { usePreventScreenCapture } from "expo-screen-capture";
+import { syncReminders } from "./src/lib/reminders";
 import type { Lang } from "@sexdiary/core";
 import { AppProvider, useApp } from "./src/state/store";
 import { APP_NAME } from "./src/branding";
@@ -173,7 +174,7 @@ function TabBar({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
 }
 
 function Shell() {
-  const { data, palette, isDark } = useApp();
+  const { data, t, palette, isDark } = useApp();
   const [tab, setTab] = useState<Tab>("dashboard");
   const [decoy, setDecoy] = useState(false);
 
@@ -186,6 +187,21 @@ function Shell() {
   const lockEnabled = data.prefs.lock && data.onboarded;
   const [locked, setLocked] = useState(lockEnabled);
   const [covered, setCovered] = useState(false);
+
+  // The schedule is derived from the data, so it is rebuilt whenever
+  // anything it depends on moves. Cheap: a handful of dates.
+  const { intercourse, tests, vaccinations } = data;
+  useEffect(() => {
+    void syncReminders(data, { title: t("reminderTitle"), body: t("reminderBody") });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    intercourse,
+    tests,
+    vaccinations,
+    data.prefs.notifs,
+    data.prefs.country,
+    data.profile.conditions,
+  ]);
 
   useEffect(() => {
     const sub = AppState.addEventListener("change", (state) => {

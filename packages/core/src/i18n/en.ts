@@ -338,6 +338,12 @@ export const en = {
     "This device has no unlock set up. Add a PIN, pattern or biometrics in the system settings, then the lock can be switched on.",
   appLockNote:
     "The lock protects the interface against someone picking up the unlocked phone. The data itself is encrypted regardless.",
+  reminderTitle: "Reminder",
+  reminderBody: "There is something to look at.",
+  remindersUnavailable:
+    "Notifications are switched off for this app in the system settings. Without them there can be no reminder.",
+  remindersNote:
+    "The reminder names no infection and no date — it is readable by anyone on your lock screen. What it refers to stays inside the app.",
   lockTitle: "Locked",
   lockPrompt: "Unlock to continue",
   lockUnlock: "Unlock",

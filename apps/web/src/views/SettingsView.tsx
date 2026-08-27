@@ -256,13 +256,6 @@ export function SettingsView({
         },
         {
           type: "toggle",
-          label: t("testReminders"),
-          sub: t("testRemindersSub"),
-          value: prefs.notifs,
-          onChange: (v) => updPrefs({ notifs: v }),
-        },
-        {
-          type: "toggle",
           label: t("highPrevToggle"),
           sub: t("highPrevToggleSub"),
           value: prefs.highPrev,
