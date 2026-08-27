@@ -82,36 +82,54 @@ genehmigungsfähig ist.
 graph LR
     U(["Nutzer"])
     K(["Kontakt<br/>eines Nutzers"])
-    T(["Teststelle"])
+    T["<b>Teststelle</b><br/>signiert Befunde,<br/>hält Abrufendpunkt"]
 
     APP["<b>Sexdiary App</b><br/>Android / iOS<br/><i>alle Gesundheitsdaten</i>"]
     REL["<b>Alert-Relay</b><br/>anonyme Benachrichtigung"]
     WEB["<b>Infoseite</b><br/>Erklärung, Impressum,<br/>Teststellen"]
     CLOUD["<b>Cloud des Nutzers</b><br/>iCloud / Google Drive"]
 
+    FOR["<b>Forschungsempfänger</b><br/>nur verrauschte Aggregate"]
+
     U -->|"protokolliert,<br/>liest Bewertung"| APP
-    T -->|"signierter<br/>Ergebnis-QR"| APP
+    T -->|"signierter QR<br/><i>Übergabe</i>"| APP
+    APP -->|"Abrufcode + 2. Faktor<br/><i>Abholung</i>"| T
     APP -->|"Token + Label,<br/>kein Absender"| REL
-    REL -->|"holt Benachrichtigungen<br/>zum eigenen Token"| K
+    REL -->|"eigene Benachrichtigungen"| K
+    K -->|"Antwort aus fester Liste<br/>an das Antwort-Token"| REL
     APP -.->|"opt-in,<br/>E2E-verschlüsselt"| CLOUD
+    APP -.->|"opt-in,<br/>Rauschen auf dem Gerät"| FOR
     U -->|"informiert sich"| WEB
 
     style APP fill:#1B7276,color:#fff,stroke:#134f52
     style REL fill:#F5F3EF,stroke:#B0414D
+    style T fill:#F5F3EF,stroke:#9C6218
     style WEB fill:#F5F3EF,stroke:#8a8696
     style CLOUD fill:#F5F3EF,stroke:#8a8696
+    style FOR fill:#F5F3EF,stroke:#8a8696
 ```
 
 ### 3.2 Was das Diagramm sagt
 
-Die App ist der einzige Ort, an dem Gesundheitsdaten liegen. Es gibt genau
-**drei** Verbindungen über die Gerätegrenze, und alle drei sind schmal:
+Die App ist der einzige Ort, an dem Gesundheitsdaten liegen. Jede Verbindung
+über die Gerätegrenze ist einzeln begründet und schmal:
 
-| Richtung | Inhalt | Wer erfährt was |
-|---|---|---|
-| Teststelle → App | signiertes Ergebnis, vom Nutzer gescannt | Die Teststelle erfährt nichts über die App. Der Scan ist offline. |
-| App → Relay | Empfänger-Token, Erreger-Label, Zeitstempel | Das Relay erfährt nicht, wer gesendet hat, und nichts über den Absender. |
-| App ↔ Cloud | verschlüsselter Blob | Der Cloud-Anbieter sieht undurchdringliche Bytes. Opt-in. |
+| Richtung | Inhalt | Wer erfährt was | ADR |
+|---|---|---|---|
+| Teststelle → App, *Übergabe* | signierter Befund im QR | Die Teststelle erfährt nichts. Die Prüfung ist offline. | [0007](adr/0007-signierte-testergebnisse.md) |
+| App → Teststelle, *Abholung* | Abrufcode und zweiter Faktor | Die Teststelle erfährt den Abrufzeitpunkt. Der Betreiber ist **nicht** im Pfad. | [0012](adr/0012-befundabruf.md) |
+| App → Relay | Empfänger-Token, Label, Zeit, optional ein Antwort-Token | Das Relay erfährt nicht, wer gesendet hat. | [0008](adr/0008-anonyme-benachrichtigung.md) |
+| Kontakt → Relay → App | Antwort aus geschlossener Liste an das Antwort-Token | Wie oben. Keine automatischen Bestätigungen. | [0011](adr/0011-rueckmeldung.md) |
+| App ↔ Cloud des Nutzers | verschlüsselter Blob, opt-in | Der Anbieter sieht undurchdringliche Bytes. | [0009](adr/0009-backup-modell.md) |
+| App → Forschungsempfänger | verrauschte Aggregate, opt-in | Kein Einzelbeitrag rekonstruierbar — das Rauschen entsteht auf dem Gerät. | [0013](adr/0013-forschungsdaten.md) |
+
+Das sind sechs Verbindungen, wo der ursprüngliche Entwurf drei vorsah. Jede der
+drei neuen ist begründet, aber **die Zunahme selbst ist das Risiko**: Jede
+Außenschnittstelle vergrößert die Fläche, die eine Datenschutzprüfung durchgeht,
+und erzeugt Metadaten, die vorher nicht existierten. Die Regel aus
+[`interfaces/README.md`](interfaces/README.md) gilt unverändert — ein Vorschlag
+für eine siebte muss zuerst begründen, warum er nicht auf dem Gerät stattfinden
+kann.
 
 Die Infoseite hat **keine** Verbindung zur App und kennt keinen Nutzer. Sie ist
 bewusst ein getrenntes System, damit ihre Reichweitenmessung, ihr Betrieb und
@@ -407,6 +425,9 @@ Vollständig in [`adr/`](adr/). Die tragenden:
 | [0008](adr/0008-anonyme-benachrichtigung.md) | Tokenbasierte Benachrichtigung ohne Konten | angenommen |
 | [0009](adr/0009-backup-modell.md) | Sicherung in die Cloud des Nutzers, Ende-zu-Ende verschlüsselt | vorgeschlagen |
 | [0010](adr/0010-verteilung-erprobung.md) | Verteilung während der Erprobung | vorgeschlagen |
+| [0011](adr/0011-rueckmeldung.md) | Rückmeldung des Benachrichtigten, ohne Absenderidentität | vorgeschlagen |
+| [0012](adr/0012-befundabruf.md) | Befundabruf über einen Code bei der Teststelle | vorgeschlagen |
+| [0013](adr/0013-forschungsdaten.md) | Forschungsbeitrag nur als verrauschtes Aggregat | vorgeschlagen |
 
 ---
 
@@ -452,6 +473,9 @@ schlimmer als keins.
 | R10 | **MDR-Einordnung offen.** | Kommt im Amtsgespräch in den ersten zwanzig Minuten | vor dem Pitch |
 | R11 | **Der Web-Tracker existiert noch** und dupliziert das Produkt. | Zwei Produkte mit einem Namen, doppelte Pflege | Welle 4 |
 | R12 | **Bus-Faktor 1.** | Diese Dokumentation ist die Gegenmaßnahme, nicht die Lösung | dauerhaft |
+| R13 | **Die Außenfläche ist von drei auf sechs Verbindungen gewachsen** (Rückmeldung, Befundabruf, Forschungsbeitrag). Jede einzeln begründet, die Zunahme bleibt ein Risiko | Größere Prüffläche, mehr Metadaten | laufend |
+| R14 | **Der Befundabruf hängt an der Teststelle**, nicht am Betreiber. Ohne Referenzimplementierung für die Teststellenseite bleibt die Funktion theoretisch | Signierte Befunde ohne Gegenstelle | Welle 5 |
+| R15 | **Der Forschungsbeitrag verbraucht Privatsphärebudget über die Zeit.** Ohne Budgetverwaltung ist die Anonymitätszusicherung nach genügend Übertragungen wertlos | Zusicherung nicht haltbar | vor dem Bau |
 
 ---
 

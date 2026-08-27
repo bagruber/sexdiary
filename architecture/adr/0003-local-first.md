@@ -4,58 +4,58 @@
 
 ## Kontext
 
-Sexuelle Aktivitaet und Gesundheitszustand fallen unter Art. 9 DSGVO,
-besondere Kategorien personenbezogener Daten. Der Betrieb durch eine oeffentliche
-Stelle verschaerft die Anforderungen zusaetzlich.
+Sexuelle Aktivität und Gesundheitszustand fallen unter Art. 9 DSGVO,
+besondere Kategorien personenbezogener Daten. Der Betrieb durch eine öffentliche
+Stelle verschärft die Anforderungen zusätzlich.
 
 Jede serverseitige Speicherung solcher Daten erzeugt: eine
-Datenschutz-Folgenabschaetzung, Verantwortlichkeitsregelungen, Loeschkonzepte,
-Zugriffsprotokolle, eine wachsende Angriffsflaeche — und ein Vertrauensproblem
-gegenueber genau der Zielgruppe, die Diskretion am dringendsten braucht.
+Datenschutz-Folgenabschätzung, Verantwortlichkeitsregelungen, Löschkonzepte,
+Zugriffsprotokolle, eine wachsende Angriffsfläche — und ein Vertrauensproblem
+gegenüber genau der Zielgruppe, die Diskretion am dringendsten braucht.
 
 ## Entscheidung
 
-Gesundheitsdaten werden **niemals** an einen Server uebertragen. Konkret nicht
-uebertragen werden: Begegnungen, Praktiken, Kontakte, Testergebnisse, Impfungen,
+Gesundheitsdaten werden **niemals** an einen Server übertragen. Konkret nicht
+übertragen werden: Begegnungen, Praktiken, Kontakte, Testergebnisse, Impfungen,
 Prophylaxen, Risikobewertungen, Profilangaben.
 
-Der einzige Dienst, der ueberhaupt Daten entgegennimmt, ist das Alert-Relay, und
-er speichert ausschliesslich Empfaenger-Token, Erreger-Label und Zeitstempel
+Der einzige Dienst, der überhaupt Daten entgegennimmt, ist das Alert-Relay, und
+er speichert ausschließlich Empfänger-Token, Erreger-Label und Zeitstempel
 (ADR-0008).
 
-Fuer jeden neuen Endpunkt gilt die Pruefrage: **Koennte das auf dem Geraet
+Für jeden neuen Endpunkt gilt die Prüfrage: **Könnte das auf dem Gerät
 bleiben?** Wenn ja, bleibt es dort.
 
 ## Konsequenzen
 
 **Positiv**
 
-- Die serverseitige datenschutzrechtliche Flaeche ist minimal. Das ist das
-  staerkste Argument fuer eine Genehmigungsfaehigkeit ueberhaupt.
-- Ein vollstaendig kompromittierter Server gibt keine Gesundheitshistorien preis.
+- Die serverseitige datenschutzrechtliche Fläche ist minimal. Das ist das
+  stärkste Argument für eine Genehmigungsfähigkeit überhaupt.
+- Ein vollständig kompromittierter Server gibt keine Gesundheitshistorien preis.
 - Kein Konto, keine Anmeldung, keine Passwortwiederherstellung.
 
 **Negativ**
 
-- **Geraeteverlust bedeutet Datenverlust**, solange keine Sicherung existiert.
-  Dieser Punkt ist der Preis der Entscheidung und der Grund fuer ADR-0009.
-- Kein Geraetewechsel ohne bewusste Sicherung.
-- Keine geraeteuebergreifende Nutzung.
-- Keine Auswertung ueber Nutzer hinweg, auch keine gutgemeinte epidemiologische.
+- **Geräteverlust bedeutet Datenverlust**, solange keine Sicherung existiert.
+  Dieser Punkt ist der Preis der Entscheidung und der Grund für ADR-0009.
+- Kein Gerätewechsel ohne bewusste Sicherung.
+- Keine geräteübergreifende Nutzung.
+- Keine Auswertung über Nutzer hinweg, auch keine gutgemeinte epidemiologische.
 
 **Nicht verhandelbar**
 
-Diese Entscheidung ist die Grundlage aller anderen. Sie fuer Bequemlichkeit
-aufzuweichen — „nur die Testergebnisse synchronisieren“ — wuerde die Architektur
+Diese Entscheidung ist die Grundlage aller anderen. Sie für Bequemlichkeit
+aufzuweichen — „nur die Testergebnisse synchronisieren“ — würde die Architektur
 in ein anderes Produkt verwandeln und die datenschutzrechtliche Argumentation
-zerstoeren.
+zerstören.
 
 ## Verworfene Alternativen
 
-**Verschluesselte Serversynchronisation mit nutzergehaltenem Schluessel.**
+**Verschlüsselte Serversynchronisation mit nutzergehaltenem Schlüssel.**
 Technisch sauber, aber sie verlagert die Argumentation von „wir haben die Daten
-nicht“ zu „wir koennen die Daten nicht lesen“. Der erste Satz ueberzeugt eine
-Datenschutzpruefung, der zweite muss belegt werden.
+nicht“ zu „wir können die Daten nicht lesen“. Der erste Satz überzeugt eine
+Datenschutzprüfung, der zweite muss belegt werden.
 
 **Konten mit serverseitiger Speicherung.** Bequem, aber unvereinbar mit dem
 Vertrauensmodell und mit Art. 9.

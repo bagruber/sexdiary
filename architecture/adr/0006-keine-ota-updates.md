@@ -5,39 +5,39 @@
 ## Kontext
 
 Das eingesetzte Rahmenwerk kann Anwendungscode nach der Installation
-nachladen, ohne dass eine neue Version durch den Store geht. Fuer viele Produkte
+nachladen, ohne dass eine neue Version durch den Store geht. Für viele Produkte
 ist das ein Vorteil: Fehler sind in Minuten behoben.
 
-Fuer dieses Produkt kollidiert es mit der Pruefbarkeit. Wenn Code nach der
+Für dieses Produkt kollidiert es mit der Prüfbarkeit. Wenn Code nach der
 Auslieferung ausgetauscht werden kann, gilt die Aussage „der ausgelieferte Code
-ist der geprueefte Code“ nicht mehr.
+ist der geprüfte Code“ nicht mehr.
 
 ## Entscheidung
 
-Over-the-Air-Updates sind ausgeschaltet. Jede Codeaenderung geht durch einen
-vollstaendigen Build und die regulaere Verteilung.
+Over-the-Air-Updates sind ausgeschaltet. Jede Codeänderung geht durch einen
+vollständigen Build und die reguläre Verteilung.
 
 ## Konsequenzen
 
 **Positiv**
 
-- Was auf dem Geraet laeuft, entspricht einem Stand aus der Quellcodeverwaltung.
-  Ein Pruefteam kann sich darauf berufen.
-- Kein Kanal, ueber den jemand mit Zugriff auf das Verteilungskonto Code
-  einschleusen koennte.
-- Voraussetzung fuer reproduzierbare Builds und fuer eine Aufnahme in
+- Was auf dem Gerät läuft, entspricht einem Stand aus der Quellcodeverwaltung.
+  Ein Prüfteam kann sich darauf berufen.
+- Kein Kanal, über den jemand mit Zugriff auf das Verteilungskonto Code
+  einschleusen könnte.
+- Voraussetzung für reproduzierbare Builds und für eine Aufnahme in
   Verzeichnisse, die aus der Quelle bauen.
 
 **Negativ**
 
 - Dringende Korrekturen brauchen eine Store-Freigabe.
-- Nutzer laufen laenger auf alten Staenden.
+- Nutzer laufen länger auf alten Ständen.
 
 ## Verworfene Alternativen
 
-**Updates nur fuer Nicht-Sicherheitscode.** Die Grenze ist nicht sauber zu
-ziehen und im Audit nicht zu erklaeren.
+**Updates nur für Nicht-Sicherheitscode.** Die Grenze ist nicht sauber zu
+ziehen und im Audit nicht zu erklären.
 
-**Updates mit Signaturpruefung.** Verlagert das Vertrauen auf die
-Schluesselverwaltung, statt es zu vermeiden. Der Gewinn rechtfertigt die
-Erklaerungslast nicht.
+**Updates mit Signaturprüfung.** Verlagert das Vertrauen auf die
+Schlüsselverwaltung, statt es zu vermeiden. Der Gewinn rechtfertigt die
+Erklärungslast nicht.

@@ -6,42 +6,42 @@
 
 Die App braucht Android und iOS. Sie braucht Zugriff auf Plattform-Keystore,
 Biometrie, Kamera, lokale Benachrichtigungen und Screenshot-Sperre. Und sie
-muss die Gesundheitslogik aus ADR-0002 unveraendert mitbenutzen.
+muss die Gesundheitslogik aus ADR-0002 unverändert mitbenutzen.
 
-Entwicklungskapazitaet: eine Person.
+Entwicklungskapazität: eine Person.
 
 ## Entscheidung
 
-React Native, verwaltet ueber Expo, in TypeScript. Der geteilte Kern wird
-unveraendert importiert.
+React Native, verwaltet über Expo, in TypeScript. Der geteilte Kern wird
+unverändert importiert.
 
 ## Konsequenzen
 
 **Positiv**
 
-- Eine Implementierung der Gesundheitslogik fuer beide Plattformen. Das ist das
+- Eine Implementierung der Gesundheitslogik für beide Plattformen. Das ist das
   eigentliche Argument — nicht Entwicklungsgeschwindigkeit, sondern eine
-  einzige pruefbare Wahrheit.
+  einzige prüfbare Wahrheit.
 - Native Bedienelemente, keine Webansicht.
-- Zugriff auf Keystore, Biometrie, Kamera, Benachrichtigungen ueber gepflegte
+- Zugriff auf Keystore, Biometrie, Kamera, Benachrichtigungen über gepflegte
   Module.
-- Bau lokal moeglich, ohne Cloud-Dienst.
+- Bau lokal möglich, ohne Cloud-Dienst.
 
 **Negativ**
 
-- Abhaengigkeit vom Versionsrhythmus des Rahmenwerks. Der Sprung ueber drei
+- Abhängigkeit vom Versionsrhythmus des Rahmenwerks. Der Sprung über drei
   Generationen am 27.08.2026 zeigt, dass das Arbeit erzeugt.
-- Die Plattform gibt Versionsstaende vor, die mit der repositoryuebergreifenden
-  Vorgabe kollidieren koennen. Geloest ueber eine Ausnahmeliste.
-- Eine zusaetzliche Abstraktionsschicht zwischen Code und Plattform.
+- Die Plattform gibt Versionsstände vor, die mit der repositoryübergreifenden
+  Vorgabe kollidieren können. Gelöst über eine Ausnahmeliste.
+- Eine zusätzliche Abstraktionsschicht zwischen Code und Plattform.
 
 ## Verworfene Alternativen
 
-**Flutter oder zwei native Codebasen.** Haetten Risikologik und Uebersetzungen
+**Flutter oder zwei native Codebasen.** Hätten Risikologik und Uebersetzungen
 in einer zweiten Sprache dupliziert. Zwei Implementierungen derselben
-Gesundheitsaussagen sind bei einer Person Entwicklungskapazitaet nicht
-synchron zu halten — und die Pruefgeschichte waere deutlich schwaecher.
+Gesundheitsaussagen sind bei einer Person Entwicklungskapazität nicht
+synchron zu halten — und die Prüfgeschichte wäre deutlich schwächer.
 
-**Webansicht-Verpackung.** Schwaechste Sicherheitslage und schwaechste
+**Webansicht-Verpackung.** Schwächste Sicherheitslage und schwächste
 Plattformanbindung. Genau die Grenzen, an denen ADR-0001 den reinen Webweg
 verworfen hat.

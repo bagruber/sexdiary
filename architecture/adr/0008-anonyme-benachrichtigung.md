@@ -1,50 +1,50 @@
 # ADR-0008 — Tokenbasierte Benachrichtigung ohne Konten
 
-**Status:** angenommen · 10.07.2026
+**Status:** angenommen · 10.07.2026 · erweitert durch [ADR-0011](0011-rueckmeldung.md)
 
 ## Kontext
 
-Nach einem positiven Befund sollen fruehere Kontakte erfahren, dass ein Test
-sinnvoll waere. Das ist der eine Vorgang, bei dem Information zwischen zwei
-Menschen fliessen muss — und damit die einzige Stelle, an der ueberhaupt ein
-Server noetig ist.
+Nach einem positiven Befund sollen frühere Kontakte erfahren, dass ein Test
+sinnvoll wäre. Das ist der eine Vorgang, bei dem Information zwischen zwei
+Menschen fließen muss — und damit die einzige Stelle, an der überhaupt ein
+Server nötig ist.
 
-Gesundheitsaemter machen Kontaktnachverfolgung heute per Telefon. Die App soll
-das ergaenzen, nicht ersetzen, und sie soll den Weg fuer die Faelle oeffnen, in
+Gesundheitsämter machen Kontaktnachverfolgung heute per Telefon. Die App soll
+das ergänzen, nicht ersetzen, und sie soll den Weg für die Fälle öffnen, in
 denen ein Anruf nicht stattfindet.
 
 ## Entscheidung
 
-Benachrichtigung ueber zufaellige Token statt ueber Identitaeten.
+Benachrichtigung über zufällige Token statt über Identitäten.
 
-- Jeder Nutzer haelt ein selbst erzeugtes, nicht zurueckrechenbares Token.
+- Jeder Nutzer hält ein selbst erzeugtes, nicht zurückrechenbares Token.
 - Kontakte tauschen Token aus, wenn sie das wollen — per QR oder Link.
-- Eine Benachrichtigung besteht aus `{Empfaenger-Token, Erreger-Label,
+- Eine Benachrichtigung besteht aus `{Empfänger-Token, Erreger-Label,
   Zeitstempel}`. **Kein Absender. Kein Nachrichtentext. Keine IP-Vorhaltung
-  ueber den Transport hinaus.**
-- Der Empfaenger fragt Benachrichtigungen zu seinem eigenen Token ab.
-- **`DELETE` ab dem ersten Tag**, nicht spaeter nachgeruestet: „Alles loeschen“
+  über den Transport hinaus.**
+- Der Empfänger fragt Benachrichtigungen zu seinem eigenen Token ab.
+- **`DELETE` ab dem ersten Tag**, nicht später nachgerüstet: „Alles löschen“
   in der App muss auch die serverseitigen Benachrichtigungen zum eigenen Token
   erfassen (Art. 17).
-- Vor jedem Versand zeigt die App, was genau uebertragen wird.
+- Vor jedem Versand zeigt die App, was genau übertragen wird.
 
 ## Konsequenzen
 
 **Positiv**
 
-- Ein vollstaendig kompromittiertes Relay gibt Token, Labels und Zeitstempel
-  preis — keine Identitaeten, keine Historien, keine Verbindungsgraphen ueber
+- Ein vollständig kompromittiertes Relay gibt Token, Labels und Zeitstempel
+  preis — keine Identitäten, keine Historien, keine Verbindungsgraphen über
   das hinaus, was die Tokenpaare ohnehin zeigen.
-- Keine Konten heisst keine Anmeldung, keine Passwortwiederherstellung, keine
-  Kontouebernahme.
-- Der Dienst ist klein genug, dass eine Sicherheitspruefung guenstig ist.
+- Keine Konten heißt keine Anmeldung, keine Passwortwiederherstellung, keine
+  Kontoübernahme.
+- Der Dienst ist klein genug, dass eine Sicherheitsprüfung günstig ist.
 
 **Negativ**
 
 - Ein verlorenes Token ist nicht wiederherstellbar.
-- Kein Zustellungsnachweis. Der Absender erfaehrt nicht, ob jemand gelesen hat.
-- Missbrauch — jemand sendet grundlos — ist nicht vollstaendig zu verhindern.
-  Abschwaechung: Token werden bewusst ausgetauscht, nicht erraten.
+- Kein Zustellungsnachweis. Der Absender erfährt nicht, ob jemand gelesen hat.
+- Missbrauch — jemand sendet grundlos — ist nicht vollständig zu verhindern.
+  Abschwächung: Token werden bewusst ausgetauscht, nicht erraten.
 
 **Offen**
 
@@ -53,9 +53,9 @@ automatischem Verfall.
 
 ## Verworfene Alternativen
 
-**Benachrichtigung per E-Mail oder Telefonnummer.** Waere personenbezogen, damit
+**Benachrichtigung per E-Mail oder Telefonnummer.** Wäre personenbezogen, damit
 serverseitige Verarbeitung besonderer Kategorien — Widerspruch zu ADR-0003.
 
-**Push mit Inhalt.** Ein Push-Payload mit Gesundheitsbezug laeuft ueber die
-Infrastruktur der Plattformanbieter. Falls Push noetig wird: inhaltsleerer
-Weckruf, der einen Abruf ausloest.
+**Push mit Inhalt.** Ein Push-Payload mit Gesundheitsbezug läuft über die
+Infrastruktur der Plattformanbieter. Falls Push nötig wird: inhaltsleerer
+Weckruf, der einen Abruf auslöst.

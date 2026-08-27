@@ -12,41 +12,41 @@ Plattformen eine andere Farbe.
 
 Entscheidender als die Drift ist aber, was der Browser prinzipiell nicht kann.
 Das realistische Bedrohungsmodell dieser App ist die Person, die daneben sitzt
-oder das entsperrte Telefon in der Hand haelt. Dagegen wirken Screenshot-Sperre,
+oder das entsperrte Telefon in der Hand hält. Dagegen wirken Screenshot-Sperre,
 verdeckte Vorschau in der App-Uebersicht, ein an den Keystore gebundener Lock,
-ein alternatives Icon und lokale Erinnerungen. **Keine dieser Massnahmen ist im
+ein alternatives Icon und lokale Erinnerungen. **Keine dieser Maßnahmen ist im
 Browser umsetzbar.** Der Web-Tracker konnte das Kernversprechen des Produkts
-nie einloesen.
+nie einlösen.
 
 ## Entscheidung
 
 Die native App ist das Produkt. Alle Gesundheitsdaten — Begegnungen, Kontakte,
-Tests, Impfungen — existieren ausschliesslich dort und werden nirgendwo sonst
+Tests, Impfungen — existieren ausschließlich dort und werden nirgendwo sonst
 gespeichert.
 
-Der Browser bekommt eine **Informationsseite**: Erklaerung der Funktionsweise,
-Impressum, Datenschutzerklaerung, Teststellenverzeichnis. Sie kennt keinen
+Der Browser bekommt eine **Informationsseite**: Erklärung der Funktionsweise,
+Impressum, Datenschutzerklärung, Teststellenverzeichnis. Sie kennt keinen
 Nutzer, verarbeitet keine Gesundheitsdaten und hat keine Verbindung zur App.
 
 ## Konsequenzen
 
 **Positiv**
 
-- Die Kernversprechen werden einloesbar statt simuliert.
-- Nur noch eine Codebasis, die Gesundheitsdaten beruehrt — die Pruefflaeche
-  schrumpft, und damit der Aufwand jeder Sicherheitspruefung.
+- Die Kernversprechen werden einlösbar statt simuliert.
+- Nur noch eine Codebasis, die Gesundheitsdaten berührt — die Prüffläche
+  schrumpft, und damit der Aufwand jeder Sicherheitsprüfung.
 - Die Infoseite kann von Grund auf barrierefrei gebaut werden. Das ist erheblich
-  billiger, als einen gewachsenen Tracker nachtraeglich zu sanieren.
+  billiger, als einen gewachsenen Tracker nachträglich zu sanieren.
 - Die datenschutzrechtliche Aussage wird einfach genug, um sie in einem Satz zu
-  sagen: Gesundheitsdaten verlassen das Geraet nicht.
+  sagen: Gesundheitsdaten verlassen das Gerät nicht.
 
 **Negativ**
 
-- Reichweite ohne Installation entfaellt. Wer die App nur ausprobieren will,
+- Reichweite ohne Installation entfällt. Wer die App nur ausprobieren will,
   muss installieren.
 - Die Arbeit am Web-Tracker ist abgeschrieben. Der geteilte Kern bleibt.
-- iOS braucht Entwicklerkonto und Mac. Android geht vollstaendig lokal.
-- Ohne Store-Praesenz ist Verteilung ein eigenes Thema (siehe ADR-0010).
+- iOS braucht Entwicklerkonto und Mac. Android geht vollständig lokal.
+- Ohne Store-Präsenz ist Verteilung ein eigenes Thema (siehe ADR-0010).
 
 **Offen**
 
@@ -60,11 +60,11 @@ dauerhaft Pflege.
 **Installierbare Web-App (PWA).** Naheliegend, weil sie unter Android fast wie
 eine App wirkt. Scheitert an denselben Grenzen: kein Screenshot-Schutz, kein
 Hardware-Keystore, keine verdeckte Vorschau, kein alternatives Icon. Unter iOS
-zusaetzlich schwach. Sie haette die Diskretionsversprechen kosmetisch gemacht.
+zusätzlich schwach. Sie hätte die Diskretionsversprechen kosmetisch gemacht.
 
 **Funktionsgleichheit beider Plattformen.** Der bisherige Zustand. Bedeutet
-dauerhaft doppelte Pflege fuer eine Plattform, die das Kernversprechen nicht
-einloesen kann.
+dauerhaft doppelte Pflege für eine Plattform, die das Kernversprechen nicht
+einlösen kann.
 
-**Nur Web.** Haette die Diskretionsfunktionen vollstaendig gestrichen — also
-genau das, was die App gegenueber einer Notiz-App auszeichnet.
+**Nur Web.** Hätte die Diskretionsfunktionen vollständig gestrichen — also
+genau das, was die App gegenüber einer Notiz-App auszeichnet.
