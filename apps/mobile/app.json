@@ -29,6 +29,7 @@
       "expo-secure-store",
       "expo-localization",
       "expo-status-bar",
+      "expo-system-ui",
       "expo-notifications",
       [
         "expo-local-authentication",
