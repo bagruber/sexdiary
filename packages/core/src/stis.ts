@@ -1,4 +1,4 @@
-import type { ActKey, PartnerAnatomy, RiskLevel } from "./domain";
+import type { ActKey, PartnerAnatomy, RiskLevel } from "./domain.js";
 
 export interface StiTx {
   r: RiskLevel;

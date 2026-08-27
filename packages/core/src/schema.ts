@@ -40,8 +40,8 @@ import {
   type TestRecord,
   type TestResultValue,
   type Vaccination,
-} from "./domain";
-import { gid } from "./id";
+} from "./domain.js";
+import { gid } from "./id.js";
 
 export interface TestResultPayload {
   v: 1;

@@ -11,8 +11,8 @@ import type {
   Profile,
   TestRecord,
   Vaccination,
-} from "./domain";
-import { freshAppData } from "./seed";
+} from "./domain.js";
+import { freshAppData } from "./seed.js";
 
 export type EntryType = "intercourse" | "test" | "contact" | "vaccination";
 

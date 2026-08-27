@@ -1,4 +1,4 @@
-import type { Dict } from "./en";
+import type { Dict } from "./en.js";
 
 export const de: Dict = {
   dashboard: "Übersicht",

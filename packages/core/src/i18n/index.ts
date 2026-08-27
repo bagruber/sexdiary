@@ -1,6 +1,6 @@
-import { en, type Dict } from "./en";
-import { de } from "./de";
-import type { Lang } from "../domain";
+import { en, type Dict } from "./en.js";
+import { de } from "./de.js";
+import type { Lang } from "../domain.js";
 
 const DICTS: Record<Lang, Dict> = { en, de };
 

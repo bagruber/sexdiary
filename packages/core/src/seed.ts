@@ -9,8 +9,8 @@ import {
   type Preferences,
   type TestRecord,
   type Vaccination,
-} from "./domain";
-import { genToken } from "./id";
+} from "./domain.js";
+import { genToken } from "./id.js";
 
 const mkEntry = (
   id: string,

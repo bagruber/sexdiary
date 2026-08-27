@@ -1,4 +1,4 @@
-import type { Lang } from "./domain";
+import type { Lang } from "./domain.js";
 
 export const toDate = (s: string): Date => new Date(s + "T12:00:00");
 

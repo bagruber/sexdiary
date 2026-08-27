@@ -4,10 +4,11 @@
   "version": "0.4.0",
   "type": "module",
   "scripts": {
-    "dev": "pnpm --filter @sexdiary/web dev",
-    "build": "pnpm --filter @sexdiary/web build",
+    "dev": "pnpm build:core && pnpm --filter @sexdiary/web dev",
+    "build": "pnpm build:core && pnpm --filter @sexdiary/web build",
+    "build:core": "pnpm --filter @sexdiary/core build",
     "preview": "pnpm --filter @sexdiary/web preview",
     "test": "pnpm --filter @sexdiary/core test",
-    "typecheck": "pnpm -r --if-present typecheck"
+    "typecheck": "pnpm build:core && pnpm -r --if-present typecheck"
   }
 }

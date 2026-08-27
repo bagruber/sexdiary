@@ -12,8 +12,8 @@
  *   v2 — envelope { v, savedAt, data }, same AppData shape
  */
 
-import type { AppData, Lang } from "./domain";
-import { freshAppData } from "./seed";
+import type { AppData, Lang } from "./domain.js";
+import { freshAppData } from "./seed.js";
 
 export const CURRENT_SCHEMA_VERSION = 2;
 

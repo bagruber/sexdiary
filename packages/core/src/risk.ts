@@ -3,7 +3,7 @@ import {
   STI_DB,
   STI_NAMES,
   type StiTx,
-} from "./stis";
+} from "./stis.js";
 import {
   RISK_ORDER,
   type ActKey,
@@ -12,8 +12,8 @@ import {
   type RiskLevel,
   type TestRecord,
   type Vaccination,
-} from "./domain";
-import { toDate } from "./date";
+} from "./domain.js";
+import { toDate } from "./date.js";
 
 /**
  * One encounter that contributed to an STI's rating, with the reasons.
