@@ -1,5 +1,4 @@
 import type { CSSProperties, ReactNode } from "react";
-import { FONT } from "../../theme/tokens";
 import { useApp } from "../../state/store";
 
 interface Props {
@@ -39,7 +38,6 @@ export function Button({
         background: outline ? "transparent" : c,
         border: `1.5px solid ${c}`,
         color: outline ? c : "#fff",
-        fontFamily: FONT,
         fontSize: small ? 13 : 14,
         fontWeight: 600,
         cursor: disabled ? "not-allowed" : "pointer",

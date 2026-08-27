@@ -7,7 +7,6 @@ import {
   Shield,
   type LucideIcon,
 } from "lucide-react";
-import { FONT } from "../../theme/tokens";
 import { useApp } from "../../state/store";
 import type { EditType } from "../sheets/AddEditSheet";
 
@@ -87,7 +86,6 @@ export function FAB({ onAdd }: Props) {
             >
               <div
                 style={{
-                  fontFamily: FONT,
                   fontSize: 12,
                   fontWeight: 600,
                   color: palette.text,

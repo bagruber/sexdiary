@@ -1,4 +1,3 @@
-import { FONT } from "../../theme/tokens";
 import { Sheet, Tag, Dot } from "../ui";
 import { useApp } from "../../state/store";
 import { formatDate } from "@sexdiary/core";
@@ -33,7 +32,6 @@ export function DaySheet({ date, onClose, onEdit }: Props) {
           style={{
             color: palette.muted,
             fontSize: 14,
-            fontFamily: FONT,
             padding: "16px 0",
           }}
         >
@@ -55,7 +53,6 @@ export function DaySheet({ date, onClose, onEdit }: Props) {
             <Dot color={palette.teal} />
             <span
               style={{
-                fontFamily: FONT,
                 fontWeight: 700,
                 fontSize: 13,
                 color: palette.teal,
@@ -65,7 +62,6 @@ export function DaySheet({ date, onClose, onEdit }: Props) {
             </span>
             <span
               style={{
-                fontFamily: FONT,
                 fontSize: 11,
                 color: palette.muted,
                 marginLeft: "auto",
@@ -79,7 +75,6 @@ export function DaySheet({ date, onClose, onEdit }: Props) {
                 background: "none",
                 border: "none",
                 color: palette.teal,
-                fontFamily: FONT,
                 fontSize: 12,
                 fontWeight: 600,
                 cursor: "pointer",
@@ -92,7 +87,6 @@ export function DaySheet({ date, onClose, onEdit }: Props) {
           </div>
           <div
             style={{
-              fontFamily: FONT,
               fontSize: 12,
               color: palette.muted,
               marginBottom: 8,
@@ -131,7 +125,6 @@ export function DaySheet({ date, onClose, onEdit }: Props) {
             <Dot color={palette.amber} />
             <span
               style={{
-                fontFamily: FONT,
                 fontWeight: 700,
                 fontSize: 13,
                 color: palette.amber,
@@ -149,7 +142,6 @@ export function DaySheet({ date, onClose, onEdit }: Props) {
                 background: "none",
                 border: "none",
                 color: palette.amber,
-                fontFamily: FONT,
                 fontSize: 12,
                 fontWeight: 600,
                 cursor: "pointer",
@@ -162,12 +154,12 @@ export function DaySheet({ date, onClose, onEdit }: Props) {
             </button>
           </div>
           {v.kind === "vaccine" && (
-            <div style={{ fontFamily: FONT, fontSize: 12, color: palette.muted }}>
+            <div style={{ fontSize: 12, color: palette.muted }}>
               {v.manufacturer} · {t("dose")} {v.dose}
             </div>
           )}
           {v.kind === "prep" && (
-            <div style={{ fontFamily: FONT, fontSize: 12, color: palette.muted }}>
+            <div style={{ fontSize: 12, color: palette.muted }}>
               {v.startDate && formatDate(v.startDate, data.prefs.lang)}
               {v.endDate
                 ? ` — ${formatDate(v.endDate, data.prefs.lang)}`
@@ -194,7 +186,6 @@ export function DaySheet({ date, onClose, onEdit }: Props) {
               <Dot color={palette.rose} />
               <span
                 style={{
-                  fontFamily: FONT,
                   fontWeight: 700,
                   fontSize: 13,
                   color: palette.rose,
@@ -208,7 +199,6 @@ export function DaySheet({ date, onClose, onEdit }: Props) {
                   background: "none",
                   border: "none",
                   color: palette.rose,
-                  fontFamily: FONT,
                   fontSize: 12,
                   fontWeight: 600,
                   cursor: "pointer",
@@ -230,7 +220,7 @@ export function DaySheet({ date, onClose, onEdit }: Props) {
                     alignItems: "center",
                   }}
                 >
-                  <span style={{ fontFamily: FONT, fontSize: 13, color: palette.text }}>
+                  <span style={{ fontSize: 13, color: palette.text }}>
                     {t(ty as keyof typeof e.t)}
                   </span>
                   <Tag

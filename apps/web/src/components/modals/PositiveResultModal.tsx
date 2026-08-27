@@ -1,5 +1,4 @@
 import { AlertTriangle } from "lucide-react";
-import { FONT } from "../../theme/tokens";
 import { Modal, Button } from "../ui";
 import { useApp } from "../../state/store";
 
@@ -29,7 +28,6 @@ export function PositiveResultModal({ stis, onGo, onDismiss }: Props) {
       </div>
       <div
         style={{
-          fontFamily: FONT,
           fontSize: 19,
           fontWeight: 700,
           color: palette.text,
@@ -41,7 +39,6 @@ export function PositiveResultModal({ stis, onGo, onDismiss }: Props) {
       </div>
       <div
         style={{
-          fontFamily: FONT,
           fontSize: 14,
           color: palette.muted,
           textAlign: "center",
@@ -61,7 +58,6 @@ export function PositiveResultModal({ stis, onGo, onDismiss }: Props) {
           padding: 13,
           background: "none",
           border: "none",
-          fontFamily: FONT,
           fontSize: 14,
           color: palette.muted,
           cursor: "pointer",

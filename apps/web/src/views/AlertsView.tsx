@@ -7,7 +7,7 @@ import {
   ChevronLeft,
   type LucideIcon,
 } from "lucide-react";
-import { FONT, shadow } from "../theme/tokens";
+import { shadow } from "../theme/tokens";
 import { Tag, Checkbox, Button } from "../components/ui";
 import { useApp } from "../state/store";
 import { getAlerts } from "@sexdiary/core";
@@ -59,7 +59,6 @@ export function AlertsView({ onBack }: Props) {
         style={{
           background: "none",
           border: "none",
-          fontFamily: FONT,
           fontSize: 14,
           color: palette.teal,
           fontWeight: 600,
@@ -76,7 +75,6 @@ export function AlertsView({ onBack }: Props) {
       </button>
       <h1
         style={{
-          fontFamily: FONT,
           fontSize: 26,
           fontWeight: 700,
           color: palette.text,
@@ -87,7 +85,7 @@ export function AlertsView({ onBack }: Props) {
       </h1>
 
       {alerts.length === 0 && (
-        <p style={{ fontFamily: FONT, fontSize: 14, color: palette.muted }}>
+        <p style={{ fontSize: 14, color: palette.muted }}>
           {t("noAlerts")}
         </p>
       )}
@@ -98,13 +96,12 @@ export function AlertsView({ onBack }: Props) {
             <Tag color={palette.rose} filled>
               {al.sti} +
             </Tag>
-            <span style={{ fontFamily: FONT, fontSize: 12, color: palette.muted }}>
+            <span style={{ fontSize: 12, color: palette.muted }}>
               {formatDate(al.testDate, data.prefs.lang)}
             </span>
           </div>
           <div
             style={{
-              fontFamily: FONT,
               fontSize: 13,
               color: palette.muted,
               lineHeight: 1.6,
@@ -116,7 +113,6 @@ export function AlertsView({ onBack }: Props) {
           {al.contacts.length === 0 && (
             <div
               style={{
-                fontFamily: FONT,
                 fontSize: 13,
                 color: palette.muted,
                 fontStyle: "italic",
@@ -153,7 +149,6 @@ export function AlertsView({ onBack }: Props) {
                   <div>
                     <div
                       style={{
-                        fontFamily: FONT,
                         fontWeight: 700,
                         fontSize: 15,
                         color: palette.text,
@@ -176,7 +171,6 @@ export function AlertsView({ onBack }: Props) {
                     <Icon size={14} color={col} strokeWidth={2.2} />
                     <span
                       style={{
-                        fontFamily: FONT,
                         fontSize: 11,
                         fontWeight: 600,
                         color: col,
@@ -215,7 +209,6 @@ export function AlertsView({ onBack }: Props) {
                     <Icon size={14} color={col} strokeWidth={2.2} />
                     <span
                       style={{
-                        fontFamily: FONT,
                         fontSize: 12,
                         color: col,
                         fontWeight: 600,
