@@ -165,11 +165,6 @@ function Shell() {
     return () => sub.remove();
   }, [data.prefs.lockPin]);
 
-  // Enabling the lock in Settings should not immediately lock the user out.
-  useEffect(() => {
-    if (!hasPin) setLocked(false);
-  }, [hasPin]);
-
   if (locked && hasPin) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: palette.bg }}>

@@ -5,9 +5,8 @@
  * risk engine emits alongside the score. Nothing is recomputed in the UI,
  * so what the user reads is exactly what the engine used.
  */
-import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { Modal, ScrollView, Text, View } from "react-native";
 import {
-  ACT_KEYS,
   WIKI,
   formatDate,
   plurals,

@@ -1,0 +1,32 @@
+name: Pruefung
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  pruefung:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v6
+        with:
+          # Mindestens 22: pnpm 11 laedt node:sqlite. Siehe hausbasis/baseline.json.
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run lint
+      - run: pnpm run typecheck
+      - run: pnpm run test
+      - run: pnpm run build
+
+      # Der Build schreibt nach docs/, und docs/ liegt im Repo, weil
+      # GitHub Pages von dort ausliefert. Weicht das Ergebnis vom
+      # Committeten ab, ist die ausgelieferte Seite nicht der Quellcode.
+      - name: docs/ entspricht dem Quellstand
+        run: git diff --exit-code -- docs

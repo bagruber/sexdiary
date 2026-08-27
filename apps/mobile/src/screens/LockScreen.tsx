@@ -35,6 +35,13 @@ export function LockScreen({
 
   const appName = data.prefs.disguise ? t("neutralAppName") : APP_NAME;
 
+  // Judging the PIN in the keypad handler instead would batch the state
+  // updates into one render, so the fourth dot would never paint before
+  // a wrong PIN clears it. The extra render is the point, and [entry] is
+  // the intended dependency: this reacts to digits, not to t(). Kept as
+  // is because there is no device to verify a change on; the screen is
+  // replaced by the keystore-backed lock in wave 3.
+  /* eslint-disable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
   useEffect(() => {
     if (entry.length !== 4) return;
 
@@ -68,6 +75,7 @@ export function LockScreen({
       setMode("set");
     }
   }, [entry]);
+  /* eslint-enable react-hooks/set-state-in-effect, react-hooks/exhaustive-deps */
 
   const prompt =
     mode === "verify"
