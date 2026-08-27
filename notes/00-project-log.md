@@ -3,7 +3,104 @@
 Reverse-chronological decision log. Read this first each session; append
 before ending one. `docs/` is GitHub Pages build output — notes live here.
 
-## 2026-08-27 (latest) — Data-architecture additions, UI direction, design tokens
+## 2026-08-27 (latest) — Wave 2 shipped: tokens, a real package, lint, CI, sources
+
+All five items. Nothing in this entry was decided by looking at code and
+guessing; each has a number behind it.
+
+**Colour tokens, decided and computed** (ADR-0015). Two scales that never
+touch: one interaction colour plus neutrals, and a separate semantic scale for
+the risk rating. Three values changed, each because the arithmetic said so:
+
+- `warn` light `#B7791F` → `#8C6208`. The old one was **3.29:1** against the
+  background — it failed as text. That was R16, sitting on the list.
+- `bad` dark `#E06A5A` → `#E87A6A`. At 4.96:1 on card it was the weakest of
+  the three semantic colours, which means the *most severe* level was the
+  least legible.
+- `good` light `#2E7D52` → `#2B7A4E`. 4.54 passes only on the second decimal.
+
+The three now sit at 4.74 / 4.90 / 4.91 on light — equal weight, so no level
+shouts louder for being accidentally darker.
+
+**The web tracker's seven-step risk ramp turned out worse than its
+reputation.** Six of seven values below 3:1 on light, and on dark `very_high`
+was the *weakest value in the whole ramp* at 3.19:1. Seven levels now map onto
+four colours; the level name is the discriminator. `apps/web` takes only
+`riskColor` from core and keeps its own palette — its accent is teal, and
+recolouring an app that wave 4 replaces would be a redesign, not a refactor.
+
+`packages/core/test/tokens.test.ts` recomputes every pair against both grounds
+of its theme. Checked that it is not vacuous: with the old warn value it fails
+at exactly 3.29.
+
+**Core is a package now, not an alias.** It had `main: src/index.ts` plus three
+aliases — vite config, web tsconfig paths, mobile tsconfig paths. `exports`
+points at `dist`, built with **NodeNext** resolution, which is the only setting
+that proves the output resolves outside a bundler. Relative imports carry `.js`
+now; doing that surfaced `./i18n` as a *directory import*, which would never
+have worked in Node. Verified by actually loading it: `node -e "import('./packages/core/dist/index.js')"`
+gives 47 exports.
+
+The dev loop cost was real, and Benedict framed the answer well — whatever is
+easier for whoever maintains this in Munich. The worst failure mode for a
+newcomer is the silent one: change core, nothing happens. So `pnpm dev` starts
+the core watch and the dev server together via `pnpm --parallel`, no extra
+dependency, one command.
+
+**FONT removed, 91 sites.** It pointed at DM Sans, deleted in July for the
+Google Fonts request. One correction to `notes/05`: "not a pixel changes" was
+not quite right — `input`, `select` and `textarea` do **not** inherit
+`font-family` from `body`, so removing the inline value would have handed them
+to the browser's default form font. The existing `button` rule in `global.css`
+now covers them. Bundle 454.43 → 451.54 kB.
+
+**Lint and CI.** ESLint 10 flat config in the same ranges as freshdoc and
+freshpost, so the three repos share one copy in the store; the targets are in
+`hausbasis/baseline.json` now. Three zones rather than one config for
+everything — and the middle one is the interesting part: **`packages/core` may
+not import anything non-relative.** That is ADR-0002 as a rule instead of an
+intention. Plus a test that goes red the moment core takes a dependency, which
+`notes/05` 6.5 had asked for. Both were verified by breaking them on purpose.
+
+The first lint run found eight errors. `App.tsx` held an effect that could
+never do anything (`locked` is only read as `locked && hasPin`).
+`ExplainSheet` imported `Pressable` and `ACT_KEYS` without using either, both
+predating this wave. `index.ts` suppressed a rule that no longer exists. The
+React rules apply to `apps/mobile` only — no new React is written in
+`apps/web`, and rewriting its effects would be work on code that is going away.
+
+**Sources on the medical numbers — and this is the part that grew.** The HIV
+per-act values match Patel et al. 2014 *exactly* (138/11/8/4 per 10 000). The
+condom factor for HIV is Weller & Davis, Cochrane 2002. Doxy-PEP is Luetkemeyer
+et al. 2023. The 45-day HIV window is the conservative end of the CDC range.
+
+Everything else is marked as an estimate rather than dressed up as sourced —
+including the HIV oral values, for which the meta-analysis gives no point
+estimate at all.
+
+**Four findings came out of the search, and two of them matter:**
+
+- **HSV-2, window 16 days.** IgG seroconversion takes 3–12 weeks. The app says
+  "testable now" where a negative rules nothing out.
+- **Mpox, window 21 days.** Mpox is diagnosed by PCR from lesion material.
+  There is no serological window to wait out — the logic is answering a
+  question that does not arise.
+- Syphilis 21 and gonorrhoea 7 sit at the optimistic end of their ranges while
+  HIV sits at the conservative end.
+- Hep B receptive anal `0.37` looks like the **needlestick** figure. Different
+  route, and it produces `very_high` today.
+
+None of them were changed, on Benedict's decision and with the reasoning in
+`architecture/risikomodell-quellen.md` section 7: adjusting a medical model
+from a literature search is the same mistake as writing it without sources,
+only harder to notice. These belong in front of an infectious-disease
+clinician. It is the app's core promise that bends in the wrong place here.
+
+**Next up:** wave 3 — mobile becomes the product. Real lock, screenshot
+blocking, reminders, signed QRs, backup, distribution. And the app has still
+never run on a device.
+
+## 2026-08-27 — Data-architecture additions, UI direction, design tokens
 
 Three additions from Benedict, each with a consequence beyond the feature —
 plus a UI direction decision and a first look at a proposed palette.

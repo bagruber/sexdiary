@@ -1,6 +1,7 @@
 # Design-Tokens — Analyse und Vorschlag
 
-**Status:** Vorschlag · 27.08.2026 · Entscheidung offen
+**Status:** entschieden am 27.08.2026 durch [ADR-0015](adr/0015-farbtokens.md).
+Dieses Dokument bleibt als Analyse stehen; verbindlich ist die ADR.
 
 Anlass: ein Farb- und Schriftvorschlag mit Münchner Bezug. Dieses Dokument
 prüft ihn und schlägt eine Fassung vor, die trägt. Kontrastwerte sind
@@ -113,10 +114,14 @@ Infoseite selbst gehostet. **Niemals ein Google-Fonts-Link** — das holt exakt
 das Problem zurück, das damals behoben wurde. Der Punkt gehört in die
 Definition of Done der Infoseite.
 
-## Was dann noch zu tun ist
+## Was daraus wurde
 
-1. Für den Warnton einen Wert mit mindestens 4,5:1 auf Hell finden.
-2. Alle Paare in beiden Themes nachrechnen und die Tabelle hier fortschreiben.
-3. Die Tokens nach `packages/core` legen, damit App und Infoseite dieselben
-   konsumieren (Welle 2).
-4. Erst danach Farben in Code schreiben.
+1. ~~Für den Warnton einen Wert mit mindestens 4,5:1 auf Hell finden.~~
+   `#8C6208`, 4,90:1 auf `#F5F3EF`.
+2. ~~Alle Paare in beiden Themes nachrechnen.~~ Rechnet jetzt
+   `packages/core/test/tokens.test.ts` bei jedem Testlauf.
+3. ~~Die Tokens nach `packages/core` legen.~~ `packages/core/src/tokens.ts`.
+4. **Offen: die Schrift.** Atkinson Hyperlegible bleibt empfohlen, kommt aber
+   erst in die Tokens, wenn die Dateien mitgeliefert werden — nativ in Welle 3,
+   Infoseite in Welle 4. Ein Token, das auf eine nicht mitgelieferte Schrift
+   zeigt, wäre genau der Fehler, den `FONT` drei Wellen lang vorgemacht hat.

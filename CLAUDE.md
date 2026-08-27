@@ -37,7 +37,7 @@ Gerät bleiben?**
 | `packages/core` | Gesundheitslogik, Schemata, Speicherhülle, i18n | **Null Runtime-Dependencies, keine Ein-/Ausgabe.** Das ist die Audit-Fläche — die Regel verteidigen. |
 | `apps/mobile` | Expo/React Native — **das Produkt** | Lief noch nie auf einem Gerät |
 | `apps/web` | Alter Tracker | Nicht mehr das Produkt. Wird durch die Infoseite ersetzt (Welle 4) |
-| `architecture/` | arc42, ADRs, Threat Model, Schnittstellen | Auf Deutsch, echte Umlaute |
+| `architecture/` | arc42, ADRs, Threat Model, Schnittstellen, Risikomodell-Quellen | Auf Deutsch, echte Umlaute |
 | `notes/` | Entscheidungslog, Audits, Roadmap | Rohmaterial, nicht Lieferobjekt |
 | `design/` | Screen-Entwürfe als Quelldateien | Keine Produktivdateien. Zeigen noch die heutige Palette |
 | `docs/` | **Build-Output** der Webseite | Keine Dokumentation. Soll perspektivisch aus dem Repo |
@@ -47,6 +47,10 @@ Gerät bleiben?**
 - **pnpm**, nicht npm. Versionen kommen aus `../hausbasis/baseline.json` —
   dort ändern, nie in einem einzelnen Repo. `node ../hausbasis/check.mjs --kurz`
   zeigt Abweichungen.
+- **`packages/core` wird gebaut, nicht aliassiert.** `exports` zeigt auf
+  `dist`. `pnpm dev` startet den Kern im Watch-Modus neben dem Dev-Server;
+  `build`, `typecheck` und die CI bauen ihn vorher. Wer ihn direkt aufruft:
+  `pnpm build:core`.
 - `apps/mobile/package.json` hat `expo.install.exclude` für typescript, react
   und @types/react. Die folgen bewusst der Hausbasis statt dem Expo-Template;
   ohne den Eintrag meldet `expo-doctor` das dauerhaft als Fehler.
@@ -59,7 +63,10 @@ Gerät bleiben?**
 
 In diesem Repo hat sich mehrfach gezeigt, dass grüne Builds wenig beweisen:
 
-- `pnpm run build` · `pnpm run test` (45 Tests) · `pnpm run typecheck`
+- `pnpm run lint` · `pnpm run typecheck` · `pnpm run test` (70 Tests) ·
+  `pnpm run build`. Dieselben vier Schritte laufen in der CI
+  (`.github/workflows/pruefung.yml`), dazu die Prüfung, ob `docs/` dem
+  Quellstand entspricht.
 - **Nach einem React-Major zusätzlich eine Laufzeitprobe im Browser.** Am
   27.08.2026 waren Build, 45 Tests und drei Typechecks grün, während die App
   im Browser abstürzte — npm hatte eine alte React-Kopie gehoistet stehen
@@ -75,10 +82,16 @@ In diesem Repo hat sich mehrfach gezeigt, dass grüne Builds wenig beweisen:
 |---|---|---|
 | 0 | Versionen, Expo 57, pnpm | erledigt 27.08.2026 |
 | 1 | Architektur festschreiben | erledigt 27.08.2026 |
-| 2 | Design-Tokens in den Kern, Lint und CI, tote Konstanten, Quellenangaben an den medizinischen Zahlen, Kern als echtes Paket | **als Nächstes** |
-| 3 | Mobile wird das Produkt: echter Lock, Screenshot-Schutz, Erinnerungen, signierte QRs, Backup, Verteilung | offen |
+| 2 | Design-Tokens in den Kern, Lint und CI, tote Konstanten, Quellenangaben an den medizinischen Zahlen, Kern als echtes Paket | erledigt 27.08.2026 |
+| 3 | Mobile wird das Produkt: echter Lock, Screenshot-Schutz, Erinnerungen, signierte QRs, Backup, Verteilung | **als Nächstes** |
 | 4 | Infoseite ersetzt den Web-Tracker | offen |
 | 5 | Server: Alert-Relay, Schlüsselverzeichnis, Deployment-Artefakt | offen |
+
+Aus Welle 2 mitgenommen: die **vier medizinischen Befunde** in
+`architecture/risikomodell-quellen.md`, Abschnitt 7. Zwei diagnostische Fenster
+(HSV-2, Mpox) melden „testbar“, wo ein negativer Befund nichts aussagt. Das ist
+der Kernnutzen der App — gehört einer Infektiologin vorgelegt, bevor jemand
+sie benutzt.
 
 Querschnitt, unabhängig von allem: **Lizenz festlegen.** Blockiert Code-Audit,
 openCode.de, F-Droid und Nachnutzung. Empfehlung EUPL-1.2. Kostet eine Datei.

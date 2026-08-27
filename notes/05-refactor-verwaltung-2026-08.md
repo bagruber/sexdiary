@@ -69,7 +69,7 @@ CI), 1.8 (Kern ist kein Paket), 3.3 (kein Undo), 3.4 (Risiko nur ueber Farbe),
 |---|---|---|
 | 0 | Versionen, Expo 57, pnpm | erledigt 27.08. |
 | 1 | **Architektur festschreiben** — arc42, C4, ADRs, Threat Model, Datenfluss, Schnittstellenspezifikationen | erledigt 27.08. |
-| 2 | Fundament: Design-Tokens im Kern, Lint und CI, tote Konstanten raus, Quellenangaben an den medizinischen Zahlen, Kern als echtes Paket | offen |
+| 2 | Fundament: Design-Tokens im Kern, Lint und CI, tote Konstanten raus, Quellenangaben an den medizinischen Zahlen, Kern als echtes Paket | erledigt 27.08. |
 | 3 | Mobile wird das Produkt: echter Lock, Screenshot-Schutz, Erinnerungen, signierte QRs, Backup, Verteilung | offen |
 | 4 | Die Infoseite ersetzt den Web-Tracker | offen |
 | 5 | Server: Alert-Relay und Schluesselverzeichnis, Deployment-Artefakt | offen |

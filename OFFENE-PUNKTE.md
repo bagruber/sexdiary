@@ -1,27 +1,40 @@
 # Offene Punkte
 
-*Notiert am 26.08.2026, fortgeschrieben am 27.08.2026. Erledigte Punkte bitte
-streichen, nicht abhaken — die Datei soll kurz bleiben.*
+*Notiert am 26.08.2026, fortgeschrieben am 27.08.2026 nach Welle 2. Erledigte
+Punkte bitte streichen, nicht abhaken — die Datei soll kurz bleiben.*
 
 
-## Design-Tokens: Farben und Schriften entscheiden
+## Vier medizinische Befunde warten auf ärztliche Prüfung
 
-Ein Vorschlag mit Münchner Bezug liegt vor und ist in
-`architecture/design-tokens.md` durchgerechnet. Kurzfassung:
+Aus Welle 2, ausführlich in `architecture/risikomodell-quellen.md`,
+Abschnitt 7. Der schwerste zuerst:
 
-- **Münchner Gelb kann nicht Primär/CTA sein** — 1,5 bis 1,8:1 auf Hell, und
-  es kollidiert semantisch mit „erhöhtes Risiko“. Vorschlag: Markenfarbe
-  (Icon, Splash, Infoseite), immer als Fläche mit dunklem Text darauf.
-- **Medical Blue** fällt im Dark Mode als Text durch und zieht inhaltlich
-  Richtung „Medizinprodukt“. **Safe Green** fällt auf Hell durch, und
-  „sicher“ ist ein Zustand, den die App nicht bescheinigen kann.
-- Schriften: **Atkinson Hyperlegible durchgehend** empfohlen — vom Braille
-  Institute für maximale Zeichenunterscheidbarkeit entworfen, also ein
-  BITV-Argument statt eines Stilentscheids. Nicht Inter (LLM-Tell laut
-  Arbeitsvereinbarung), nicht Montserrat (Canva-Standardlook).
-- **Schriftdateien mitliefern, niemals Google Fonts verlinken.**
+- **HSV-2, Fenster 16 Tage.** Die IgG-Serokonversion dauert 3 bis 12 Wochen.
+  Die App sagt „jetzt testbar“, wo ein negatives Ergebnis nichts ausschließt.
+- **Mpox, Fenster 21 Tage.** Mpox wird per PCR aus Läsionsmaterial
+  diagnostiziert. Ein serologisches Fenster gibt es nicht.
+- **Syphilis 21 und Gonorrhoe 7** liegen am optimistischen Ende ihrer
+  Spannen, während HIV am konservativen liegt.
+- **Hep B rezeptiv anal 0,37** sieht aus wie die Nadelstich-Zahl — anderer
+  Übertragungsweg, und sie erzeugt heute `very_high`.
 
-Zu entscheiden, bevor in Welle 2 Farben in Code geschrieben werden.
+Bewusst nicht geändert. Ein medizinisches Modell aufgrund einer
+Literaturrecherche zu verstellen wäre derselbe Fehler wie es ohne Quellen zu
+schreiben, nur schwerer zu bemerken. Das ist der Kernnutzen der App — es
+gehört einer Infektiologin vorgelegt, bevor jemand die App benutzt.
+
+
+## Schriftentscheidung wartet auf die Schriftdateien
+
+Farben sind entschieden ([ADR-0015](architecture/adr/0015-farbtokens.md)),
+die Schrift nicht. **Atkinson Hyperlegible durchgehend** bleibt die
+Empfehlung — vom Braille Institute für maximale Zeichenunterscheidbarkeit
+entworfen, also ein BITV-Argument statt eines Stilentscheids.
+
+Sie kommt erst in die Tokens, wenn die Dateien mitgeliefert werden: nativ in
+Welle 3, Infoseite in Welle 4. Ein Token, das auf eine nicht mitgelieferte
+Schrift zeigt, wäre genau der Fehler, den `FONT` drei Wellen lang vorgemacht
+hat. **Schriftdateien mitliefern, niemals Google Fonts verlinken.**
 
 
 ## Web-Tracker: Rente oder beschriftete Demo?
@@ -53,12 +66,21 @@ nicht mehr abschaltbar ist. `npx expo start` und einmal durchklicken.
 
 Alle Aenderungen vom 26. und 27.08.2026 liegen als lokale Commits auf
 `refactor/welle-0-versionen`. Der Branchname passt nicht mehr — inzwischen
-liegen Welle 0 und Welle 1 darauf.
+liegen Welle 0, 1 und 2 darauf.
 
-Dazu kommt eine Aenderung **ausserhalb dieses Repos**: in
-`hausbasis/baseline.json` ist der Ausnahme-Eintrag fuer sexdiary entfernt
-(er ist gegenstandslos, seit web und mobile auf derselben React-Version
-stehen). Die liegt dort uncommitted im Working Tree.
+Dazu kommen **zwei Aenderungen ausserhalb dieses Repos**, beide uncommitted im
+Working Tree von `hausbasis`:
+
+- Der Ausnahme-Eintrag fuer sexdiary ist entfernt (gegenstandslos, seit web und
+  mobile auf derselben React-Version stehen).
+- `baseline.json` fuehrt jetzt die sechs ESLint-Pakete als Zielversionen, in
+  denselben Ranges wie freshdoc und freshpost. `node check.mjs --kurz` meldet
+  dafuer keine Abweichung — die drei Repos teilen sich eine Kopie im Store.
+
+**Die CI ist noch nie gelaufen.** Ein Schritt darin ist ungeprueft: der
+Vergleich, ob `docs/` dem Quellstand entspricht. Lokal geht er durch; ob der
+Build unter Linux dieselben Hashes erzeugt wie unter Windows, zeigt erst der
+erste Lauf.
 
 
 ## Lizenz weiterhin offen
