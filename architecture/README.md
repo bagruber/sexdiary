@@ -16,7 +16,8 @@ Entscheidungslog der laufenden Arbeit, also Rohmaterial, nicht Ergebnis.
 | [`threat-model.md`](threat-model.md) | angreiferzentriert | Sicherheitsprüfung: was erfährt wer in welcher Lage |
 | [`data-flow.md`](data-flow.md) | Verarbeitungsübersicht | Datenschutz: Vorarbeit für Art. 30 und die Folgenabschätzung |
 | [`adr/`](adr/) | MADR | Einzelne Entscheidungen mit Kontext und Konsequenz |
-| [`interfaces/`](interfaces/) | Spezifikation | Die zwei Schnittstellen, an denen Daten das Gerät verlassen |
+| [`design-tokens.md`](design-tokens.md) | Analyse | Farben und Schriften: gerechnete Kontraste, Vorschlag, offene Punkte |
+| [`interfaces/`](interfaces/) | Spezifikation | Die Stellen, an denen Daten das Gerät verlassen — Befunde, Benachrichtigung, Forschungsbeitrag |
 
 ## Warum diese Formate
 

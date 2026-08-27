@@ -3,6 +3,95 @@
 Reverse-chronological decision log. Read this first each session; append
 before ending one. `docs/` is GitHub Pages build output — notes live here.
 
+## 2026-08-27 (latest) — Data-architecture additions, UI direction, design tokens
+
+Three additions from Benedict, each with a consequence beyond the feature —
+plus a UI direction decision and a first look at a proposed palette.
+
+**ADR-0011, feedback from the notified contact.** This contradicts ADR-0008,
+where "no reply from the recipient" stood as a deliberate gap. That reasoning
+was too short: a reply channel needs no sender *identity*, only a sender
+*address*, and that can be fresh per notification. So a reply is not a new
+relay operation, just a notification in the other direction. Two rules are
+fixed: **no automatic delivery or read receipts**, and "done" is offered
+*before* "tested negative". Someone receiving an exposure notice must be able
+to not answer, and the reciprocity pressure after a disclosed diagnosis is real
+enough that the interface must not push toward disclosure.
+
+**ADR-0012, result retrieval by code.** Surfaces something obvious that
+ADR-0007 missed: **at the time the sample is given, there is no result.** A QR
+handed over at the counter cannot contain a finding. Without a retrieval path
+the whole signing feature is theoretical. The retrieval goes to the test
+centre, not the operator — were the operator in the path, they would know who
+tests when.
+
+**ADR-0013, research contribution.** Pushed back on the phrasing "opt-in for
+pseudonymised research data": pseudonymised is not anonymous under Art. 4 Nr. 5,
+Art. 9 applies in full, and sexual-health records are exceptionally
+re-identifiable. Specified instead as on-device aggregation, coarsening before
+aggregation, noise **on the device** rather than at the recipient, and a
+threshold before publication. Not to be built before a research partner with
+ethics approval exists.
+
+The external surface grew from three connections to six. That is recorded as
+R13 in arc42 section 11, alongside R14 and R15. The threat model gained A9
+(re-identification in the research contribution — the most dangerous attacker
+on the list) and A10 (a found retrieval code).
+
+**ADR-0014, main screen.** Two directions were drawn against each other and
+Benedict picked **A, answer-first**; **B, the timeline, is kept as a noted
+variant**, not discarded. The honest cost is in the ADR: B would have made the
+diagnostic window *visible* rather than described, and position on an axis
+would have been a second encoding channel alongside colour — which would have
+solved the BITV "colour only" finding as a side effect. Under A that has to be
+built deliberately (recorded as R17).
+
+**Design tokens** (`architecture/design-tokens.md`, decision still open). A
+palette proposal with a Munich reference was checked by computing contrast
+rather than eyeballing it:
+
+- Munich yellow cannot be the primary/CTA: **1.51–1.82:1** on light. It works
+  as a *fill* with dark text (9.57:1). The heavier objection is semantic —
+  yellow is already "elevated risk" on the risk scale, so CTA and warning would
+  look alike in an app where colour carries the message.
+- Medical Blue fails as text in dark mode (3.17–3.63:1) and pulls toward
+  "medical device", the exact signal the regulatory position avoids. Safe Green
+  fails on light (3.38–3.75:1), and "safe" is a state this app cannot certify.
+- Found in passing: the existing warning colour `#B7791F` is **3.64:1** and
+  fails as text too. Pre-existing, recorded as R16.
+- Recommendation: two palettes that never touch — interaction keeps `#1F1D2B`
+  (14.93:1), semantics get their own scale, Munich yellow becomes the *brand*
+  colour rather than the CTA.
+- Type: **Atkinson Hyperlegible throughout**. Designed by the Braille Institute
+  for maximum character distinction; where BITV is an admission requirement
+  that is an argument, not a style choice. Advised against Inter (named as an
+  LLM tell in the working agreement, and pairing it with Roboto is duplication
+  rather than a pairing) and Montserrat (the Canva default look).
+- Constraint worth not losing: the app ships **no webfont** today, because
+  Google Fonts was removed in July for GDPR reasons. Any of these means
+  bundling the font files — never a Google Fonts link.
+
+**Design drafts.** Eight artboards, built from the real values in
+`apps/mobile/src/ui.tsx` and `theme.ts` rather than from memory. Two rendering
+bugs were found and fixed only by actually rendering them — a timeline built
+from per-row line segments breaks (`flex:1` grows width, not height, in a row
+flex), and the absolutely positioned axis then painted over the dots. Neither
+was visible in the source.
+
+Found while rebuilding: **the app's chips are ~31px tall** (7px padding,
+13px type) — below the 44px touch-target minimum. Left as-is in the drafts
+because they mirror the app; belongs on the BITV list.
+
+**New this session:** `CLAUDE.md` at the repo root, so a fresh session gets
+oriented without being told. It points at the log, the open points and
+`architecture/`, and carries the repo-specific rules (pnpm, hausbasis, no
+third-party requests) and the verification habits this repo learned the hard
+way.
+
+**Next up:** wave 2 — design tokens into core (after the palette decision),
+lint and CI, dead constants out, source citations on every medical number, and
+core gets a real package entry point.
+
 ## 2026-08-27 (later) — Architecture decision: native-only, and the architecture deck
 
 Benedict decided the shape of the product: **the native app is the product.**

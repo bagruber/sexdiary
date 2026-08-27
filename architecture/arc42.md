@@ -428,6 +428,7 @@ Vollständig in [`adr/`](adr/). Die tragenden:
 | [0011](adr/0011-rueckmeldung.md) | Rückmeldung des Benachrichtigten, ohne Absenderidentität | vorgeschlagen |
 | [0012](adr/0012-befundabruf.md) | Befundabruf über einen Code bei der Teststelle | vorgeschlagen |
 | [0013](adr/0013-forschungsdaten.md) | Forschungsbeitrag nur als verrauschtes Aggregat | vorgeschlagen |
+| [0014](adr/0014-hauptbildschirm.md) | Hauptbildschirm: Antwort zuerst, Zeitachse als Variante | angenommen |
 
 ---
 
@@ -476,6 +477,8 @@ schlimmer als keins.
 | R13 | **Die Außenfläche ist von drei auf sechs Verbindungen gewachsen** (Rückmeldung, Befundabruf, Forschungsbeitrag). Jede einzeln begründet, die Zunahme bleibt ein Risiko | Größere Prüffläche, mehr Metadaten | laufend |
 | R14 | **Der Befundabruf hängt an der Teststelle**, nicht am Betreiber. Ohne Referenzimplementierung für die Teststellenseite bleibt die Funktion theoretisch | Signierte Befunde ohne Gegenstelle | Welle 5 |
 | R15 | **Der Forschungsbeitrag verbraucht Privatsphärebudget über die Zeit.** Ohne Budgetverwaltung ist die Anonymitätszusicherung nach genügend Übertragungen wertlos | Zusicherung nicht haltbar | vor dem Bau |
+| R16 | **Die Warnfarbe `#B7791F` liegt bei 3,64:1 auf Weiß** und fällt als Text durch. Vorbestehend, unabhängig von der Token-Entscheidung | BITV-Verstoß, Ziel 4 | Welle 2 |
+| R17 | **Der zweite Kodierungskanal neben der Risikofarbe fehlt weiterhin.** Die verworfene Variante B hätte ihn über die Position auf einer Zeitachse mitgeliefert; unter Richtung A muss er eigens gebaut werden | BITV-Verstoß, Ziel 4 | Welle 2 |
 
 ---
 

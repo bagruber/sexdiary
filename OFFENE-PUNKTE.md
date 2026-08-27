@@ -4,6 +4,26 @@
 streichen, nicht abhaken — die Datei soll kurz bleiben.*
 
 
+## Design-Tokens: Farben und Schriften entscheiden
+
+Ein Vorschlag mit Münchner Bezug liegt vor und ist in
+`architecture/design-tokens.md` durchgerechnet. Kurzfassung:
+
+- **Münchner Gelb kann nicht Primär/CTA sein** — 1,5 bis 1,8:1 auf Hell, und
+  es kollidiert semantisch mit „erhöhtes Risiko“. Vorschlag: Markenfarbe
+  (Icon, Splash, Infoseite), immer als Fläche mit dunklem Text darauf.
+- **Medical Blue** fällt im Dark Mode als Text durch und zieht inhaltlich
+  Richtung „Medizinprodukt“. **Safe Green** fällt auf Hell durch, und
+  „sicher“ ist ein Zustand, den die App nicht bescheinigen kann.
+- Schriften: **Atkinson Hyperlegible durchgehend** empfohlen — vom Braille
+  Institute für maximale Zeichenunterscheidbarkeit entworfen, also ein
+  BITV-Argument statt eines Stilentscheids. Nicht Inter (LLM-Tell laut
+  Arbeitsvereinbarung), nicht Montserrat (Canva-Standardlook).
+- **Schriftdateien mitliefern, niemals Google Fonts verlinken.**
+
+Zu entscheiden, bevor in Welle 2 Farben in Code geschrieben werden.
+
+
 ## Web-Tracker: Rente oder beschriftete Demo?
 
 Seit der Native-Only-Entscheidung vom 27.08.2026 ist `apps/web` nicht mehr das
