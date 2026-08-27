@@ -23,6 +23,7 @@ Status: `vorgeschlagen` · `angenommen` · `abgeloest durch ADR-XXXX` · `verwor
 | [0012](0012-befundabruf.md) | Befundabruf über einen Code | vorgeschlagen | 27.08.2026 |
 | [0013](0013-forschungsdaten.md) | Forschungsbeitrag, nur aggregiert | vorgeschlagen | 27.08.2026 |
 | [0014](0014-hauptbildschirm.md) | Hauptbildschirm: Antwort zuerst, Zeitachse als Variante | angenommen | 27.08.2026 |
+| [0015](0015-farbtokens.md) | Farbtokens im Kern, zwei getrennte Skalen | angenommen | 27.08.2026 |
 
 Die Entscheidungen von 10.07.2026 wurden damals getroffen, aber erst am
 27.08.2026 in dieses Format überführt. Kontext und Begründung stammen aus

@@ -16,7 +16,7 @@ export function RiskCard({ name, data }: Props) {
   const { t, palette, isDark } = useApp();
   const [open, setOpen] = useState(false);
   const [rem, setRem] = useState(false);
-  const color = riskColor(data.mr);
+  const color = riskColor(data.mr, isDark);
   const isT = !!data.testable;
 
   return (

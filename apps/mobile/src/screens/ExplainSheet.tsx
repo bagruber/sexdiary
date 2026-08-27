@@ -11,11 +11,11 @@ import {
   WIKI,
   formatDate,
   plurals,
+  riskColor,
   type ActKey,
   type RiskData,
 } from "@sexdiary/core";
 import { useApp } from "../state/store";
-import { riskColor } from "../theme";
 import { Card, GhostButton, SectionTitle } from "../ui";
 
 export function ExplainSheet({
@@ -28,7 +28,6 @@ export function ExplainSheet({
   onClose: () => void;
 }) {
   const { data, t, palette } = useApp();
-  const colors = riskColor(palette);
   const lang = data.prefs.lang;
 
   const contactName = (cid: string | null) =>
@@ -122,7 +121,7 @@ export function ExplainSheet({
                         </Text>
                         <Text
                           style={{
-                            color: colors[c.level],
+                            color: riskColor(palette, c.level),
                             fontSize: 12,
                             fontWeight: "600",
                           }}

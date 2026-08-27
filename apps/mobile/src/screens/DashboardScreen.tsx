@@ -5,13 +5,13 @@ import {
   formatDate,
   nextAction,
   plurals,
+  riskColor,
   summarizeProtections,
   today,
   vaccineSeries,
   type RiskData,
 } from "@sexdiary/core";
 import { useApp } from "../state/store";
-import { riskColor } from "../theme";
 import { Card, Meter, Screen, SectionTitle, Title } from "../ui";
 import { ExplainSheet } from "./ExplainSheet";
 
@@ -124,7 +124,6 @@ function RiskRow({
   onPress: () => void;
 }) {
   const { t, palette } = useApp();
-  const colors = riskColor(palette);
 
   let status: string;
   let color = palette.sub;
@@ -138,7 +137,7 @@ function RiskRow({
     color = palette.bad;
   } else if (risk.exposed && risk.testable) {
     status = t("testableNow");
-    color = risk.mr ? colors[risk.mr] : palette.warn;
+    color = riskColor(palette, risk.mr);
   } else if (risk.exposed) {
     const remaining = Math.max((risk.wd ?? 0) - (risk.days ?? 0), 1);
     status = t("notYetMeaningful", { n: remaining });
