@@ -309,6 +309,22 @@ export function LogScreen() {
               <Text style={{ color: palette.sub, marginTop: 4, fontSize: 13 }}>
                 {Object.keys(item.r.ts).join(", ")}
               </Text>
+              {/* ADR-0007 A6: every record says where it came from. This
+                  is the part that works before a single test centre
+                  takes part — it turns each entry into a labelled claim
+                  instead of an unqualified fact. */}
+              <Text
+                style={{
+                  color: item.r.signed ? palette.good : palette.sub,
+                  marginTop: 4,
+                  fontSize: 12,
+                  fontWeight: item.r.signed ? "600" : "400",
+                }}
+              >
+                {item.r.signed
+                  ? t("signedBy", { name: item.r.signed.issuer })
+                  : t("selfEntered")}
+              </Text>
               {Object.entries(item.r.results ?? {}).some(([, v]) => v === "positive") && (
                 <Text style={{ color: palette.bad, marginTop: 2, fontSize: 13 }}>
                   {t("positive")}:{" "}

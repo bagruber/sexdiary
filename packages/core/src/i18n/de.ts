@@ -327,6 +327,8 @@ export const de: Dict = {
     "Auf diesem Gerät ist keine Entsperrung eingerichtet. Richte in den Systemeinstellungen eine PIN, ein Muster oder Biometrie ein, dann lässt sich die Sperre aktivieren.",
   appLockNote:
     "Die Sperre schützt die Oberfläche gegen jemanden, der das entsperrte Telefon in die Hand nimmt. Die Daten selbst sind unabhängig davon verschlüsselt.",
+  selfEntered: "Selbst eingetragen",
+  signedBy: "Signiert von {name}",
   reminderTitle: "Erinnerung",
   reminderBody: "Es gibt etwas nachzusehen.",
   remindersUnavailable:

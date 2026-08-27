@@ -2,6 +2,10 @@
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ES2022"],
+    // Node types are here for the tests only. src may not import
+    // anything non-relative -- the lint rule enforces that, so the
+    // types cannot quietly become a door into I/O.
+    "types": ["node"],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "skipLibCheck": true,

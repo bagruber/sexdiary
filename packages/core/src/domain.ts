@@ -60,6 +60,24 @@ export interface Intercourse {
 
 export type TestResultValue = "negative" | "positive";
 
+/**
+ * Where a record came from. The distinction between a finding signed by
+ * a test centre and one somebody typed in is the larger half of what
+ * ADR-0007 buys, and it works before a single test centre takes part:
+ * it turns every entry into an honestly labelled claim.
+ */
+export interface ResultProvenance {
+  /** Key id of the issuer, as it appeared in the trust list. */
+  kid: string;
+  /** Display name at the time of import — kept so the record still
+   *  reads correctly after the trust list changes. */
+  issuer: string;
+  /** The QR text, so the signature stays checkable later. */
+  qr: string;
+  /** When the app verified it. */
+  importedAt: string;
+}
+
 export interface TestRecord {
   id: string;
   date: string;
@@ -67,6 +85,8 @@ export interface TestRecord {
   fac: string;
   ts: Partial<Record<string, 0 | 1>>;
   results?: Partial<Record<string, TestResultValue>>;
+  /** Absent means self-entered. Present means it verified on import. */
+  signed?: ResultProvenance;
 }
 
 export type VaccineKind = "vaccine" | "prep" | "doxypep";
