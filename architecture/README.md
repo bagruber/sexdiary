@@ -17,6 +17,7 @@ Entscheidungslog der laufenden Arbeit, also Rohmaterial, nicht Ergebnis.
 | [`data-flow.md`](data-flow.md) | Verarbeitungsübersicht | Datenschutz: Vorarbeit für Art. 30 und die Folgenabschätzung |
 | [`adr/`](adr/) | MADR | Einzelne Entscheidungen mit Kontext und Konsequenz |
 | [`design-tokens.md`](design-tokens.md) | Analyse | Farben und Schriften: gerechnete Kontraste, Vorschlag, offene Punkte |
+| [`risikomodell-quellen.md`](risikomodell-quellen.md) | Belegtabelle | Herkunft jeder medizinischen Zahl — und wo es keine gibt |
 | [`interfaces/`](interfaces/) | Spezifikation | Die Stellen, an denen Daten das Gerät verlassen — Befunde, Benachrichtigung, Forschungsbeitrag |
 
 ## Warum diese Formate

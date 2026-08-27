@@ -1,5 +1,19 @@
 import type { ActKey, PartnerAnatomy, RiskLevel } from "./domain.js";
 
+/**
+ * Where every number here comes from is written down in
+ * `architecture/risikomodell-quellen.md` — including the ones that have
+ * no source. Four values are recorded there as probably wrong; they are
+ * left standing until a clinician has ruled on them, because quietly
+ * adjusting a medical model from a literature search is the same
+ * mistake as writing it without sources, only harder to notice.
+ *
+ *   wd  days until a test becomes meaningful
+ *   p   per-act transmission probability
+ *   c   relative reduction from condom use
+ *   r   the ordinal level shown to the user — not a medical quantity
+ */
+
 export interface StiTx {
   r: RiskLevel;
   p: number;
@@ -13,12 +27,18 @@ export interface StiInfo {
 
 export const STI_DB: Record<string, StiInfo> = {
   HIV: {
+    // CDC: a 4th-generation lab test detects most infections at 18-45
+    // days. 45 is the conservative end of that range.
     wd: 45,
     sym: [
       "Flu-like illness 2–4 wk post-exposure",
       "Fever, fatigue, swollen lymph nodes",
       "Often completely asymptomatic",
     ],
+    // Patel et al. 2014, AIDS 28(10):1509-19, per 10 000 exposures:
+    // 138 / 11 / 8 / 4. Condom factor: Weller & Davis, Cochrane 2002.
+    // The oral values are this package's own conservative floor — the
+    // review reports "low, 0-4 per 10 000", not a point estimate.
     tx: {
       recAnal: { r: "very_high", p: 0.0138, c: 0.8 },
       insAnal: { r: "high", p: 0.0011, c: 0.8 },
@@ -31,6 +51,8 @@ export const STI_DB: Record<string, StiInfo> = {
     },
   },
   Gonorrhea: {
+    // Open finding: NAAT is usually given as 1-2 weeks. 7 is the very
+    // bottom of that.
     wd: 7,
     sym: [
       "Discharge (genital, anal, throat)",
@@ -67,6 +89,8 @@ export const STI_DB: Record<string, StiInfo> = {
     },
   },
   Syphilis: {
+    // Open finding: serology usually turns positive 3-6 weeks after the
+    // chancre, with retesting advised at 6 and 12 weeks.
     wd: 21,
     sym: [
       "Painless ulcer (chancre)",
@@ -99,6 +123,8 @@ export const STI_DB: Record<string, StiInfo> = {
     },
   },
   "HSV-2": {
+    // Open finding: IgG seroconversion takes 3-12 weeks. At 16 days the
+    // app calls a test meaningful when a negative rules nothing out.
     wd: 16,
     sym: [
       "Blisters or sores",
@@ -117,6 +143,9 @@ export const STI_DB: Record<string, StiInfo> = {
     },
   },
   Mpox: {
+    // Open finding: mpox is diagnosed by PCR from lesion material.
+    // There is no serological window to wait out, so this number is
+    // answering a question that does not arise.
     wd: 21,
     sym: [
       "Rash → pustules",
@@ -194,6 +223,11 @@ export const COUNTRIES = [
   "Russia",
 ];
 
+/**
+ * Drives the "elevated prevalence" hint. No source, no date, no
+ * criterion — see section 6 of the sources document. Either put it on a
+ * dated source or drop it; it currently reads to the user as fact.
+ */
 export const HIGH_PREVALENCE: Record<string, string[]> = {
   "South Africa": ["HIV", "Syphilis", "Gonorrhea", "Chlamydia", "HSV-2"],
   Nigeria: ["HIV", "Syphilis", "Gonorrhea", "Hep B"],

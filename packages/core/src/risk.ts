@@ -75,6 +75,14 @@ export function vaccineProtection(vx: Vaccination[]): Record<string, 1> {
   return p;
 }
 
+/**
+ * Two known simplifications, both recorded in
+ * `architecture/risikomodell-quellen.md`: the seven-day lead-in is the
+ * figure for receptive anal exposure, and guidance gives a longer one
+ * for vaginal exposure; and treating PrEP as full suppression is
+ * stronger than the evidence, which is why the encounter is still
+ * surfaced as `prepExcluded` rather than dropped.
+ */
 export function prepActiveOn(vx: Vaccination[], date: string): boolean {
   const dt = toDate(date);
   for (const v of vx) {
@@ -170,6 +178,9 @@ export function calcRisk(
           ["Gonorrhea", "Chlamydia", "Syphilis"].includes(sn) &&
           doxyCoverage(vx, e.date)
         ) {
+          // Luetkemeyer et al. 2023, NEJM 388(14):1296-1306. One flat
+          // factor across all three is too coarse: the trial's
+          // reduction was weakest for gonorrhoea.
           rate *= 0.25;
           reduced = true;
         }
