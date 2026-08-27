@@ -84,10 +84,21 @@ cd android && ./gradlew assembleRelease
 # → android/app/build/outputs/apk/release/app-release.apk
 ```
 
-The first run downloads Gradle and any missing SDK components, so budget
-half an hour. The generated project signs the release build with the
-**debug** keystore — fine for sideloading to testers, and exactly what
-must be replaced before anything is distributed for real.
+**Check free disk space first: this needs about 4 GB.** Attempted on
+28.08.2026 and it did not finish — Gradle downloaded its distribution
+and dependency cache (2.4 GB), ran for 17 minutes, and then failed
+writing `executionHistory.bin` because the disk had filled up. That
+error reads like a Gradle bug and is almost always a full disk or a file
+lock on Windows. The route itself is sound; it has simply not produced
+an APK on this machine yet.
+
+The generated project signs the release build with the **debug**
+keystore — fine for sideloading to testers, and exactly what must be
+replaced before anything is distributed for real.
+
+One more thing that cost time: piping Gradle through `tail` hides its
+exit code, so a failed build reports success. Redirect to a file and
+check `$?`, or set `pipefail`.
 
 Or via EAS, which builds in the cloud and hands back a download link:
 
