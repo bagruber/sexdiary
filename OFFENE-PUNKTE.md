@@ -4,6 +4,19 @@
 streichen, nicht abhaken — die Datei soll kurz bleiben.*
 
 
+## Web-Tracker: Rente oder beschriftete Demo?
+
+Seit der Native-Only-Entscheidung vom 27.08.2026 ist `apps/web` nicht mehr das
+Produkt. Er existiert aber noch, dupliziert die App und kostet Pflege.
+
+Empfehlung: **Rente.** Ein anklickbarer Web-Klon einer nativen App suggeriert im
+Pitch „wir haben eine Web-App gebaut und nennen sie nativ“. Ueberzeugender ist
+die echte App auf einem echten Telefon plus ein Test-Link fuer die Runde. Der
+Code bleibt in der Historie, `packages/core` wandert unveraendert mit.
+
+Betrifft Welle 4. Begruendung in `architecture/adr/0001-native-only.md`.
+
+
 ## Mobile-App ist noch nie auf einem Geraet gelaufen
 
 Der aelteste offene Punkt, seit dem 10.07.2026. Verifiziert sind bisher nur
@@ -19,7 +32,8 @@ nicht mehr abschaltbar ist. `npx expo start` und einmal durchklicken.
 ## Nichts ist gepusht
 
 Alle Aenderungen vom 26. und 27.08.2026 liegen als lokale Commits auf
-`refactor/welle-0-versionen`.
+`refactor/welle-0-versionen`. Der Branchname passt nicht mehr — inzwischen
+liegen Welle 0 und Welle 1 darauf.
 
 Dazu kommt eine Aenderung **ausserhalb dieses Repos**: in
 `hausbasis/baseline.json` ist der Ausnahme-Eintrag fuer sexdiary entfernt

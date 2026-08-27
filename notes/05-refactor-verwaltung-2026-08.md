@@ -38,6 +38,81 @@ Expo-57-Template liefert `~6.0.3`. TypeScript 7 (die Go-Portierung) gegen die
 Typflaeche von React Native ist die am wenigsten erprobte Kombination in diesem
 Repo. Das gehoert **als erstes** geprueft, nicht als letztes.
 
+
+---
+
+## NACHTRAG 27.08.2026 — teilweise ueberholt
+
+Benedict hat am 27.08.2026 entschieden: **Das Produkt ist die native App. Der
+Browser bekommt eine reine Informationsseite.** Kontaktnachverfolgung, Tests und
+Impfungen laufen ausschliesslich nativ und werden nirgendwo sonst gespeichert.
+
+Das ueberholt Teile dieses Dokuments. Es wird nicht umgeschrieben, weil die
+Begruendungen weiterhin gelten und weil nachvollziehbar bleiben soll, was wann
+galt. Was jetzt anders ist:
+
+| Hier noch drin | Jetzt |
+|---|---|
+| Abschnitt 3.2 — vier Mobile-Features ins Web portieren | **entfaellt.** Das Web trackt nicht mehr |
+| Abschnitt 3.1 — Demo-Modus im Web als hoechste Prioritaet | **entschaerft.** Ein Tracker, der kein Produkt ist, darf Demo-Daten zeigen, wenn er als Demo beschriftet ist |
+| Abschnitt 1.2 — Inline-Styles des Web-Trackers refactoren | **entfaellt.** Waere Arbeit an Code, der gehen soll |
+| Abschnitt 6.3 — Barrierefreiheit am Tracker | **verlagert** auf die Infoseite. Die ist das oeffentliche Angebot und damit BITV-pflichtig — und von Grund auf barrierefrei zu bauen ist erheblich billiger |
+| Wellenplan Abschnitt 7 | **neu geschnitten**, siehe unten |
+
+Weiterhin unveraendert gueltig: Abschnitt 1.4 (luegende Schalter), 1.7 (keine
+CI), 1.8 (Kern ist kein Paket), 3.3 (kein Undo), 3.4 (Risiko nur ueber Farbe),
+3.6 (kein „Was jetzt?“), sowie der gesamte Abschnitt 6 mit Ausnahme von 6.3.
+
+### Neuer Wellenschnitt
+
+| Welle | Inhalt | Stand |
+|---|---|---|
+| 0 | Versionen, Expo 57, pnpm | erledigt 27.08. |
+| 1 | **Architektur festschreiben** — arc42, C4, ADRs, Threat Model, Datenfluss, Schnittstellenspezifikationen | erledigt 27.08. |
+| 2 | Fundament: Design-Tokens im Kern, Lint und CI, tote Konstanten raus, Quellenangaben an den medizinischen Zahlen, Kern als echtes Paket | offen |
+| 3 | Mobile wird das Produkt: echter Lock, Screenshot-Schutz, Erinnerungen, signierte QRs, Backup, Verteilung | offen |
+| 4 | Die Infoseite ersetzt den Web-Tracker | offen |
+| 5 | Server: Alert-Relay und Schluesselverzeichnis, Deployment-Artefakt | offen |
+
+### Drei Fragen, die am 27.08. beantwortet wurden
+
+**Android ohne Oeffentlichkeit verteilen.** Ja, vier Wege. Empfehlung:
+selbstgehostetes signiertes Paket hinter unverlinkter Adresse als *Erzaehlung*
+(null Dritte, belegt die Souveraenitaetsaussage praktisch), interner Testkanal
+des Stores als *Werkzeug* (Auto-Update, kurze Iterationsschleife). Ausgefuehrt in
+`architecture/adr/0010-verteilung-erprobung.md`.
+
+**Hosting-Realismus.** Es liegt an der Form des Deployments, nicht am Anbieter.
+Schlichte Linux-VM, Reverse Proxy, ein Prozess, eine Datei-Datenbank; kein
+Serverless, keine Managed-DB, kein Vendor-SDK. Das Lieferobjekt ist das
+Deployment-Artefakt, nicht die laufende Instanz. Dazu: null Requests an Dritte,
+im Netzwerk-Tab vorfuehrbar. Zielumgebung im Pitch benennen statt offenlassen.
+
+**QR gegen Faelschung.** Muster des EU-COVID-Zertifikats: signierte Nutzlast im
+QR, Trust List, **offline** verifizierbar. Der groesste Gewinn ist nicht die
+Kryptografie, sondern die sichtbare Trennung „signiert von X“ gegen „selbst
+eingetragen“ — die wirkt bereits, bevor eine einzige Teststelle mitmacht.
+Spezifikation in `architecture/interfaces/signed-results.md`.
+
+### Zwei LLM-Muster, am Code belegt
+
+**Ein Design-System, das nur so aussieht.** `theme/tokens.ts` exportiert eine
+Radius-Skala mit vier benannten Stufen — importiert wird sie **null Mal**.
+Daneben stehen 57 hartkodierte Radien in 13 verschiedenen Werten. Eine
+Token-Skala wird angelegt, weil guter Code so aussieht, und nie verkabelt.
+Dieselbe Datei hat vier Exporte: einer zeigt seit Juli ins Leere und wird
+trotzdem 91-mal benutzt, einer wird nie benutzt, zwei arbeiten.
+
+**Fuenf Krankheiten, fuenf Symptomlisten, jede exakt drei Eintraege.** Der
+Inhalt wurde einer Form angepasst statt der Krankheit. Wiegt schwerer, weil es
+medizinischer Inhalt ist. Die Uebertragungswahrscheinlichkeiten selbst halten
+der Pruefung uebrigens stand — die HIV-Werte entsprechen der publizierten
+Per-Akt-Literatur. Belegt ist das nur nirgends.
+
+Nicht gefunden: Kommentare, die die Zeile darunter wiederholen (sie erklaeren
+durchweg das Warum), hedge-gestapelte Nutzertexte, Abstraktionen ohne zweiten
+Aufrufer. Es ist kein durchgehendes Muster, sondern zwei konkrete Stellen.
+
 ---
 
 ## 1. Code Quality — was messbar im Weg steht

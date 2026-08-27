@@ -3,6 +3,91 @@
 Reverse-chronological decision log. Read this first each session; append
 before ending one. `docs/` is GitHub Pages build output — notes live here.
 
+## 2026-08-27 (later) — Architecture decision: native-only, and the architecture deck
+
+Benedict decided the shape of the product: **the native app is the product.**
+Contact tracing, tests and vaccinations live only there and are stored nowhere
+else. The browser gets an information site — how it works, Impressum,
+Datenschutz, Teststellen — and nothing more. Backup follows the model people
+already know from messengers: the user's own cloud, encrypted with a key only
+they hold.
+
+This is the right call, and the reasoning is worth recording: the realistic
+threat model for this app is the person sitting next to you, and *none* of the
+defences against that — screen-capture blocking, recents blurring, a
+keystore-bound lock, an alternate icon, local reminders — are possible in a
+browser. The web tracker could never deliver the product's core promise. Full
+reasoning in `architecture/adr/0001-native-only.md`.
+
+**What it invalidated.** A good part of the wave plan from earlier today aimed
+at the wrong codebase: porting four features to web, the web demo-mode fix as
+top priority, refactoring the web tracker's inline styles, and the accessibility
+work on the tracker. The accessibility work moves to the info site, where it is
+much cheaper — building accessible from scratch beats retrofitting a grown
+tracker. `notes/05` carries an addendum rather than a rewrite, so it stays clear
+what applied when.
+
+**Wave 1 shipped: the architecture deck.** `architecture/` — deliberately not
+`docs/`, which is build output. 18 files, ~1 600 lines:
+
+- `arc42.md` — the DACH-standard 12-section architecture overview, with C4
+  diagrams at levels 1–3, runtime views for the three flows that matter, and an
+  honest section 11 listing twelve risks and debts including "the app has never
+  run on a device" and "the app lock is simulated".
+- `adr/` — ten decision records in MADR format. Six retroactively capture
+  decisions from 10.07. that were only ever in the log; four are new or
+  proposed. Immutable by convention: a revised decision gets a new ADR that
+  supersedes the old one.
+- `threat-model.md` — attacker-centric, eight attackers, with what each learns
+  today versus after the planned work. Names three things explicitly *not*
+  covered (compromised OS, coercion, forensics on a seized unlocked device),
+  because a threat model that implies completeness gets read as a guarantee.
+- `data-flow.md` — Art. 30 groundwork. Four processing activities; the operator
+  appears in exactly one of them.
+- `interfaces/` — the two places data crosses the device boundary, specified
+  before being built.
+
+**Verified:** 40 internal links, none dead. All 9 Mermaid diagrams actually
+render — checked by injecting the mermaid UMD bundle into headless Chrome and
+calling `parse` + `render` on each block. Fence balance alone proves nothing,
+and a broken diagram in the flagship architecture document would be expensive
+at a pitch. The check script lives outside the repo; making it a CI job in wave
+2 would mean adding mermaid and playwright-core as dev dependencies, which is a
+family-wide decision, not a single-repo one.
+
+**LLM-pattern audit** (Benedict asked for it, done against the code):
+
+- `theme/tokens.ts` exports a four-step radius scale that is imported **zero
+  times**, while 57 hardcoded radii in 13 distinct values sit next to it. The
+  archetypal tell: a token scale written because good code looks like that, then
+  never wired up. Same file, four exports — one dead but used 91×, one entirely
+  dead, two working.
+- Five STIs, five symptom lists, every one exactly three entries. Content shaped
+  to a template rather than to the disease. Worse than the radius scale because
+  it is medical content. The transmission probabilities themselves hold up —
+  the HIV per-act values match the published literature — but nothing cites a
+  source, and unsourced good data looks exactly like invented data.
+- Checked and clean: comments explain *why* rather than restating the line
+  below; user-facing copy is terse, not hedge-stacked; no abstraction without a
+  second caller.
+
+**Also answered:** Android can be distributed to testers without going public
+(self-hosted signed package as the story, store internal-testing as the tool —
+ADR-0010). Hosting professionalism is a property of the deployment's shape, not
+the vendor: plain Linux VM, compose file, runbook, and the deliverable is the
+deployment artifact rather than the running instance. The anti-forgery QR has a
+German precedent worth copying wholesale — the COVID certificate's
+signed-payload-plus-trust-list, verified offline.
+
+**Not done:** the app still hasn't run on a device. Licence still open. The web
+tracker still exists and still duplicates the product — retiring it is wave 4,
+and it needs a decision (recommendation: retire, don't keep as a demo; a
+clickable web clone of a native app sends the wrong signal in a pitch).
+
+**Next up:** wave 2 — design tokens into core, lint and CI, dead constants out,
+source citations on every medical number, and the core gets a real package
+entry point so the relay can validate against the same schemas.
+
 ## 2026-08-27 — Wave 0: version alignment, Expo 57, pnpm
 
 Scope set by Benedict: refactor across design, usability and code quality;
