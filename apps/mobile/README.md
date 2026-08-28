@@ -84,6 +84,24 @@ cd android && ./gradlew assembleRelease
 # → android/app/build/outputs/apk/release/app-release.apk
 ```
 
+**Windows: der lokale Build kommt derzeit nicht durch.** Nicht wegen der
+App, sondern wegen der 260-Zeichen-Pfadgrenze. Stand 28.08.2026:
+
+- Das flache pnpm-Layout (`nodeLinker: hoisted`) hat den groessten Teil
+  geloest: laengster Quellpfad 293 auf 213 Zeichen, CMake-Warnungen von
+  403 auf 1, zwei scheiternde Native-Tasks auf einen.
+- Was bleibt: CMake kodiert bei `react-native-safe-area-context` den
+  absoluten Quellpfad in den Objektpfad (`.../react_codegen_….dir/C_/Users/…`).
+  Der Repo-Pfad steckt dadurch zweimal drin, zusammen 396 Zeichen.
+  **Repo flacher legen hilft nicht** — unter `C:/sd` waeren es noch 308.
+- Windows-Langpfade einzuschalten hilft ebenfalls nicht: das ninja.exe
+  aus Android SDK cmake 3.22.1 ist nicht langpfadfaehig (weder
+  `longPathAware`-Manifest noch `RtlAreLongPathsEnabled` im Binary), es
+  bricht unabhaengig von der Registry bei 260 ab. Ab ninja 1.11 waere das
+  anders — dafuer braucht es eine neuere CMake aus dem SDK-Manager.
+
+Bis dahin: EAS Build baut auf Linux, wo die Grenze nicht existiert.
+
 **Check free disk space first: this needs about 4 GB.** Attempted on
 28.08.2026 and it did not finish — Gradle downloaded its distribution
 and dependency cache (2.4 GB), ran for 17 minutes, and then failed

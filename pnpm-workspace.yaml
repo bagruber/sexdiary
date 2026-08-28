@@ -1,6 +1,13 @@
 packages:
   - 'packages/*'
   - 'apps/*'
+
+# Flaches node_modules statt des .pnpm-Speichers. Der Android-Build
+# scheitert sonst an Windows' 260-Zeichen-Grenze: die Hash-Verzeichnisse
+# unter .pnpm/ kosten rund 80 Zeichen, und RNs Codegen legt darunter noch
+# einmal tief ab. Gemessen am 28.08.2026: 293 Zeichen, flach 213.
+# Preis: Phantom-Dependencies werden moeglich.
+nodeLinker: hoisted
 minimumReleaseAgeExclude:
   - '@expo/cli@57.0.19'
   - '@expo/inline-modules@0.1.7'
