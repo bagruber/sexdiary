@@ -76,43 +76,63 @@ Go's, not ours. Disguise mode cannot be judged here either.
 Locally, no cloud service involved (the ADR-0010 "self-hosted" path):
 
 ```bash
-export JAVA_HOME="C:\Program Files\Android\Android Studio\jbr"
-export ANDROID_HOME="$LOCALAPPDATA/Android/Sdk"
+export JAVA_HOME="C:/Program Files/Android/Android Studio/jbr"
+export ANDROID_HOME="C:/Users/<you>/AppData/Local/Android/Sdk"
 
 npx expo prebuild --platform android   # generates android/, not committed
+cat > android/local.properties <<PROPS
+sdk.dir=$ANDROID_HOME
+cmake.dir=$ANDROID_HOME/cmake/3.31.6
+PROPS
 cd android && ./gradlew assembleRelease
 # → android/app/build/outputs/apk/release/app-release.apk
 ```
 
-**Windows: der lokale Build kommt derzeit nicht durch.** Nicht wegen der
-App, sondern wegen der 260-Zeichen-Pfadgrenze. Stand 28.08.2026:
+**This produced an APK on 28.08.2026** — 71 MB, `de.bagruber.sexdiary`,
+all four ABIs, 7m15s. Getting there on Windows needed three things that
+are not obvious, so they are written down here rather than rediscovered.
 
-- Das flache pnpm-Layout (`nodeLinker: hoisted`) hat den groessten Teil
-  geloest: laengster Quellpfad 293 auf 213 Zeichen, CMake-Warnungen von
-  403 auf 1, zwei scheiternde Native-Tasks auf einen.
-- Was bleibt: CMake kodiert bei `react-native-safe-area-context` den
-  absoluten Quellpfad in den Objektpfad (`.../react_codegen_….dir/C_/Users/…`).
-  Der Repo-Pfad steckt dadurch zweimal drin, zusammen 396 Zeichen.
-  **Repo flacher legen hilft nicht** — unter `C:/sd` waeren es noch 308.
-- Windows-Langpfade einzuschalten hilft ebenfalls nicht: das ninja.exe
-  aus Android SDK cmake 3.22.1 ist nicht langpfadfaehig (weder
-  `longPathAware`-Manifest noch `RtlAreLongPathsEnabled` im Binary), es
-  bricht unabhaengig von der Registry bei 260 ab. Ab ninja 1.11 waere das
-  anders — dafuer braucht es eine neuere CMake aus dem SDK-Manager.
+**1. A JDK.** There is no standalone JDK on this machine. The one that
+works is the JDK 17 bundled with Android Studio, hence the `JAVA_HOME`
+above — Gradle finds no `java` on PATH without it.
 
-Bis dahin: EAS Build baut auf Linux, wo die Grenze nicht existiert.
+**2. CMake 3.31.6, not the 3.22.1 the SDK installs by default.** This is
+the one that actually blocks the build, and it took two failed runs to
+find. Windows caps paths at 260 characters. CMake 3.22.1 encodes the
+absolute source path into the object path, so a codegen file under
+`react-native-safe-area-context` came out at 396 characters and ninja
+refused it. CMake 3.31.6 replaces that encoded path with a hash of the
+source directory — `react_codegen_safeareacontext.dir/823417e8…/` — and
+nothing ever reaches 260.
 
-**Check free disk space first: this needs about 4 GB.** Attempted on
-28.08.2026 and it did not finish — Gradle downloaded its distribution
-and dependency cache (2.4 GB), ran for 17 minutes, and then failed
-writing `executionHistory.bin` because the disk had filled up. That
-error reads like a Gradle bug and is almost always a full disk or a file
-lock on Windows. The route itself is sound; it has simply not produced
-an APK on this machine yet.
+Note what does *not* help, both measured rather than assumed: moving the
+repo somewhere shallow (under `C:/sd` the path is still 308), and
+enabling Windows long paths (the ninja 1.10.2 in CMake 3.22.1 has no
+`longPathAware` manifest and never queries the setting, so it fails at
+260 regardless). The newer ninja 1.12.1 does query it — but by then
+CMake has already shortened the paths, so it never comes up.
+
+```bash
+sdkmanager "cmake;3.31.6"     # cmdline-tools if you have no sdkmanager
+```
+
+`cmake.dir` in `local.properties` is how the build is pointed at it —
+that file is local and untracked, so pinning the version there costs the
+repo nothing and stays out of anyone else's way.
+
+**3. `nodeLinker: hoisted`**, already set in `pnpm-workspace.yaml`.
+pnpm's default layout nests packages under `.pnpm/<name>@<version>_<hash>/`,
+which alone put the longest source path at 293 characters and produced
+403 CMake warnings. Flat layout brings that to 213 and one warning.
+
+Budget about 4 GB of free disk. A run on the same day with ~2 GB free
+died 17 minutes in, writing `executionHistory.bin` — an error that reads
+like a Gradle bug and is almost always a full disk or a file lock.
 
 The generated project signs the release build with the **debug**
-keystore — fine for sideloading to testers, and exactly what must be
-replaced before anything is distributed for real.
+keystore — verified: `CN=Android Debug`. Fine for sideloading to
+testers, and exactly what must be replaced before anything is
+distributed for real.
 
 One more thing that cost time: piping Gradle through `tail` hides its
 exit code, so a failed build reports success. Redirect to a file and

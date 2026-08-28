@@ -17,11 +17,12 @@ Offen, in dieser Reihenfolge sinnvoll:
 2. **QR-Scanner und Ed25519-Verifizierer auf dem Gerät.** Das Format steht und
    ist getestet, gescannt wird noch nichts. Braucht einen Kamerabildschirm.
 3. **Verteilung ([ADR-0010](architecture/adr/0010-verteilung-erprobung.md)).**
-   `eas.json` liegt mit beiden Profilen bereit. Der lokale Bauweg ist
-   beschrieben, hat aber **noch kein APK erzeugt**: der Versuch am
-   28.08.2026 lief 17 Minuten und scheiterte, weil die Platte volllief.
-   Er braucht rund 4 GB frei. Vor einer echten Verteilung muss ausserdem
-   der Debug-Keystore durch einen eigenen ersetzt werden.
+   `eas.json` liegt mit beiden Profilen bereit. Der lokale Bauweg
+   **erzeugt seit dem 28.08.2026 ein APK** (71 MB, alle vier ABIs); das
+   Rezept samt der drei nicht offensichtlichen Voraussetzungen steht im
+   README von `apps/mobile`. Offen bleibt: **eigener Keystore** statt des
+   Debug-Schluessels (geprueft: `CN=Android Debug`), bevor irgendetwas
+   verteilt wird.
 4. **Alternatives Icon und OS-Name.** Ohne das verrät eine Benachrichtigung im
    Tarnmodus auf dem Sperrbildschirm weiterhin den App-Namen.
 
