@@ -43,10 +43,20 @@ function NextActionCard({
   }
 
   return (
-    <Card style={{ borderLeftWidth: 4, borderLeftColor: color, paddingVertical: 18 }}>
-      <Text style={{ color: palette.sub, fontSize: 11, letterSpacing: 0.8 }}>
-        {t("nextAction").toUpperCase()}
-      </Text>
+    <Card style={{ paddingVertical: 18 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 7 }}>
+        <View
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: 3.5,
+            backgroundColor: color,
+          }}
+        />
+        <Text style={{ color: palette.sub, fontSize: 11, letterSpacing: 0.8 }}>
+          {t("nextAction").toUpperCase()}
+        </Text>
+      </View>
       <Text
         style={{
           color: palette.text,
