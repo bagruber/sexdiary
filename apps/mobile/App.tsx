@@ -5,13 +5,14 @@ import {
   Pressable,
   ScrollView,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { usePreventScreenCapture } from "expo-screen-capture";
 import { syncReminders } from "./src/lib/reminders";
-import type { Lang } from "@sexdiary/core";
+import type { Lang, PartnerAnatomy } from "@sexdiary/core";
 import { AppProvider, useApp } from "./src/state/store";
 import { APP_NAME } from "./src/branding";
 import { tapMedium } from "./src/haptics";
@@ -30,46 +31,124 @@ function Onboarding() {
   const setLang = (l: Lang) =>
     dispatch({ type: "updatePrefs", patch: { lang: l } });
 
+  const [step, setStep] = useState(0);
+  const [age, setAge] = useState(data.profile.age);
+  const [pa, setPa] = useState<PartnerAnatomy>(data.profile.pa);
+
+  /**
+   * Neither answer is decoration. `pa` decides which acts the entry form
+   * offers at all (ACT_NEEDS), and skipping leaves the widest set rather
+   * than a wrong one — so skipping is offered, and costs nothing.
+   *
+   * `clearAll` keeps the profile, so the order here is safe.
+   */
+  const finish = (sample: boolean) => {
+    dispatch({ type: "updateProfile", patch: { age, pa } });
+    if (!sample) dispatch({ type: "clearAll" });
+    dispatch({ type: "setOnboarded", value: true });
+  };
+
+  const anatomy: { id: PartnerAnatomy; label: string }[] = [
+    { id: "both", label: t("both") },
+    { id: "penis", label: t("penis") },
+    { id: "vagina", label: t("vagina") },
+  ];
+
   return (
     <Screen>
-      <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}>
-        <Title>{t("welcomeTitle")}</Title>
-        <Text style={{ color: palette.text, marginBottom: 16 }}>
-          {t("welcomeBody")}
-        </Text>
-        <Card>
-          <Text style={{ color: palette.sub, fontSize: 13, lineHeight: 19 }}>
-            {lang === "de"
-              ? "Kein Medizinprodukt. Ersetzt keine ärztliche Beratung. Alle Daten werden ausschließlich verschlüsselt auf diesem Gerät gespeichert."
-              : "Not a medical device. Does not replace professional medical advice. All data is stored encrypted on this device only."}
-          </Text>
-        </Card>
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+        keyboardShouldPersistTaps="handled"
+      >
+        {step === 0 && (
+          <>
+            <Title>{t("welcomeTitle")}</Title>
+            <Text style={{ color: palette.text, marginBottom: 16 }}>
+              {t("welcomeBody")}
+            </Text>
+            <Card>
+              <Text style={{ color: palette.sub, fontSize: 13, lineHeight: 19 }}>
+                {lang === "de"
+                  ? "Kein Medizinprodukt. Ersetzt keine ärztliche Beratung. Alle Daten werden ausschließlich verschlüsselt auf diesem Gerät gespeichert."
+                  : "Not a medical device. Does not replace professional medical advice. All data is stored encrypted on this device only."}
+              </Text>
+            </Card>
 
-        <Text style={{ color: palette.sub, marginTop: 16, marginBottom: 8 }}>
-          {t("onboardLang")}
-        </Text>
-        <View style={{ flexDirection: "row" }}>
-          <Chip label="English" active={lang === "en"} onPress={() => setLang("en")} />
-          <Chip label="Deutsch" active={lang === "de"} onPress={() => setLang("de")} />
-        </View>
+            <Text style={{ color: palette.sub, marginTop: 16, marginBottom: 8 }}>
+              {t("onboardLang")}
+            </Text>
+            <View style={{ flexDirection: "row" }}>
+              <Chip label="English" active={lang === "en"} onPress={() => setLang("en")} />
+              <Chip label="Deutsch" active={lang === "de"} onPress={() => setLang("de")} />
+            </View>
+          </>
+        )}
+
+        {step === 1 && (
+          <>
+            <Title>{t("onboardAge")}</Title>
+            <TextInput
+              value={age}
+              onChangeText={setAge}
+              keyboardType="number-pad"
+              placeholder="28"
+              placeholderTextColor={palette.sub}
+              accessibilityLabel={t("onboardAge")}
+              style={{
+                color: palette.text,
+                backgroundColor: palette.card,
+                borderColor: palette.border,
+                borderWidth: 1,
+                borderRadius: 10,
+                paddingHorizontal: 14,
+                paddingVertical: 12,
+                fontSize: 17,
+                marginTop: 12,
+              }}
+            />
+          </>
+        )}
+
+        {step === 2 && (
+          <>
+            <Title>{t("onboardAnatomy")}</Title>
+            <View style={{ marginTop: 12 }}>
+              {anatomy.map((a) => (
+                <Chip
+                  key={a.id}
+                  label={a.label}
+                  active={pa === a.id}
+                  onPress={() => setPa(a.id)}
+                />
+              ))}
+            </View>
+          </>
+        )}
 
         <View style={{ marginTop: 24 }}>
-          <PrimaryButton
-            label={t("onboardStart")}
-            onPress={() => {
-              // Real users start with an empty diary, not demo data.
-              dispatch({ type: "clearAll" });
-              dispatch({ type: "setOnboarded", value: true });
-            }}
-          />
-          <GhostButton
-            label={
-              lang === "de"
-                ? "Mit Beispieldaten erkunden"
-                : "Explore with sample data"
-            }
-            onPress={() => dispatch({ type: "setOnboarded", value: true })}
-          />
+          {step < 2 ? (
+            <>
+              <PrimaryButton
+                label={t("onboardContinue")}
+                onPress={() => setStep((n) => n + 1)}
+              />
+              {step === 1 && (
+                <GhostButton label={t("onboardSkip")} onPress={() => setStep(2)} />
+              )}
+            </>
+          ) : (
+            <>
+              <PrimaryButton label={t("onboardStart")} onPress={() => finish(false)} />
+              <GhostButton
+                label={
+                  lang === "de"
+                    ? "Mit Beispieldaten erkunden"
+                    : "Explore with sample data"
+                }
+                onPress={() => finish(true)}
+              />
+            </>
+          )}
         </View>
       </ScrollView>
     </Screen>

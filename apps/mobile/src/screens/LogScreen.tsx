@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import {
   ACT_KEYS,
+  ACT_NEEDS,
   PROTECTABLE_ACTS,
   STI_NAMES,
   emptyActs,
@@ -76,6 +77,16 @@ function AddEncounter({ onClose }: { onClose: () => void }) {
   // the medicine, and kissing-only entries show no switch.
   const protectable = PROTECTABLE_ACTS.filter((k) => acts.has(k));
 
+  // ACT_NEEDS records which anatomy an act requires. Offering acts the
+  // stated partner anatomy rules out is noise, not flexibility; "both"
+  // and the unanswered case both fall through to the full list.
+  const offered = ACT_KEYS.filter((k) => {
+    const needs = ACT_NEEDS[k];
+    return (
+      needs === null || data.profile.pa === "both" || needs === data.profile.pa
+    );
+  });
+
   const save = () => {
     const tf = emptyActs();
     const pf = emptyActs();
@@ -95,7 +106,7 @@ function AddEncounter({ onClose }: { onClose: () => void }) {
 
       <SectionTitle>{t("activities")}</SectionTitle>
       <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-        {ACT_KEYS.map((k) => (
+        {offered.map((k) => (
           <Chip
             key={k}
             label={t(k)}

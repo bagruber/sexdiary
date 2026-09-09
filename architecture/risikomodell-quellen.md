@@ -138,7 +138,7 @@ Nichts an den Zahlen wurde für dieses Dokument geändert. Das ist Absicht: ein
 medizinisches Modell aufgrund einer Literaturrecherche zu verstellen wäre
 derselbe Fehler wie es ohne Quellen zu schreiben — nur schwerer zu bemerken.
 
-Vier Punkte sind vor einer Erprobung zu klären, in dieser Reihenfolge:
+Fünf Punkte sind vor einer Erprobung zu klären, in dieser Reihenfolge:
 
 1. **HSV-2 und Mpox.** Beide melden „testbar“ zu einem Zeitpunkt, an dem ein
    negatives Ergebnis nichts wert ist. Das ist der Kernnutzen der App, der dort
@@ -147,6 +147,15 @@ Vier Punkte sind vor einer Erprobung zu klären, in dieser Reihenfolge:
    es bei HIV bereits geschieht.
 3. **Hep B, rezeptiv anal `0.37`** auf seine Herkunft prüfen.
 4. **`HIGH_PREVALENCE`** belegen oder entfernen.
+5. **Mpox, Küssen, `c = 0.2`.** Die Tabelle sagt damit, ein Kondom senke die
+   Übertragung beim Küssen um ein Fünftel. Syphilis führt für denselben Akt
+   korrekt `c = 0`. Der Wert ist vermutlich aus den penetrativen Akten
+   übernommen worden.
 
-Alle vier gehören einer Infektiologin vorgelegt, nicht von der Entwicklung
+   Er hat eine sichtbare Folge: `PROTECTABLE_ACTS` in `stis.ts` leitet aus der
+   Tabelle ab, für welche Akte die App überhaupt einen Schutzschalter anbietet.
+   Solange dieser Wert steht, bekommt auch Küssen einen — was Nutzende zu Recht
+   verwundert. Aufgefallen am 09.09.2026 beim Bau der Schutzeingabe pro Akt.
+
+Alle fünf gehören einer Infektiologin vorgelegt, nicht von der Entwicklung
 entschieden.

@@ -33,7 +33,7 @@ Biometrie ändert. Ohne Backup ist das ein Datenverlust ohne Ausweg. Nach
 Punkt 1 neu zu bewerten.
 
 
-## Vier medizinische Befunde warten auf ärztliche Prüfung
+## Fünf medizinische Befunde warten auf ärztliche Prüfung
 
 Aus Welle 2, ausführlich in `architecture/risikomodell-quellen.md`,
 Abschnitt 7. Der schwerste zuerst:
@@ -46,6 +46,9 @@ Abschnitt 7. Der schwerste zuerst:
   Spannen, während HIV am konservativen liegt.
 - **Hep B rezeptiv anal 0,37** sieht aus wie die Nadelstich-Zahl — anderer
   Übertragungsweg, und sie erzeugt heute `very_high`.
+- **Mpox, Küssen, Kondomeffekt 0,2.** Syphilis führt für Küssen korrekt 0.
+  Dieser Wert ist der einzige Grund, warum die App beim Küssen einen
+  Schutzschalter anbietet.
 
 Bewusst nicht geändert. Ein medizinisches Modell aufgrund einer
 Literaturrecherche zu verstellen wäre derselbe Fehler wie es ohne Quellen zu
