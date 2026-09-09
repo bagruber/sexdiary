@@ -179,6 +179,7 @@ export const de: Dict = {
   daysShort: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"],
   protected: "Geschützt",
   unprotected: "Ungeschützt",
+  partlyProtected: "Teilweise geschützt",
   confirmDelete: "Löschen?",
   pending: "Ausstehend",
   contactHandles: "Kontaktdaten",

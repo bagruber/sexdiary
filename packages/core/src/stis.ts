@@ -1,4 +1,4 @@
-import type { ActKey, PartnerAnatomy, RiskLevel } from "./domain.js";
+import { ACT_KEYS, type ActKey, type PartnerAnatomy, type RiskLevel } from "./domain.js";
 
 /**
  * Where every number here comes from is written down in
@@ -244,3 +244,15 @@ export const HIGH_PREVALENCE: Record<string, string[]> = {
   Australia: ["Gonorrhea", "Chlamydia", "Syphilis"],
   Mexico: ["HIV", "Syphilis"],
 };
+
+/**
+ * The acts where recording protection changes the arithmetic at all.
+ *
+ * Derived from the table rather than written out: correcting a rate or
+ * adding an infection can then never leave the interface offering a
+ * switch that does nothing. Kissing and manual contact carry `p: 0`
+ * everywhere, so they fall out on their own.
+ */
+export const PROTECTABLE_ACTS: readonly ActKey[] = ACT_KEYS.filter((k) =>
+  Object.values(STI_DB).some((s) => s.tx[k].p > 0 && s.tx[k].c > 0),
+);

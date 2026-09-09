@@ -189,6 +189,7 @@ export const en = {
   daysShort: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
   protected: "Protected",
   unprotected: "Unprotected",
+  partlyProtected: "Partly protected",
   confirmDelete: "Delete this entry?",
   pending: "Pending",
   contactHandles: "Contact handles",

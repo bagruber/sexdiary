@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import {
   ACT_KEYS,
+  PROTECTABLE_ACTS,
   STI_NAMES,
   emptyActs,
   formatDate,
@@ -67,15 +68,20 @@ function AddEncounter({ onClose }: { onClose: () => void }) {
   const { data, dispatch, t, palette } = useApp();
   const [date, setDate] = useState(today());
   const [acts, setActs] = useState<Set<ActKey>>(new Set());
-  const [protectedActs, setProtected] = useState(false);
+  const [prot, setProt] = useState<Set<ActKey>>(new Set());
   const [cid, setCid] = useState<string | null>(null);
+
+  // The chosen acts where a barrier changes the arithmetic at all.
+  // The set comes from the STI table, so it cannot drift away from
+  // the medicine, and kissing-only entries show no switch.
+  const protectable = PROTECTABLE_ACTS.filter((k) => acts.has(k));
 
   const save = () => {
     const tf = emptyActs();
     const pf = emptyActs();
     for (const a of acts) {
       tf[a] = 1;
-      if (protectedActs) pf[a] = 1;
+      if (prot.has(a)) pf[a] = 1;
     }
     const entry: Intercourse = { id: gid("i"), date, cid, t: tf, p: pf };
     dispatch({ type: "saveIntercourse", payload: entry });
@@ -97,8 +103,15 @@ function AddEncounter({ onClose }: { onClose: () => void }) {
             onPress={() =>
               setActs((prev) => {
                 const next = new Set(prev);
-                if (next.has(k)) next.delete(k);
-                else next.add(k);
+                if (next.has(k)) {
+                  next.delete(k);
+                  setProt((p) => {
+                    if (!p.has(k)) return p;
+                    const q = new Set(p);
+                    q.delete(k);
+                    return q;
+                  });
+                } else next.add(k);
                 return next;
               })
             }
@@ -106,17 +119,35 @@ function AddEncounter({ onClose }: { onClose: () => void }) {
         ))}
       </View>
 
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: 12,
-        }}
-      >
-        <Text style={{ color: palette.text }}>{t("protection")}</Text>
-        <Switch value={protectedActs} onValueChange={setProtected} />
-      </View>
+      {protectable.length > 0 && (
+        <>
+          <SectionTitle>{t("protection")}</SectionTitle>
+          {protectable.map((k) => (
+            <View
+              key={k}
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                paddingVertical: 8,
+              }}
+            >
+              <Text style={{ color: palette.text }}>{t(k)}</Text>
+              <Switch
+                value={prot.has(k)}
+                onValueChange={(on) =>
+                  setProt((prev) => {
+                    const next = new Set(prev);
+                    if (on) next.add(k);
+                    else next.delete(k);
+                    return next;
+                  })
+                }
+              />
+            </View>
+          ))}
+        </>
+      )}
 
       <SectionTitle>{t("selectContact")}</SectionTitle>
       <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
@@ -253,6 +284,27 @@ function AddTest({ onClose }: { onClose: () => void }) {
   );
 }
 
+/**
+ * What to say about protection for one encounter.
+ *
+ * Only the acts a barrier actually affects are counted. An entry that
+ * is nothing but kissing gets no line at all, rather than an
+ * "unprotected" that reads as a warning about something harmless.
+ */
+function ProtectionLine({ e }: { e: Intercourse }) {
+  const { t, palette } = useApp();
+  const relevant = PROTECTABLE_ACTS.filter((k) => e.t[k]);
+  if (relevant.length === 0) return null;
+
+  const n = relevant.filter((k) => e.p[k]).length;
+  const key =
+    n === 0 ? "unprotected" : n === relevant.length ? "protected" : "partlyProtected";
+  const color =
+    n === 0 ? palette.sub : n === relevant.length ? palette.good : palette.warn;
+
+  return <Text style={{ color, marginTop: 2, fontSize: 13 }}>{t(key)}</Text>;
+}
+
 export function LogScreen() {
   const { data, t, palette } = useApp();
   const [adding, setAdding] = useState<"intercourse" | "test" | null>(null);
@@ -291,15 +343,7 @@ export function LogScreen() {
               <Text style={{ color: palette.sub, marginTop: 4, fontSize: 13 }}>
                 {ACT_KEYS.filter((k) => item.e.t[k]).map((k) => t(k)).join(", ")}
               </Text>
-              <Text
-                style={{
-                  color: ACT_KEYS.some((k) => item.e.p[k]) ? palette.good : palette.sub,
-                  marginTop: 2,
-                  fontSize: 13,
-                }}
-              >
-                {ACT_KEYS.some((k) => item.e.p[k]) ? t("protected") : t("unprotected")}
-              </Text>
+              <ProtectionLine e={item.e} />
             </Card>
           ) : (
             <Card key={item.r.id}>
