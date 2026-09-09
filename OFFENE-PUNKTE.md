@@ -73,6 +73,45 @@ Schrift zeigt, wäre genau der Fehler, den `FONT` drei Wellen lang vorgemacht
 hat. **Schriftdateien mitliefern, niemals Google Fonts verlinken.**
 
 
+## Was der Web-Prototyp kann und die App noch nicht
+
+Vollstaendige Gegenueberstellung, aufgenommen am 09.09.2026. Nichts davon soll
+verlorengehen. Reihenfolge = Vorschlag fuer die Umsetzung.
+
+| Funktion | Web | App |
+|---|---|---|
+| **Token teilen per QR** (eigenes Token oder Handle) | ja | **fehlt** |
+| **QR scannen** — Kontakt oder Testergebnis importieren | ja | **fehlt** |
+| **Code einfuegen** statt scannen | ja | **fehlt** |
+| **NFC** | nur Platzhalter | **fehlt** |
+| **Benachrichtigungsansicht**: wen informieren, pro Infektion | ja | **fehlt** |
+| **Anonym benachrichtigen** ueber das Relay | ja | **fehlt** |
+| **Persoenlich benachrichtigt** manuell markieren | ja | **fehlt** |
+| **Rueckmeldungen**: wartet, bestaetigt, negativ getestet | ja | **fehlt** |
+| **Positiv-Ablauf** (eigener Befund, wer ist betroffen) | ja | **fehlt** |
+| **Kalender** mit Monatsansicht und Tagesblatt | ja | Liste statt Kalender |
+| **Kontaktliste** verwalten, Tokens einsehen | ja | nur anlegen |
+| **Testliste** | ja | nur anlegen |
+| Einstellung **Token oder Handle**, Plattform, Handle | ja | **fehlt** |
+| Einstellung **bekannte Vorerkrankungen** | ja | **fehlt** |
+| Einstellung **Region** | ja | **fehlt** |
+| Einstellung **hohe Praevalenz**, **wenig Bewegung**, **Risikoarmes ausblenden** | ja | **fehlt** |
+| Onboarding mit Profil | ja | seit 09.09. auch nativ |
+| Schutz pro Praktik | im Tagesblatt | seit 09.09. auch nativ |
+
+Nur nativ, im Web bewusst nicht moeglich: App-Sperre, Bildschirmschutz,
+Tarnmodus, lokale Erinnerungen, verschluesselte Sicherung.
+
+
+## Aufteilung der App ist noch nicht entschieden
+
+Heute drei Reiter (Heute, Verlauf, Einstellungen) und eine Plus-Taste fuer
+Begegnungen. Offen ist, ob das die richtige Verteilung ist: Einstellungen
+werden selten gebraucht und belegen einen von drei Plaetzen, waehrend die
+Benachrichtigung — laut Konzeptvorstellung eine der beiden Kernfunktionen —
+gar keinen hat. Vorschlaege stehen zur Entscheidung an.
+
+
 ## Die App laeuft, und was dabei auffiel
 
 Am 09.09.2026 zum ersten Mal auf einem Geraet gelaufen — der aelteste offene
