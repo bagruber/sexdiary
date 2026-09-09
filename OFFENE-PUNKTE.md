@@ -69,50 +69,46 @@ Schrift zeigt, wäre genau der Fehler, den `FONT` drei Wellen lang vorgemacht
 hat. **Schriftdateien mitliefern, niemals Google Fonts verlinken.**
 
 
-## Web-Tracker: Rente oder beschriftete Demo?
+## Die App laeuft, und was dabei auffiel
 
-Seit der Native-Only-Entscheidung vom 27.08.2026 ist `apps/web` nicht mehr das
-Produkt. Er existiert aber noch, dupliziert die App und kostet Pflege.
+Am 09.09.2026 zum ersten Mal auf einem Geraet gelaufen — der aelteste offene
+Punkt, seit dem 10.07.2026. App-Lock, Tarnmodus und die Berechtigungsabfrage
+fuer Benachrichtigungen funktionieren.
 
-Empfehlung: **Rente.** Ein anklickbarer Web-Klon einer nativen App suggeriert im
-Pitch „wir haben eine Web-App gebaut und nennen sie nativ“. Ueberzeugender ist
-die echte App auf einem echten Telefon plus ein Test-Link fuer die Runde. Der
-Code bleibt in der Historie, `packages/core` wandert unveraendert mit.
+Aufgefallen ist, dass die App ein unfertiger Port des Web-Trackers war: das
+Datenmodell konnte alles, die Oberflaeche fehlte. Seither gebaut sind
+Onboarding mit Profil, Schutz pro Akt, Kontakte, Impfungen und eine Zeile, mit
+der sich die Erinnerungen pruefen lassen, ohne bis 10 Uhr zu warten.
 
-Betrifft Welle 4. Begruendung in `architecture/adr/0001-native-only.md`.
+**Noch nicht auf einem Geraet geprueft** ist genau das, was seitdem entstanden
+ist. Der Build dazu liegt unter `dist/`, benannt nach Commit.
 
+Offen bleibt aus der Beobachtungsliste:
 
-## Mobile-App ist noch nie auf einem Geraet gelaufen
-
-Der aelteste offene Punkt, seit dem 10.07.2026. Verifiziert sind bisher nur
-Typecheck, `expo-doctor` und der Metro-Bundle-Export — das sagt nichts darueber,
-ob die App startet, ob SecureStore den Schluessel haelt und ob die
-Entschluesselung beim zweiten Start durchlaeuft.
-
-Seit dem 27.08.2026 wiegt das schwerer: die App ist ueber drei Expo-Majors
-gesprungen (54 -> 57) und laeuft jetzt auf der New Architecture, die in SDK 57
-nicht mehr abschaltbar ist. `npx expo start` und einmal durchklicken.
+- **QR und NFC.** Das Web hat einen QR-Scanner, die App nicht. NFC existiert
+  nirgends ausser als Platzhalter mit dem Text „erfordert native App“.
+- **Einstellungen.** Die Web-Einstellungen sind reicher als die der App:
+  bekannte Vorerkrankungen, Region, Token-oder-Handle samt Plattform und
+  Handle. All das fehlt nativ.
 
 
-## Nichts ist gepusht
+## Gepusht, CI laeuft
 
-Alle Aenderungen vom 26. und 27.08.2026 liegen als lokale Commits auf
-`refactor/welle-0-versionen`. Der Branchname passt nicht mehr — inzwischen
-liegen Welle 0, 1 und 2 darauf.
+Seit dem 09.09.2026 auf `refactor/wellen-0-bis-3` (umbenannt, der alte Name
+trug laengst mehr als Welle 0), PR #1 gegen `main`. Die Pruefung ist mehrfach
+gruen gelaufen — auch der Schritt, der lange ungeprueft war: Linux erzeugt
+dieselben `docs/`-Hashes wie Windows.
 
-Dazu kommen **zwei Aenderungen ausserhalb dieses Repos**, beide uncommitted im
-Working Tree von `hausbasis`:
+`pnpm/action-setup@v4` laeuft auf Node 20, das GitHub als veraltet meldet und
+auf 24 zwingt. Noch kein Fehler.
+
+**Weiter offen: zwei Aenderungen ausserhalb dieses Repos**, beide uncommitted
+im Working Tree von `hausbasis`:
 
 - Der Ausnahme-Eintrag fuer sexdiary ist entfernt (gegenstandslos, seit web und
   mobile auf derselben React-Version stehen).
 - `baseline.json` fuehrt jetzt die sechs ESLint-Pakete als Zielversionen, in
-  denselben Ranges wie freshdoc und freshpost. `node check.mjs --kurz` meldet
-  dafuer keine Abweichung — die drei Repos teilen sich eine Kopie im Store.
-
-**Die CI ist noch nie gelaufen.** Ein Schritt darin ist ungeprueft: der
-Vergleich, ob `docs/` dem Quellstand entspricht. Lokal geht er durch; ob der
-Build unter Linux dieselben Hashes erzeugt wie unter Windows, zeigt erst der
-erste Lauf.
+  denselben Ranges wie freshdoc und freshpost.
 
 
 ## Lizenz weiterhin offen

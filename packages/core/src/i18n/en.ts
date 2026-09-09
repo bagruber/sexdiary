@@ -345,6 +345,9 @@ export const en = {
   reminderBody: "There is something to look at.",
   remindersUnavailable:
     "Notifications are switched off for this app in the system settings. Without them there can be no reminder.",
+  demoBar: "Demo — nothing is saved",
+  demoBarSub: "Reloading starts over. The real app runs on your phone.",
+  demoNeedsApp: "This needs the app",
   remindersCheck: "Check reminders",
   remindersCheckSub: "Shows what is scheduled, and sends a test",
   remindersPending: "{n} scheduled",

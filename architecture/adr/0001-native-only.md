@@ -48,12 +48,29 @@ Nutzer, verarbeitet keine Gesundheitsdaten und hat keine Verbindung zur App.
 - iOS braucht Entwicklerkonto und Mac. Android geht vollständig lokal.
 - Ohne Store-Präsenz ist Verteilung ein eigenes Thema (siehe ADR-0010).
 
-**Offen**
+**Entschieden am 09.09.2026: beschriftete Demo, ohne Speicher**
 
-Ob der Web-Tracker als beschriftete Demo bestehen bleibt oder in Rente geht.
-Empfehlung: Rente. Ein anklickbarer Web-Klon einer nativen App suggeriert im
-Pitch „wir haben eine Web-App gebaut und nennen sie nativ“, und er kostet
-dauerhaft Pflege.
+Die ursprüngliche Empfehlung war Rente. Dagegen stand ein praktischer Einwand:
+wem die App vorgeführt wird, der installiert nicht im selben Moment ein APK.
+Ohne etwas Vorzeigbares im Browser hängt jedes Gespräch daran, dass ein Gerät
+zur Hand ist.
+
+Der Web-Tracker bleibt deshalb als Demo. Was ihn von einem zweiten Produkt
+unterscheidet, ist nicht die Beschriftung, sondern dass er **nichts speichert**:
+der Zustand lebt im Speicher des Tabs, ein Neuladen beginnt von vorn mit
+Beispieldaten. Das ist die eigentliche Schutzmaßnahme. Ein Hinweisbanner, das
+man wegklicken kann, ist ein Banner, das weggeklickt wird; eine Anwendung, in
+der sich nichts ansammeln *kann*, braucht kein Vertrauen.
+
+Die vier Verteidigungen, um die herum das Produkt gebaut ist — App-Sperre,
+Tarnmodus, Erinnerungen, Bildschirmsperre — stehen in der Demo sichtbar, aber
+als nicht verfügbar markiert. Sie zu verstecken hiesse zu verschweigen, wofür
+die App da ist; sie nachzuahmen wäre genau der kosmetische Fehler, an dem die
+PWA-Variante unten scheitert.
+
+Der Preis bleibt: eine zweite Oberfläche, die gepflegt werden will, und die
+Gefahr, dass jemand sie für das Produkt hält. Der fehlende Speicher begrenzt
+den Schaden auf ein Missverständnis statt auf Gesundheitsdaten im Browser.
 
 ## Verworfene Alternativen
 

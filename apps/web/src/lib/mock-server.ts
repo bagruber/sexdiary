@@ -1,9 +1,14 @@
 /**
- * Mock partner-alert server backed by localStorage.
+ * Mock partner-alert server, held in memory for the life of the tab.
  *
- * Real implementation would post to a server keyed by recipient token.
- * For the prototype, we store records locally and auto-advance status
- * based on elapsed wall time. Status survives reload.
+ * A real implementation would post to a server keyed by recipient token.
+ * Here the records only need to live long enough for the status to
+ * advance on screen, so they live in a variable.
+ *
+ * It used to be localStorage, and that was wrong for a demonstration
+ * build: a row pairs a recipient token with an infection name, which is
+ * exactly the kind of trace this product exists to avoid leaving behind.
+ * Nothing in this build outlives a reload (see AppProvider).
  */
 
 export type AlertStatus =
@@ -20,20 +25,12 @@ export interface MockAlert {
   manualNote?: string;
 }
 
-const KEY = "sexdiary.v1.mockServer.alerts";
+let alerts: MockAlert[] = [];
 
-function readAll(): MockAlert[] {
-  if (typeof localStorage === "undefined") return [];
-  try {
-    return JSON.parse(localStorage.getItem(KEY) ?? "[]") as MockAlert[];
-  } catch {
-    return [];
-  }
-}
+const readAll = (): MockAlert[] => alerts;
 
 function writeAll(rows: MockAlert[]): void {
-  if (typeof localStorage === "undefined") return;
-  localStorage.setItem(KEY, JSON.stringify(rows));
+  alerts = rows;
 }
 
 export function sendAlert(toToken: string, sti: string): MockAlert {

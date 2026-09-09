@@ -334,6 +334,9 @@ export const de: Dict = {
   reminderBody: "Es gibt etwas nachzusehen.",
   remindersUnavailable:
     "Benachrichtigungen sind für diese App im System abgeschaltet. Ohne sie kann nicht erinnert werden.",
+  demoBar: "Demo — nichts wird gespeichert",
+  demoBarSub: "Neu laden setzt zurück. Die echte App läuft auf dem Telefon.",
+  demoNeedsApp: "Dafür braucht es die App",
   remindersCheck: "Erinnerungen prüfen",
   remindersCheckSub: "Zeigt, was geplant ist, und schickt eine Testmeldung",
   remindersPending: "{n} geplant",

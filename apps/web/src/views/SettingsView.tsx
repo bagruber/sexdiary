@@ -277,6 +277,33 @@ export function SettingsView({
         },
       ])}
 
+      {/*
+        The four defences the product is actually shaped around. They are
+        listed rather than hidden so a demonstration shows what the app
+        is for — and marked unavailable rather than faked, because a
+        browser genuinely cannot deliver any of them (ADR-0001).
+      */}
+      {renderSection(t("privacy"), [
+        { type: "info", label: t("appLock"), sub: t("appLockSub"), value: t("demoNeedsApp") },
+        {
+          type: "info",
+          label: t("disguiseMode"),
+          sub: t("disguiseModeSub"),
+          value: t("demoNeedsApp"),
+        },
+        {
+          type: "info",
+          label: t("testReminders"),
+          sub: t("testRemindersSub"),
+          value: t("demoNeedsApp"),
+        },
+        {
+          type: "info",
+          label: t("screenshotBlocked"),
+          value: t("demoNeedsApp"),
+        },
+      ])}
+
       {renderSection(t("sharingPrefs"), [
         {
           type: "select",
