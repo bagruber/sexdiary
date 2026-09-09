@@ -14,13 +14,17 @@ import {
   STI_NAMES,
   emptyActs,
   formatDate,
+  genToken,
   gid,
   isIsoDate,
   today,
   type ActKey,
+  type Contact,
   type Intercourse,
   type TestRecord,
   type TestResultValue,
+  type VaccineKind,
+  type Vaccination,
 } from "@sexdiary/core";
 import { useApp } from "../state/store";
 import {
@@ -295,6 +299,168 @@ function AddTest({ onClose }: { onClose: () => void }) {
   );
 }
 
+function AddContact({ onClose }: { onClose: () => void }) {
+  const { dispatch, t, palette } = useApp();
+  const [name, setName] = useState("");
+  const [notes, setNotes] = useState("");
+
+  const field = {
+    borderWidth: 1,
+    borderColor: palette.border,
+    borderRadius: 12,
+    padding: 12,
+    color: palette.text,
+    marginBottom: 12,
+  };
+
+  const save = () => {
+    dispatch({
+      type: "saveContact",
+      payload: {
+        id: gid("c"),
+        name: name.trim(),
+        notes: notes.trim() || null,
+        // Every contact gets a token the moment it is created. Anonymous
+        // notification must not depend on having thought of it earlier —
+        // by the time it is needed, the conversation is hard enough.
+        token: genToken(),
+        cx: {},
+      } satisfies Contact,
+    });
+    onClose();
+  };
+
+  return (
+    <ScrollView keyboardShouldPersistTaps="handled">
+      <Title>{t("contact")}</Title>
+
+      <Text style={{ color: palette.sub, fontSize: 13, marginBottom: 6 }}>
+        {t("name")}
+      </Text>
+      <TextInput value={name} onChangeText={setName} style={field} />
+
+      <Text style={{ color: palette.sub, fontSize: 13, marginBottom: 6 }}>
+        {t("notes")} ({t("optional")})
+      </Text>
+      <TextInput value={notes} onChangeText={setNotes} multiline style={field} />
+
+      <PrimaryButton label={t("save")} onPress={save} disabled={!name.trim()} />
+      <GhostButton label={t("cancel")} onPress={onClose} />
+      <View style={{ height: 32 }} />
+    </ScrollView>
+  );
+}
+
+/**
+ * Vaccinations, PrEP and Doxy-PEP share one record type because they
+ * answer the same question — what was protecting you on a given date —
+ * but they carry different fields, so the form follows the choice.
+ */
+function AddVaccination({ onClose }: { onClose: () => void }) {
+  const { dispatch, t, palette } = useApp();
+  const [kind, setKind] = useState<VaccineKind>("vaccine");
+  const [type, setType] = useState("Hep B");
+  const [manufacturer, setManufacturer] = useState("");
+  const [date, setDate] = useState(today());
+  const [endDate, setEndDate] = useState("");
+
+  const kinds: { id: VaccineKind; label: string }[] = [
+    { id: "vaccine", label: t("vaccine") },
+    { id: "prep", label: t("prep") },
+    { id: "doxypep", label: t("doxyPep") },
+  ];
+
+  // Only the two series the app actually tracks (vaccineSeries targets
+  // Hep B at 3 doses and Mpox at 2). Offering more would record doses
+  // nothing ever counts.
+  const types = ["Hep B", "Mpox"];
+
+  const save = () => {
+    const base = { id: gid("v"), kind };
+    const record: Vaccination =
+      kind === "vaccine"
+        ? {
+            ...base,
+            type,
+            ...(manufacturer.trim() ? { manufacturer: manufacturer.trim() } : {}),
+            date,
+          }
+        : kind === "prep"
+          ? { ...base, startDate: date, endDate: endDate.trim() || null }
+          : { ...base, date };
+    dispatch({ type: "saveVaccination", payload: record });
+    onClose();
+  };
+
+  const valid = isIsoDate(date) && (kind !== "prep" || !endDate || isIsoDate(endDate));
+
+  return (
+    <ScrollView keyboardShouldPersistTaps="handled">
+      <Title>{t("vaccination")}</Title>
+
+      <View style={{ flexDirection: "row", flexWrap: "wrap", marginBottom: 8 }}>
+        {kinds.map((k) => (
+          <Chip
+            key={k.id}
+            label={k.label}
+            active={kind === k.id}
+            onPress={() => setKind(k.id)}
+          />
+        ))}
+      </View>
+
+      {kind === "vaccine" && (
+        <>
+          <SectionTitle>{t("vaccineType")}</SectionTitle>
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            {types.map((ty) => (
+              <Chip
+                key={ty}
+                label={ty}
+                active={type === ty}
+                onPress={() => setType(ty)}
+              />
+            ))}
+          </View>
+
+          <Text
+            style={{ color: palette.sub, fontSize: 13, marginTop: 12, marginBottom: 6 }}
+          >
+            {t("manufacturer")} ({t("optional")})
+          </Text>
+          <TextInput
+            value={manufacturer}
+            onChangeText={setManufacturer}
+            style={{
+              borderWidth: 1,
+              borderColor: palette.border,
+              borderRadius: 12,
+              padding: 12,
+              color: palette.text,
+              marginBottom: 12,
+            }}
+          />
+        </>
+      )}
+
+      <DateField value={date} onChange={setDate} />
+
+      {kind === "prep" && (
+        <>
+          <Text style={{ color: palette.sub, fontSize: 13, marginBottom: 6 }}>
+            {t("endDate")} ({t("ongoing")})
+          </Text>
+          <DateField value={endDate} onChange={setEndDate} />
+        </>
+      )}
+
+      <PrimaryButton label={t("save")} onPress={save} disabled={!valid} />
+      <GhostButton label={t("cancel")} onPress={onClose} />
+      <View style={{ height: 32 }} />
+    </ScrollView>
+  );
+}
+
 /**
  * What to say about protection for one encounter.
  *
@@ -318,7 +484,9 @@ function ProtectionLine({ e }: { e: Intercourse }) {
 
 export function LogScreen() {
   const { data, t, palette } = useApp();
-  const [adding, setAdding] = useState<"intercourse" | "test" | null>(null);
+  const [adding, setAdding] = useState<
+    "intercourse" | "test" | "contact" | "vaccination" | null
+  >(null);
 
   const timeline = useMemo(() => {
     const enc = data.intercourse.map((e) => ({ kind: "enc" as const, date: e.date, e }));
@@ -337,6 +505,11 @@ export function LogScreen() {
         <Title>{t("calendar")}</Title>
         <PrimaryButton label={`+ ${t("intercourse")}`} onPress={() => setAdding("intercourse")} />
         <GhostButton label={`+ ${t("testEntry")}`} onPress={() => setAdding("test")} />
+        <GhostButton label={`+ ${t("contact")}`} onPress={() => setAdding("contact")} />
+        <GhostButton
+          label={`+ ${t("vaccination")}`}
+          onPress={() => setAdding("vaccination")}
+        />
 
         <SectionTitle>{t("addEntry")}</SectionTitle>
         {timeline.length === 0 && (
@@ -399,6 +572,10 @@ export function LogScreen() {
         <View style={{ flex: 1, backgroundColor: palette.bg, padding: 16, paddingTop: 48 }}>
           {adding === "intercourse" && <AddEncounter onClose={() => setAdding(null)} />}
           {adding === "test" && <AddTest onClose={() => setAdding(null)} />}
+          {adding === "contact" && <AddContact onClose={() => setAdding(null)} />}
+          {adding === "vaccination" && (
+            <AddVaccination onClose={() => setAdding(null)} />
+          )}
         </View>
       </Modal>
     </Screen>
