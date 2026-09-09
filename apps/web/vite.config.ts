@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { fileURLToPath } from "node:url";
 import { render, themeStyles } from "./src/info/page.ts";
+import { beispielQrs } from "./src/info/beispiele.ts";
 
 /**
  * Rendert die Informationsseite zur Bauzeit in index.html.
@@ -19,7 +20,7 @@ const prerenderInfo = {
       if (!ctx.filename.endsWith("index.html")) return html;
       return html
         .replace("</head>", `<style>${themeStyles()}</style></head>`)
-        .replace('<div id="root"></div>', `<div id="root">${render()}</div>`);
+        .replace('<div id="root"></div>', `<div id="root">${render(beispielQrs())}</div>`);
     },
   },
 };

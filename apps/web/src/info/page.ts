@@ -43,7 +43,18 @@ ${items
 const fehlt = (was: string): string =>
   `    <p class="fehlt"><strong>Fehlt noch:</strong> ${was}</p>`;
 
-export function render(): string {
+export interface BeispielQr {
+  label: string;
+  hinweis: string;
+  svg: string;
+}
+
+/**
+ * Die Beispielcodes kommen von aussen herein, statt hier erzeugt zu
+ * werden: sonst zoege dieses Modul `qrcode` in das Bundle, das der
+ * Browser laedt — fuer Bilder, die im HTML ohnehin schon fertig stehen.
+ */
+export function render(qrs: BeispielQr[] = []): string {
   return `
 <a class="skip" href="#inhalt">Zum Inhalt springen</a>
 
@@ -209,6 +220,25 @@ ${section(
       oben kann ein Browser nicht leisten; sie sind dort sichtbar, aber als
       nicht verfügbar gekennzeichnet.
     </p>
+${
+    qrs.length
+      ? `    <h3>Drei Szenarien zum Ausprobieren</h3>
+    <p>
+      Diese Codes sind echt: mit der App eingelesen legen sie einen Kontakt
+      beziehungsweise ein Testergebnis an. Erfunden ist nur der Inhalt.
+    </p>
+    <div class="qrs">
+${qrs
+  .map(
+    (q) => `      <figure class="qr">
+        ${q.svg}
+        <figcaption><strong>${q.label}</strong><br />${q.hinweis}</figcaption>
+      </figure>`,
+  )
+  .join("")}
+    </div>`
+      : ""
+  }
 ${fehlt("Bezugsweg für die Android-App, sobald die Verteilung steht.")}`,
 )}
 ${section(

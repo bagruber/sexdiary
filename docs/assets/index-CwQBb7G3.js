@@ -6,7 +6,7 @@ ${n}
   </section>`,i=e=>`    <div class="karten">
 ${e.map(([e,t])=>`      <div class="karte"><h3>${e}</h3><p>${t}</p></div>`).join(`
 `)}
-    </div>`,a=e=>`    <p class="fehlt"><strong>Fehlt noch:</strong> ${e}</p>`;function o(){return`
+    </div>`,a=e=>`    <p class="fehlt"><strong>Fehlt noch:</strong> ${e}</p>`;function o(e=[]){return`
 <a class="skip" href="#inhalt">Zum Inhalt springen</a>
 
 <header>
@@ -118,6 +118,17 @@ ${r(`ausprobieren`,`Ansehen`,`    <p>
       oben kann ein Browser nicht leisten; sie sind dort sichtbar, aber als
       nicht verfügbar gekennzeichnet.
     </p>
+${e.length?`    <h3>Drei Szenarien zum Ausprobieren</h3>
+    <p>
+      Diese Codes sind echt: mit der App eingelesen legen sie einen Kontakt
+      beziehungsweise ein Testergebnis an. Erfunden ist nur der Inhalt.
+    </p>
+    <div class="qrs">
+${e.map(e=>`      <figure class="qr">
+        ${e.svg}
+        <figcaption><strong>${e.label}</strong><br />${e.hinweis}</figcaption>
+      </figure>`).join(``)}
+    </div>`:``}
 ${a(`Bezugsweg für die Android-App, sobald die Verteilung steht.`)}`)}
 ${r(`teststellen`,`Wo man sich testen lassen kann`,a(`Verzeichnis der Teststellen. Gehört mit geprüften Angaben gefüllt, etwa vom Gesundheitsreferat oder der Aidshilfe.`))}
 ${r(`impressum`,`Impressum`,a(`Anbieterkennzeichnung nach § 5 DDG: Name, ladungsfähige Anschrift, Kontakt.`))}

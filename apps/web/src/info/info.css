@@ -149,3 +149,26 @@ section > h3:first-of-type { margin-top: 0; }
   padding: 16px 0 0;
   color: var(--text);
 }
+
+/* Beispielcodes zum Abscannen vom Bildschirm. */
+.qrs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 20px;
+  max-width: 620px;
+  margin-top: 16px;
+}
+.qr { margin: 0; }
+.qr svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.qr figcaption {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--sub);
+  line-height: 1.4;
+}
