@@ -11,9 +11,13 @@ signierten Befunde samt Vertrauensliste.
 
 Offen, in dieser Reihenfolge sinnvoll:
 
-1. **Backup ([ADR-0009](architecture/adr/0009-backup-modell.md)).** Kommt
-   zuerst, weil der nächste Härtungsschritt am Lock ohne Sicherung eine
-   Datenverlustfalle wäre — siehe unten.
+1. **Backup ([ADR-0009](architecture/adr/0009-backup-modell.md)).** Der
+   **verschlüsselte Dateiexport steht** seit dem 09.09.2026: scrypt über eine
+   Passphrase, AES-256-GCM, selbstbeschreibendes Format. Offen bleibt die
+   Cloud-Sicherung — und die ist es, die den Lock-Härtungsschritt freigibt,
+   denn ein Dateiexport verlangt Disziplin und existiert im Ernstfall nicht.
+   Auf einem Gerät ist der Export noch nicht geprüft, auch nicht, wie lange
+   scrypt dort braucht.
 2. **QR-Scanner und Ed25519-Verifizierer auf dem Gerät.** Das Format steht und
    ist getestet, gescannt wird noch nichts. Braucht einen Kamerabildschirm.
 3. **Verteilung ([ADR-0010](architecture/adr/0010-verteilung-erprobung.md)).**

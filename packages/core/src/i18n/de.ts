@@ -337,6 +337,23 @@ export const de: Dict = {
   demoBar: "Demo — nichts wird gespeichert",
   demoBarSub: "Neu laden setzt zurück. Die echte App läuft auf dem Telefon.",
   demoNeedsApp: "Dafür braucht es die App",
+  backupSection: "Sicherung",
+  backupExport: "Sicherung erstellen",
+  backupExportSub: "Verschlüsselte Datei, die du selbst ablegst",
+  backupImport: "Sicherung einlesen",
+  backupImportSub: "Ersetzt alle Daten auf diesem Gerät",
+  backupPassphrase: "Passphrase",
+  backupPassphraseRepeat: "Passphrase wiederholen",
+  backupPassphraseWarn:
+    "Ohne diese Passphrase ist die Sicherung verloren. Es gibt keinen Ersatzweg und niemanden, der sie zurücksetzen kann.",
+  backupMismatch: "Die beiden Eingaben stimmen nicht überein",
+  backupTooShort: "Mindestens 8 Zeichen",
+  backupWrongPassphrase:
+    "Passphrase falsch, oder die Datei ist beschädigt. Beides sieht von außen gleich aus.",
+  backupReplaceWarn:
+    "Das ersetzt alles, was jetzt auf diesem Gerät steht. Nicht rückgängig zu machen.",
+  backupDone: "Sicherung erstellt",
+  backupRestored: "Daten wiederhergestellt",
   remindersCheck: "Erinnerungen prüfen",
   remindersCheckSub: "Zeigt, was geplant ist, und schickt eine Testmeldung",
   remindersPending: "{n} geplant",

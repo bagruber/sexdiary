@@ -13,6 +13,7 @@ export * from "./reducer.js";
 export * from "./schema.js";
 export * from "./seed.js";
 export * from "./storage.js";
+export * from "./backup.js";
 export * from "./date.js";
 export * from "./id.js";
 export * from "./i18n/index.js";

@@ -348,6 +348,23 @@ export const en = {
   demoBar: "Demo — nothing is saved",
   demoBarSub: "Reloading starts over. The real app runs on your phone.",
   demoNeedsApp: "This needs the app",
+  backupSection: "Backup",
+  backupExport: "Create a backup",
+  backupExportSub: "An encrypted file you keep yourself",
+  backupImport: "Restore from backup",
+  backupImportSub: "Replaces everything on this device",
+  backupPassphrase: "Passphrase",
+  backupPassphraseRepeat: "Repeat passphrase",
+  backupPassphraseWarn:
+    "Without this passphrase the backup is lost. There is no reset and nobody who can recover it.",
+  backupMismatch: "The two entries do not match",
+  backupTooShort: "At least 8 characters",
+  backupWrongPassphrase:
+    "Wrong passphrase, or the file is damaged. From the outside these look the same.",
+  backupReplaceWarn:
+    "This replaces everything currently on this device. It cannot be undone.",
+  backupDone: "Backup created",
+  backupRestored: "Data restored",
   remindersCheck: "Check reminders",
   remindersCheckSub: "Shows what is scheduled, and sends a test",
   remindersPending: "{n} scheduled",

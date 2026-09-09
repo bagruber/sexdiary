@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Alert, ScrollView, Switch, Text, View } from "react-native";
+import { Alert, Modal, ScrollView, Switch, Text, View } from "react-native";
 import { formatDate, type Lang, type Theme } from "@sexdiary/core";
 import { useApp } from "../state/store";
 import { APP_NAME } from "../branding";
 import { Card, Chip, PrimaryButton, Row, Screen, SectionTitle, Title } from "../ui";
 import { DataScreen } from "./DataScreen";
+import { BackupSheet } from "./BackupSheet";
 import { authenticate, lockAvailability, type LockAvailability } from "../lib/app-lock";
 import {
   cancelReminders,
@@ -22,6 +23,7 @@ const LANGS: { value: Lang; label: string }[] = [
 export function SettingsScreen() {
   const { data, dispatch, t, palette } = useApp();
   const [showData, setShowData] = useState(false);
+  const [backup, setBackup] = useState<"export" | "import" | null>(null);
   const [canLock, setCanLock] = useState<LockAvailability | null>(null);
   const [pending, setPending] = useState<Date[] | null>(null);
   const [testSent, setTestSent] = useState(false);
@@ -228,6 +230,18 @@ export function SettingsScreen() {
           </Card>
         )}
 
+        <SectionTitle>{t("backupSection")}</SectionTitle>
+        <Row
+          label={t("backupExport")}
+          sub={t("backupExportSub")}
+          onPress={() => setBackup("export")}
+        />
+        <Row
+          label={t("backupImport")}
+          sub={t("backupImportSub")}
+          onPress={() => setBackup("import")}
+        />
+
         <SectionTitle>{t("data")}</SectionTitle>
         <Row
           label={t("yourData")}
@@ -256,6 +270,24 @@ export function SettingsScreen() {
       </ScrollView>
 
       {showData && <DataScreen onClose={() => setShowData(false)} />}
+      <Modal
+        visible={backup !== null}
+        animationType="slide"
+        onRequestClose={() => setBackup(null)}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: palette.bg,
+            padding: 16,
+            paddingTop: 48,
+          }}
+        >
+          {backup && (
+            <BackupSheet mode={backup} onClose={() => setBackup(null)} />
+          )}
+        </View>
+      </Modal>
 
     </Screen>
   );

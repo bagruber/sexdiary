@@ -1,6 +1,7 @@
 # ADR-0009 — Sicherung in die Cloud des Nutzers, Ende-zu-Ende verschlüsselt
 
-**Status:** vorgeschlagen · 27.08.2026
+**Status:** angenommen · 27.08.2026 · Dateiexport umgesetzt am 09.09.2026,
+Cloud-Sicherung weiterhin offen
 
 ## Kontext
 
@@ -48,12 +49,50 @@ verliert die Sicherung.
   bewusst meiden, braucht es zusätzlich einen Dateiexport.
 - Zwei Implementierungen, eine je Plattform.
 
-**Offen**
+## Entschieden am 09.09.2026
 
-Schlüsselableitung und Parameter, Format der Sicherungsdatei, Umgang mit
-Teilwiederherstellung bei Schemadifferenz. Und ob ein Dateiexport als dritter
-Weg von Anfang an dazugehört — Empfehlung: ja, er ist billig und macht
-unabhängig.
+**Der Dateiexport kommt zuerst.** Die Empfehlung oben wird angenommen: er ist
+billig, macht unabhängig, und er baut Format und Kryptographie, die die
+Cloud-Variante später unverändert wiederverwendet. Das nimmt die
+Datenverlust-Klippe sofort für jeden, der handelt. Der Einwand von unten bleibt
+gültig — eine Sicherung, die Disziplin verlangt, existiert im Ernstfall nicht.
+Das hier ist Schritt eins, nicht die Antwort.
+
+**Schlüsselableitung: scrypt**, N = 2^15, r = 8, p = 1, 128-Bit-Salz je Datei.
+Speicherhart, also nicht mit Grafikkarten breitzuwalzen, und aus derselben
+geprüften Bibliotheksfamilie wie die bereits eingesetzte Chiffre — reines
+TypeScript, kein nativer Code. Argon2id wäre die formal stärkere Wahl
+(RFC 9106), ist in reinem JavaScript auf älteren Telefonen aber spürbar
+langsam; scrypt ist ausserdem langweiliger und weiter verstanden, was bei einer
+Übergabe in Jahren mehr wiegt.
+
+N = 2^15 sind rund 32 MiB. Das ist **niedriger als die übliche Empfehlung**
+(OWASP nennt 2^17 für Passwortspeicher) und bewusst so gewählt, weil 2^17 rund
+128 MiB belegt und auf älteren Android-Geräten in JavaScript ein
+Speicherproblem wäre. Gemessen auf dem Entwicklungsrechner: 111 ms. Auf einem
+echten Gerät ist das noch nicht gemessen; die Kosten gehören dort nachgeprüft
+und dann angehoben, soweit es trägt.
+
+**Chiffre: AES-256-GCM** unter frischer 96-Bit-Nonce — dieselbe, die die App
+schon im Ruhezustand nutzt. Ein zweites Verfahren einzuführen hiesse, eine
+zweite Sache prüfen zu lassen.
+
+**Format:** JSON mit selbstbeschreibendem Kopf. Jede Datei trägt ihre eigenen
+Parameter, was zwei Dinge kauft: die Kosten lassen sich anheben, ohne alte
+Dateien unlesbar zu machen, und wer die Datei in drei Jahren ohne die App in
+der Hand hält, kann dem Kopf entnehmen, was zu tun ist. Der Container liegt in
+`packages/core` und kommt ohne Abhängigkeiten aus; alles Kryptographische liegt
+in der App, damit die Prüffläche des Kerns bleibt, was sie ist.
+
+Eine falsche Passphrase und eine beschädigte Datei sind von aussen nicht zu
+unterscheiden — GCM authentifiziert, mehr nicht. Die Meldung nennt deshalb
+beides, statt zu raten.
+
+**Weiterhin offen**
+
+Die Cloud-Sicherung selbst, also zwei Plattform-Implementierungen. Und der
+Umgang mit Teilwiederherstellung bei Schemadifferenz: die Datei führt die
+Schemaversion mit, abgelehnt wird bisher aber nur pauschal.
 
 ## Verworfene Alternativen
 
