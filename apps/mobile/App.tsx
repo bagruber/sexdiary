@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   AppState,
+  Modal,
   Pressable,
   ScrollView,
   Text,
@@ -17,11 +18,11 @@ import { AppProvider, useApp } from "./src/state/store";
 import { APP_NAME } from "./src/branding";
 import { tapMedium } from "./src/haptics";
 import { DashboardScreen } from "./src/screens/DashboardScreen";
-import { LogScreen } from "./src/screens/LogScreen";
+import { AddEncounter, LogScreen } from "./src/screens/LogScreen";
 import { SettingsScreen } from "./src/screens/SettingsScreen";
 import { LockScreen } from "./src/screens/LockScreen";
 import { DecoyScreen } from "./src/screens/DecoyScreen";
-import { Card, Chip, GhostButton, PrimaryButton, Screen, Title } from "./src/ui";
+import { Card, Chip, Fab, GhostButton, PrimaryButton, Screen, Title } from "./src/ui";
 
 type Tab = "dashboard" | "log" | "settings";
 
@@ -256,6 +257,7 @@ function Shell() {
   const { data, t, palette, isDark } = useApp();
   const [tab, setTab] = useState<Tab>("dashboard");
   const [decoy, setDecoy] = useState(false);
+  const [logging, setLogging] = useState(false);
 
   // Android: FLAG_SECURE — no screenshots, no screen recording, and a
   // blank tile in the recents switcher. iOS: blocks screen recording.
@@ -333,8 +335,27 @@ function Shell() {
             {tab === "dashboard" && <DashboardScreen />}
             {tab === "log" && <LogScreen />}
             {tab === "settings" && <SettingsScreen />}
+            {tab !== "settings" && (
+              <Fab label={t("intercourse")} onPress={() => setLogging(true)} />
+            )}
           </View>
           <TabBar tab={tab} setTab={setTab} />
+          <Modal
+            visible={logging}
+            animationType="slide"
+            onRequestClose={() => setLogging(false)}
+          >
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: palette.bg,
+                padding: 16,
+                paddingTop: 48,
+              }}
+            >
+              <AddEncounter onClose={() => setLogging(false)} />
+            </View>
+          </Modal>
         </>
       )}
     </SafeAreaView>

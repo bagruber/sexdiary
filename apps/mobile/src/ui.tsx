@@ -261,3 +261,52 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 });
+
+/**
+ * The one action ADR-0014 asks to be reachable at all times.
+ *
+ * Deliberately a single action, not a menu that fans out: "I had sex"
+ * and "am I okay" are together most of why the app is opened, while a
+ * vaccination is entered a handful of times ever. Giving all four the
+ * same tap target would treat a skewed distribution as a flat one.
+ *
+ * Plain circle, plain plus. No colour coding, no glow — it sits over
+ * content that people read in public, and it should not draw a stranger
+ * eye more than it has to.
+ */
+export function Fab({ label, onPress }: { label: string; onPress: () => void }) {
+  const { palette } = useApp();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={() => {
+        tapMedium();
+        onPress();
+      }}
+      style={{
+        position: "absolute",
+        right: 18,
+        bottom: 18,
+        width: 56,
+        height: 56,
+        borderRadius: 28,
+        backgroundColor: palette.accent,
+        alignItems: "center",
+        justifyContent: "center",
+        elevation: 3,
+      }}
+    >
+      <Text
+        style={{
+          color: palette.accentText,
+          fontSize: 30,
+          lineHeight: 34,
+          fontWeight: "300",
+        }}
+      >
+        +
+      </Text>
+    </Pressable>
+  );
+}

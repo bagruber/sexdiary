@@ -69,7 +69,7 @@ function DateField({
   );
 }
 
-function AddEncounter({ onClose }: { onClose: () => void }) {
+export function AddEncounter({ onClose }: { onClose: () => void }) {
   const { data, dispatch, t, palette } = useApp();
   const [date, setDate] = useState(today());
   const [acts, setActs] = useState<Set<ActKey>>(new Set());
@@ -503,7 +503,6 @@ export function LogScreen() {
     <Screen>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Title>{t("calendar")}</Title>
-        <PrimaryButton label={`+ ${t("intercourse")}`} onPress={() => setAdding("intercourse")} />
         <GhostButton label={`+ ${t("testEntry")}`} onPress={() => setAdding("test")} />
         <GhostButton label={`+ ${t("contact")}`} onPress={() => setAdding("contact")} />
         <GhostButton
