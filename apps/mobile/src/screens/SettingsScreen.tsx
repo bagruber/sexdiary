@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
 import { Alert, ScrollView, Switch, Text, View } from "react-native";
-import type { Lang, Theme } from "@sexdiary/core";
+import { formatDate, type Lang, type Theme } from "@sexdiary/core";
 import { useApp } from "../state/store";
 import { APP_NAME } from "../branding";
 import { Card, Chip, PrimaryButton, Row, Screen, SectionTitle, Title } from "../ui";
 import { DataScreen } from "./DataScreen";
 import { authenticate, lockAvailability, type LockAvailability } from "../lib/app-lock";
-import { cancelReminders, requestReminderPermission } from "../lib/reminders";
+import {
+  cancelReminders,
+  pendingReminders,
+  requestReminderPermission,
+  sendTestReminder,
+} from "../lib/reminders";
 
 const THEMES: Theme[] = ["system", "light", "dark"];
 const LANGS: { value: Lang; label: string }[] = [
@@ -18,6 +23,8 @@ export function SettingsScreen() {
   const { data, dispatch, t, palette } = useApp();
   const [showData, setShowData] = useState(false);
   const [canLock, setCanLock] = useState<LockAvailability | null>(null);
+  const [pending, setPending] = useState<Date[] | null>(null);
+  const [testSent, setTestSent] = useState(false);
   const lang = data.prefs.lang;
 
   const [notifsDenied, setNotifsDenied] = useState(false);
@@ -135,11 +142,42 @@ export function SettingsScreen() {
           </Card>
         ) : (
           data.prefs.notifs && (
-            <Card>
-              <Text style={{ color: palette.sub, fontSize: 12, lineHeight: 17 }}>
-                {t("remindersNote")}
-              </Text>
-            </Card>
+            <>
+              <Card>
+                <Text style={{ color: palette.sub, fontSize: 12, lineHeight: 17 }}>
+                  {t("remindersNote")}
+                </Text>
+              </Card>
+              <Row
+                label={t("remindersCheck")}
+                sub={
+                  pending === null
+                    ? t("remindersCheckSub")
+                    : pending.length === 0
+                      ? t("remindersNonePending")
+                      : `${t("remindersPending", { n: pending.length })} · ${formatDate(
+                          pending[0].toISOString().slice(0, 10),
+                          data.prefs.lang,
+                        )}`
+                }
+                onPress={() => {
+                  void (async () => {
+                    setPending(await pendingReminders());
+                    setTestSent(await sendTestReminder({
+                      title: t("reminderTitle"),
+                      body: t("reminderBody"),
+                    }));
+                  })();
+                }}
+              />
+              {testSent && (
+                <Card>
+                  <Text style={{ color: palette.good, fontSize: 12, lineHeight: 17 }}>
+                    {t("remindersTestSent")}
+                  </Text>
+                </Card>
+              )}
+            </>
           )
         )}
         <Row

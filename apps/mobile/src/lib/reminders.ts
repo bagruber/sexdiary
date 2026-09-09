@@ -93,3 +93,39 @@ export async function syncReminders(
 export async function cancelReminders(): Promise<void> {
   await Notifications.cancelAllScheduledNotificationsAsync();
 }
+
+/**
+ * The reminders currently pending with the OS, soonest first.
+ *
+ * Deliberately not gated on `__DEV__`: the build people actually carry
+ * is a release build, and "are my reminders really set?" is a fair
+ * question to be able to answer there. It reveals only dates that are
+ * already derivable from the diary the reader is holding.
+ */
+export async function pendingReminders(): Promise<Date[]> {
+  const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+  const dates: Date[] = [];
+  for (const n of scheduled) {
+    const trigger = n.trigger as { type?: string; value?: number } | null;
+    if (typeof trigger?.value === "number") dates.push(new Date(trigger.value));
+  }
+  return dates.sort((a, b) => a.getTime() - b.getTime());
+}
+
+/**
+ * Deliver one notification a few seconds out, so the wording can be read
+ * on a locked screen — which is the only place its discretion can
+ * actually be judged. Uses the same text as a real reminder.
+ */
+export async function sendTestReminder(text: ReminderText): Promise<boolean> {
+  if (!(await Notifications.getPermissionsAsync()).granted) return false;
+  await Notifications.scheduleNotificationAsync({
+    content: { title: text.title, body: text.body },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      seconds: 5,
+      ...(Platform.OS === "android" ? { channelId: CHANNEL } : {}),
+    },
+  });
+  return true;
+}

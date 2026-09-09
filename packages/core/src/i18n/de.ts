@@ -334,6 +334,11 @@ export const de: Dict = {
   reminderBody: "Es gibt etwas nachzusehen.",
   remindersUnavailable:
     "Benachrichtigungen sind für diese App im System abgeschaltet. Ohne sie kann nicht erinnert werden.",
+  remindersCheck: "Erinnerungen prüfen",
+  remindersCheckSub: "Zeigt, was geplant ist, und schickt eine Testmeldung",
+  remindersPending: "{n} geplant",
+  remindersNonePending: "Nichts geplant",
+  remindersTestSent: "Kommt in 5 Sekunden — sperre jetzt den Bildschirm",
   remindersNote:
     "Die Erinnerung nennt weder eine Infektion noch ein Datum — sie ist auf dem Sperrbildschirm für andere lesbar. Was gemeint ist, steht in der App.",
   lockTitle: "Gesperrt",

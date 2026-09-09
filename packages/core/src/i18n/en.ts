@@ -345,6 +345,11 @@ export const en = {
   reminderBody: "There is something to look at.",
   remindersUnavailable:
     "Notifications are switched off for this app in the system settings. Without them there can be no reminder.",
+  remindersCheck: "Check reminders",
+  remindersCheckSub: "Shows what is scheduled, and sends a test",
+  remindersPending: "{n} scheduled",
+  remindersNonePending: "Nothing scheduled",
+  remindersTestSent: "Arrives in 5 seconds — lock the screen now",
   remindersNote:
     "The reminder names no infection and no date — it is readable by anyone on your lock screen. What it refers to stays inside the app.",
   lockTitle: "Locked",
