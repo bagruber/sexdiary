@@ -114,3 +114,38 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
+
+/* Kartenraster fuer die Luecken und die Ergaenzungen. */
+.karten {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  max-width: 720px;
+}
+.karte {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+.karte h3 { margin: 0 0 8px; font-size: 15px; }
+.karte p { margin: 0; font-size: 15px; color: var(--sub); }
+
+/* Geraet gegen Server. */
+.gegenueber {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  max-width: 720px;
+}
+.gegenueber ul { margin-top: 8px; }
+
+h3 { margin: 24px 0 8px; font-size: 16px; }
+section > h3:first-of-type { margin-top: 0; }
+
+.zitat {
+  font-size: 17px;
+  border-left: none;
+  padding: 16px 0 0;
+  color: var(--text);
+}

@@ -1,50 +1,12 @@
-/**
- * Inhalt der Informationsseite, ohne DOM und ohne Stylesheet-Import.
- *
- * Getrennt von `main.ts`, damit die Seite ausserhalb eines Browsers
- * gerendert und geprüft werden kann — und damit der Build sie statisch
- * in index.html schreiben kann. Sie trägt Impressum und
- * Datenschutzerklärung; ohne JavaScript darf dort nicht nichts stehen.
- *
- * Inhalt und Reihenfolge folgen der Konzeptvorstellung vom 21.05.2026.
- * Die Seite kennt keinen Nutzer, verarbeitet keine Gesundheitsdaten und
- * lädt nichts von Drittanbietern.
- */
-import { STI_NAMES, paletteFor } from "@sexdiary/core";
-
-export function themeStyles(): string {
-  const vars = (p: ReturnType<typeof paletteFor>) =>
-    Object.entries(p)
-      .map(([k, v]) => `--${k}: ${v};`)
-      .join("");
-  return [
-    `:root{${vars(paletteFor("light"))}}`,
-    `:root[data-theme="dark"]{${vars(paletteFor("dark"))}}`,
-  ].join("\n");
-}
-
-const section = (id: string, title: string, body: string): string => `
-  <section id="${id}" aria-labelledby="${id}-h">
-    <h2 id="${id}-h">${title}</h2>
-${body}
-  </section>`;
-
-const karten = (items: [string, string][]): string => `    <div class="karten">
-${items
-  .map(([t, b]) => `      <div class="karte"><h3>${t}</h3><p>${b}</p></div>`)
-  .join("\n")}
-    </div>`;
-
-/**
- * Platzhalter, die als Platzhalter aussehen. Ein Impressum mit
- * erfundenen Angaben wäre schlimmer als keines, und erfundene
- * Teststellen schicken Menschen an Türen, hinter denen niemand ist.
- */
-const fehlt = (was: string): string =>
-  `    <p class="fehlt"><strong>Fehlt noch:</strong> ${was}</p>`;
-
-export function render(): string {
-  return `
+import{a as e,b as t}from"./dist-BsrUrD_w.js";function n(){let t=e=>Object.entries(e).map(([e,t])=>`--${e}: ${t};`).join(``);return[`:root{${t(e(`light`))}}`,`:root[data-theme="dark"]{${t(e(`dark`))}}`].join(`
+`)}var r=(e,t,n)=>`
+  <section id="${e}" aria-labelledby="${e}-h">
+    <h2 id="${e}-h">${t}</h2>
+${n}
+  </section>`,i=e=>`    <div class="karten">
+${e.map(([e,t])=>`      <div class="karte"><h3>${e}</h3><p>${t}</p></div>`).join(`
+`)}
+    </div>`,a=e=>`    <p class="fehlt"><strong>Fehlt noch:</strong> ${e}</p>`;function o(){return`
 <a class="skip" href="#inhalt">Zum Inhalt springen</a>
 
 <header>
@@ -61,28 +23,8 @@ export function render(): string {
       bleibt auf dem Telefon.
     </p>
   </section>
-${section(
-  "problem",
-  "Drei Lücken",
-  karten([
-    [
-      "Risiko und Testbereitschaft",
-      "Viele schätzen ihr Expositionsrisiko falsch ein oder handeln nicht entsprechend.",
-    ],
-    [
-      "Partner-Notification",
-      "Stigmatisiert, aufwändig, schambesetzt. Die häufigste Reaktion ist Unterlassen, nicht Handeln.",
-    ],
-    [
-      "Kein passendes Werkzeug",
-      "Bestehende Angebote sind selten zugleich anonym, niedrigschwellig und alltagstauglich.",
-    ],
-  ]),
-)}
-${section(
-  "funktionen",
-  "Zwei Funktionen",
-  `    <h3>Persönliches Risiko-Dashboard</h3>
+${r(`problem`,`Drei Lücken`,i([[`Risiko und Testbereitschaft`,`Viele schätzen ihr Expositionsrisiko falsch ein oder handeln nicht entsprechend.`],[`Partner-Notification`,`Stigmatisiert, aufwändig, schambesetzt. Die häufigste Reaktion ist Unterlassen, nicht Handeln.`],[`Kein passendes Werkzeug`,`Bestehende Angebote sind selten zugleich anonym, niedrigschwellig und alltagstauglich.`]]))}
+${r(`funktionen`,`Zwei Funktionen`,`    <h3>Persönliches Risiko-Dashboard</h3>
     <ul>
       <li>Dokumentation von Kontakten, Tests und Impfungen</li>
       <li>Window-Period-Tracking pro Infektion</li>
@@ -100,13 +42,9 @@ ${section(
     </ul>
     <p>
       Berücksichtigte Infektionen:
-      <span class="stis">${STI_NAMES.join(" · ")}</span>
-    </p>`,
-)}
-${section(
-  "architektur",
-  "Lokal denken, minimal zentralisieren",
-  `    <div class="gegenueber">
+      <span class="stis">${t.join(` · `)}</span>
+    </p>`)}
+${r(`architektur`,`Lokal denken, minimal zentralisieren`,`    <div class="gegenueber">
       <div>
         <h3>Auf dem Gerät</h3>
         <ul>
@@ -132,12 +70,8 @@ ${section(
       Server braucht. Übertragen wird Empfänger-Token, Erreger und Zeitstempel.
       Kein Absender, kein Nachrichtentext. Vor jedem Versand zeigt die App, was
       genau übertragen wird.
-    </p>`,
-)}
-${section(
-  "diskretion",
-  "Gebaut gegen den Blick von nebenan",
-  `    <p>
+    </p>`)}
+${r(`diskretion`,`Gebaut gegen den Blick von nebenan`,`    <p>
       Das realistische Risiko ist die Person daneben, nicht der Angreifer im
       Netz. Dagegen wirken vier Dinge, die nur eine native App leisten kann:
     </p>
@@ -149,30 +83,9 @@ ${section(
         ein Griff auf einen harmlosen Bildschirm.</li>
       <li><strong>Erinnerungen ohne Inhalt</strong>: keine Infektion, keine
         Zahl, kein Datum auf dem Sperrbildschirm.</li>
-    </ul>`,
-)}
-${section(
-  "dazu",
-  "Was dazugehört",
-  karten([
-    [
-      "Kontextualisierte Information",
-      "Zu Infektionen und Testmöglichkeiten, situationsbezogen statt generisch.",
-    ],
-    [
-      "Import per QR",
-      "Testergebnisse und Impfdaten direkt aus dem Testangebot übernehmen.",
-    ],
-    [
-      "PrEP und Doxy-PEP",
-      "Einnahme- und Adhärenzstatus fließen in die Risikoberechnung ein.",
-    ],
-  ]),
-)}
-${section(
-  "offen",
-  "Klare Augen: was noch nicht gelöst ist",
-  `    <p>
+    </ul>`)}
+${r(`dazu`,`Was dazugehört`,i([[`Kontextualisierte Information`,`Zu Infektionen und Testmöglichkeiten, situationsbezogen statt generisch.`],[`Import per QR`,`Testergebnisse und Impfdaten direkt aus dem Testangebot übernehmen.`],[`PrEP und Doxy-PEP`,`Einnahme- und Adhärenzstatus fließen in die Risikoberechnung ein.`]]))}
+${r(`offen`,`Klare Augen: was noch nicht gelöst ist`,`    <p>
       Die medizinischen Zeiträume stehen zur ärztlichen Prüfung und werden hier
       deshalb noch nicht im Einzelnen genannt. Fünf Werte sind als vermutlich
       unzutreffend vermerkt, zwei davon würden zu früh „testbar“ melden. Sie
@@ -198,50 +111,24 @@ ${section(
         Kooperationspartner?</li>
       <li>Welche Förder- und Finanzierungsmodelle sind realistisch?</li>
       <li>Strukturierte Nutzerevaluation der einzelnen Funktionen steht aus.</li>
-    </ul>`,
-)}
-${section(
-  "ausprobieren",
-  "Ansehen",
-  `    <p>
+    </ul>`)}
+${r(`ausprobieren`,`Ansehen`,`    <p>
       Die <a href="./demo.html">Demo im Browser</a> zeigt den Aufbau. Sie
       speichert nichts — ein Neuladen beginnt von vorn. Die vier Funktionen
       oben kann ein Browser nicht leisten; sie sind dort sichtbar, aber als
       nicht verfügbar gekennzeichnet.
     </p>
-${fehlt("Bezugsweg für die Android-App, sobald die Verteilung steht.")}`,
-)}
-${section(
-  "teststellen",
-  "Wo man sich testen lassen kann",
-  fehlt(
-    "Verzeichnis der Teststellen. Gehört mit geprüften Angaben gefüllt, " +
-      "etwa vom Gesundheitsreferat oder der Aidshilfe.",
-  ),
-)}
-${section(
-  "impressum",
-  "Impressum",
-  fehlt(
-    "Anbieterkennzeichnung nach § 5 DDG: Name, ladungsfähige Anschrift, Kontakt.",
-  ),
-)}
-${section(
-  "datenschutz",
-  "Datenschutz",
-  `    <p>
+${a(`Bezugsweg für die Android-App, sobald die Verteilung steht.`)}`)}
+${r(`teststellen`,`Wo man sich testen lassen kann`,a(`Verzeichnis der Teststellen. Gehört mit geprüften Angaben gefüllt, etwa vom Gesundheitsreferat oder der Aidshilfe.`))}
+${r(`impressum`,`Impressum`,a(`Anbieterkennzeichnung nach § 5 DDG: Name, ladungsfähige Anschrift, Kontakt.`))}
+${r(`datenschutz`,`Datenschutz`,`    <p>
       Diese Seite setzt keine Cookies, bindet nichts von Drittanbietern ein und
       misst nichts. Auch die Schriften sind mitgeliefert und werden nicht
       nachgeladen.
     </p>
-${fehlt(
-    "Erklärung nach Art. 13 DSGVO samt Verantwortlichem, Rechtsgrundlagen " +
-      "und Betroffenenrechten. Gehört juristisch geprüft.",
-  )}`,
-)}
+${a(`Erklärung nach Art. 13 DSGVO samt Verantwortlichem, Rechtsgrundlagen und Betroffenenrechten. Gehört juristisch geprüft.`)}`)}
 </main>
 
 <footer>
   <p>Kein Medizinprodukt. Ersetzt keine ärztliche Beratung.</p>
-</footer>`;
-}
+</footer>`}var s=document.getElementById(`root`);if(!s.firstElementChild){let e=document.createElement(`style`);e.textContent=n(),document.head.append(e),s.innerHTML=o()}function c(e){document.documentElement.dataset.theme=e,document.getElementById(`theme`).onclick=()=>{c(e===`dark`?`light`:`dark`)}}c(window.matchMedia?.(`(prefers-color-scheme: dark)`).matches?`dark`:`light`);
