@@ -35,10 +35,10 @@ export interface Palette {
 export const LIGHT: Palette = {
   bg: "#F5F3EF",
   card: "#FFFFFF",
-  text: "#1F1D2B",
-  sub: "#6E6A7A",
-  border: "#E5E1D8",
-  accent: "#1F1D2B",
+  text: "#14262B",
+  sub: "#5A6B70",
+  border: "#E3E0D8",
+  accent: "#14262B",
   accentText: "#FFFFFF",
   good: "#2B7A4E",
   warn: "#8C6208",
@@ -46,13 +46,13 @@ export const LIGHT: Palette = {
 };
 
 export const DARK: Palette = {
-  bg: "#17151F",
-  card: "#211E2B",
-  text: "#F1EFF7",
-  sub: "#9B96A8",
-  border: "#322E3F",
-  accent: "#F1EFF7",
-  accentText: "#17151F",
+  bg: "#0D1A1E",
+  card: "#142429",
+  text: "#E6EFEF",
+  sub: "#8FA5AA",
+  border: "#234047",
+  accent: "#E6EFEF",
+  accentText: "#0D1A1E",
   good: "#5BBB8A",
   warn: "#D9A441",
   bad: "#E87A6A",
@@ -67,7 +67,7 @@ export const DARK: Palette = {
 export const BRAND = {
   surface: "#F2B705",
   /** The only foreground allowed on `surface` (9.10:1). */
-  onSurface: "#1F1D2B",
+  onSurface: "#14262B",
 } as const;
 
 /**

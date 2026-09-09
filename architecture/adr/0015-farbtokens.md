@@ -39,15 +39,15 @@ Skalen, die sich nie berühren:
 | Interaktion | Identität, Bedienelemente, Navigation | Eine Farbe plus Neutrale |
 | Semantik | die Risikobewertung — der Inhalt | Eigene Skala, nie als Bedienelement |
 
-**Hell** — `bg #F5F3EF`, `card #FFFFFF`, `text`/`accent #1F1D2B` (14,93:1),
-`sub #6E6A7A`, `border #E5E1D8`, `good #2B7A4E`, `warn #8C6208`,
+**Hell** — `bg #F5F3EF`, `card #FFFFFF`, `text`/`accent #14262B` (14,12:1),
+`sub #5A6B70`, `border #E3E0D8`, `good #2B7A4E`, `warn #8C6208`,
 `bad #C0392B`.
 
-**Dunkel** — `bg #17151F`, `card #211E2B`, `text`/`accent #F1EFF7`,
-`sub #9B96A8`, `border #322E3F`, `good #5BBB8A`, `warn #D9A441`,
+**Dunkel** — `bg #0D1A1E`, `card #142429`, `text`/`accent #E6EFEF` (15,17:1),
+`sub #8FA5AA`, `border #234047`, `good #5BBB8A`, `warn #D9A441`,
 `bad #E87A6A`.
 
-**Marke** — `#F2B705` als *Fläche* mit `#1F1D2B` darauf (9,10:1). App-Icon,
+**Marke** — `#F2B705` als *Fläche* mit `#14262B` darauf (8,61:1). App-Icon,
 Splash, ein Akzent auf der Infoseite. Nie als Vordergrundfarbe.
 
 **Sieben Risikostufen, vier Farben.** `none`/`negligible` neutral,
@@ -87,6 +87,22 @@ liegt, ist exakt der Fehler, den dieselbe Welle gerade ausbaut — `FONT` zeigt
 seit dem 10.07.2026 auf DM Sans, das es nicht mehr gibt, und wird 91-mal
 gesetzt. Die Schrift wird zum Token, wenn die Dateien mitgeliefert werden:
 nativ in Welle 3, Infoseite in Welle 4.
+
+## Nachtrag 10.09.2026 — die Neutralen sind nicht mehr violett
+
+Die ursprüngliche Reihe war durchgehend violett gestimmt: `#1F1D2B` im Hellen,
+`#17151F` und `#322E3F` im Dunkeln, `#F1EFF7` als Textfarbe. Das las sich
+generisch — ein Ton, den man in beliebigen Oberflächen findet.
+
+Die Neutralen liegen jetzt auf Petrol, im selben Bereich wie die
+Konzeptvorstellung vom 21.05.2026. Damit sprechen Präsentation, Infoseite und
+App dieselbe Sprache, statt drei Farbwelten zu haben.
+
+Die Helligkeiten sind mitgewandert, nicht neu gewählt: alle Schwellen aus den
+Tests bleiben erfüllt, der Textkontrast im Hellen sinkt von 14,93 auf 14,12
+und im Dunkeln steigt er auf 15,17. Die semantische Skala — grün, gelb, rot —
+ist unberührt; sie beschreibt den Inhalt und hat mit der Identität nichts zu
+tun.
 
 ## Konsequenzen
 
