@@ -354,6 +354,8 @@ export const de: Dict = {
     "Das ersetzt alles, was jetzt auf diesem Gerät steht. Nicht rückgängig zu machen.",
   backupDone: "Sicherung erstellt",
   backupRestored: "Daten wiederhergestellt",
+  nfcPending: "Noch nicht gebaut. Der Austausch per NFC ist als nächster Schritt vorgesehen; bis dahin geht der Tausch über den QR-Code.",
+  qrShort: "QR",
   remindersCheck: "Erinnerungen prüfen",
   remindersCheckSub: "Zeigt, was geplant ist, und schickt eine Testmeldung",
   remindersPending: "{n} geplant",

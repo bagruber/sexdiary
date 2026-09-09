@@ -475,10 +475,14 @@ export function AddSheet({
   kind,
   onKind,
   onClose,
+  onQr,
 }: {
   kind: AddKind;
   onKind: (k: AddKind) => void;
   onClose: () => void;
+  /** Token tauschen. Steht neben den Eintragsarten, weil es im selben
+   *  Moment gebraucht wird wie eine Begegnung — nur schneller. */
+  onQr?: () => void;
 }) {
   const { t } = useApp();
   const kinds: { id: AddKind; label: string }[] = [
@@ -503,6 +507,7 @@ export function AddSheet({
             onPress={() => onKind(k.id)}
           />
         ))}
+        {onQr && <Chip label={t("qrShort")} active={false} onPress={onQr} />}
       </ScrollView>
 
       {kind === "intercourse" && <AddEncounter onClose={onClose} />}

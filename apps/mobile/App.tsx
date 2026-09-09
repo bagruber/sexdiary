@@ -20,6 +20,7 @@ import { tapMedium } from "./src/haptics";
 import { DashboardScreen } from "./src/screens/DashboardScreen";
 import { LogScreen } from "./src/screens/LogScreen";
 import { AddSheet, type AddKind } from "./src/screens/AddSheets";
+import { ConnectScreen } from "./src/screens/ConnectScreen";
 import { SettingsScreen } from "./src/screens/SettingsScreen";
 import { LockScreen } from "./src/screens/LockScreen";
 import { DecoyScreen } from "./src/screens/DecoyScreen";
@@ -157,8 +158,15 @@ function Onboarding() {
   );
 }
 
-/** App name plus, in disguise mode, a one-tap escape to the decoy screen. */
-function TopBar({ onHide }: { onHide: () => void }) {
+/**
+ * App-Name, der Tokentausch, und im Tarnmodus der Griff auf den
+ * harmlosen Bildschirm.
+ *
+ * Der QR-Knopf steht hier fest, weil der Tausch im Moment passiert und
+ * nicht danach: erst ein Eingabeblatt oeffnen zu muessen waere ein
+ * Umweg an genau der Stelle, an der jemand daneben wartet.
+ */
+function TopBar({ onHide, onQr }: { onHide: () => void; onQr: () => void }) {
   const { data, t, palette } = useApp();
   const name = data.prefs.disguise ? t("neutralAppName") : APP_NAME;
 
@@ -175,6 +183,18 @@ function TopBar({ onHide }: { onHide: () => void }) {
       <Text style={{ color: palette.sub, fontSize: 13, fontWeight: "600" }}>
         {name}
       </Text>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("shareTitle")}
+          onPress={() => {
+            tapMedium();
+            onQr();
+          }}
+          hitSlop={12}
+        >
+          <Text style={{ color: palette.sub, fontSize: 13 }}>{t("qrShort")}</Text>
+        </Pressable>
       {data.prefs.disguise && (
         <Pressable
           accessibilityRole="button"
@@ -188,6 +208,7 @@ function TopBar({ onHide }: { onHide: () => void }) {
           <Text style={{ color: palette.sub, fontSize: 13 }}>{t("hideNow")}</Text>
         </Pressable>
       )}
+      </View>
     </View>
   );
 }
@@ -260,6 +281,7 @@ function Shell() {
   const [decoy, setDecoy] = useState(false);
   const [adding, setAdding] = useState<AddKind | null>(null);
   const [fan, setFan] = useState(false);
+  const [connect, setConnect] = useState(false);
 
   // Android: FLAG_SECURE — no screenshots, no screen recording, and a
   // blank tile in the recents switcher. iOS: blocks screen recording.
@@ -332,7 +354,7 @@ function Shell() {
         <Onboarding />
       ) : (
         <>
-          <TopBar onHide={() => setDecoy(true)} />
+          <TopBar onHide={() => setDecoy(true)} onQr={() => setConnect(true)} />
           <View style={{ flex: 1 }}>
             {tab === "dashboard" && <DashboardScreen />}
             {tab === "log" && <LogScreen />}
@@ -416,8 +438,21 @@ function Shell() {
                   kind={adding}
                   onKind={setAdding}
                   onClose={() => setAdding(null)}
+                  onQr={() => {
+                    setAdding(null);
+                    setConnect(true);
+                  }}
                 />
               )}
+            </View>
+          </Modal>
+          <Modal
+            visible={connect}
+            animationType="slide"
+            onRequestClose={() => setConnect(false)}
+          >
+            <View style={{ flex: 1, backgroundColor: palette.bg }}>
+              <ConnectScreen onClose={() => setConnect(false)} />
             </View>
           </Modal>
         </>

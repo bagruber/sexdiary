@@ -365,6 +365,8 @@ export const en = {
     "This replaces everything currently on this device. It cannot be undone.",
   backupDone: "Backup created",
   backupRestored: "Data restored",
+  nfcPending: "Not built yet. Exchange over NFC is the next step; until then the QR code does it.",
+  qrShort: "QR",
   remindersCheck: "Check reminders",
   remindersCheckSub: "Shows what is scheduled, and sends a test",
   remindersPending: "{n} scheduled",
