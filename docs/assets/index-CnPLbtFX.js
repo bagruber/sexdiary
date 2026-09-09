@@ -1,21 +1,9 @@
-<!doctype html>
-<html lang="de">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#F5F3EF" />
-    <meta
-      name="description"
-      content="Sexdiary rechnet aus, ab wann ein STI-Test aussagekraeftig ist. Alle Daten bleiben auf dem Telefon."
-    />
-    <title>Sexdiary — wann ein Test etwas aussagt</title>
-  <style>:root{--bg: #F5F3EF;--card: #FFFFFF;--text: #1F1D2B;--sub: #6E6A7A;--border: #E5E1D8;--accent: #1F1D2B;--accentText: #FFFFFF;--good: #2B7A4E;--warn: #8C6208;--bad: #C0392B;}
-:root[data-theme="dark"]{--bg: #17151F;--card: #211E2B;--text: #F1EFF7;--sub: #9B96A8;--border: #322E3F;--accent: #F1EFF7;--accentText: #17151F;--good: #5BBB8A;--warn: #D9A441;--bad: #E87A6A;}</style>  <script type="module" crossorigin src="./assets/index-CnPLbtFX.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/dist-BsrUrD_w.js">
-  <link rel="stylesheet" crossorigin href="./assets/index-uozGM_-e.css">
-</head>
-  <body>
-    <div id="root">
+import{a as e,b as t}from"./dist-BsrUrD_w.js";function n(){let t=e=>Object.entries(e).map(([e,t])=>`--${e}: ${t};`).join(``);return[`:root{${t(e(`light`))}}`,`:root[data-theme="dark"]{${t(e(`dark`))}}`].join(`
+`)}var r=(e,t,n)=>`
+  <section id="${e}" aria-labelledby="${e}-h">
+    <h2 id="${e}-h">${t}</h2>
+${n}
+  </section>`,i=e=>`    <p class="fehlt"><strong>Fehlt noch:</strong> ${e}</p>`;function a(){return`
 <a class="skip" href="#inhalt">Zum Inhalt springen</a>
 
 <header>
@@ -34,10 +22,7 @@
       dem Telefon.
     </p>
   </section>
-
-  <section id="fenster" aria-labelledby="fenster-h">
-    <h2 id="fenster-h">Das diagnostische Fenster</h2>
-    <p>
+${r(`fenster`,`Das diagnostische Fenster`,`    <p>
       Zwischen einer moeglichen Ansteckung und dem Moment, in dem ein Test
       sie finden kann, liegt Zeit. Wer zu frueh testet, bekommt ein
       negatives Ergebnis, das nichts ausschliesst — und geht beruhigt nach
@@ -61,13 +46,9 @@
     </p>
     <p>
       Beruecksichtigt werden derzeit:
-      <span class="stis">HIV · Gonorrhea · Chlamydia · Syphilis · Hep B · HSV-2 · Mpox</span>
-    </p>
-  </section>
-
-  <section id="geraet" aria-labelledby="geraet-h">
-    <h2 id="geraet-h">Die Daten verlassen das Geraet nicht</h2>
-    <p>
+      <span class="stis">${t.join(` · `)}</span>
+    </p>`)}
+${r(`geraet`,`Die Daten verlassen das Geraet nicht`,`    <p>
       Es gibt kein Konto, keinen Server und keine Synchronisierung. Alles
       liegt verschluesselt auf dem Telefon; der Schluessel steckt im
       Schluesselspeicher des Geraets und wandert nicht in Systembackups.
@@ -75,12 +56,8 @@
     <p>
       Das ist keine Einstellung, sondern der Aufbau. Es gibt niemanden,
       der die Daten herausgeben koennte, weil niemand sie hat.
-    </p>
-  </section>
-
-  <section id="diskretion" aria-labelledby="diskretion-h">
-    <h2 id="diskretion-h">Gebaut gegen den Blick von nebenan</h2>
-    <p>
+    </p>`)}
+${r(`diskretion`,`Gebaut gegen den Blick von nebenan`,`    <p>
       Das realistische Risiko ist nicht der Angreifer im Netz, sondern die
       Person, die daneben sitzt oder das entsperrte Telefon in der Hand
       haelt. Dagegen wirken vier Dinge, die es nur nativ gibt:
@@ -94,43 +71,23 @@
         Sperrseite, ein Griff auf einen harmlosen Bildschirm.</li>
       <li><strong>Erinnerungen ohne Inhalt.</strong> Eine Meldung sagt,
         dass etwas ansteht — keine Infektion, keine Zahl, kein Datum.</li>
-    </ul>
-  </section>
-
-  <section id="benachrichtigung" aria-labelledby="benachrichtigung-h">
-    <h2 id="benachrichtigung-h">Partner benachrichtigen, ohne sich zu erkennen zu geben</h2>
-    <p>
+    </ul>`)}
+${r(`benachrichtigung`,`Partner benachrichtigen, ohne sich zu erkennen zu geben`,`    <p>
       Nach einem positiven Befund ist die schwierigste Aufgabe, die
       Menschen zu erreichen, die es angeht. Sexdiary erzeugt fuer jeden
       Kontakt ein Kennzeichen ohne Namen. Eine Benachrichtigung sagt, dass
       ein Test sinnvoll ist, und nennt nicht, von wem sie kommt.
-    </p>
-  </section>
-
-  <section id="ausprobieren" aria-labelledby="ausprobieren-h">
-    <h2 id="ausprobieren-h">Ansehen und bekommen</h2>
-    <p>
+    </p>`)}
+${r(`ausprobieren`,`Ansehen und bekommen`,`    <p>
       Es gibt eine <a href="./demo.html">Demo im Browser</a>. Sie zeigt den
       Aufbau, speichert aber nichts: ein Neuladen beginnt von vorn. Die
       vier Funktionen oben kann ein Browser grundsaetzlich nicht leisten —
       sie sind dort sichtbar, aber als nicht verfuegbar gekennzeichnet.
     </p>
-    <p class="fehlt"><strong>Fehlt noch:</strong> Bezugsweg fuer die Android-Anwendung, sobald die Verteilung steht.</p>
-  </section>
-
-  <section id="teststellen" aria-labelledby="teststellen-h">
-    <h2 id="teststellen-h">Wo man sich testen lassen kann</h2>
-    <p class="fehlt"><strong>Fehlt noch:</strong> Verzeichnis der Teststellen. Erfundene Adressen schicken Menschen an Tueren, hinter denen niemand ist — hier gehoeren geprüfte Angaben hin, etwa vom Gesundheitsamt oder der Aidshilfe.</p>
-  </section>
-
-  <section id="impressum" aria-labelledby="impressum-h">
-    <h2 id="impressum-h">Impressum</h2>
-    <p class="fehlt"><strong>Fehlt noch:</strong> Anbieterkennzeichnung nach § 5 DDG: Name, ladungsfaehige Anschrift und Kontakt. Muss von der verantwortlichen Person kommen und darf nicht geraten werden.</p>
-  </section>
-
-  <section id="datenschutz" aria-labelledby="datenschutz-h">
-    <h2 id="datenschutz-h">Datenschutz</h2>
-    <p>
+${i(`Bezugsweg fuer die Android-Anwendung, sobald die Verteilung steht.`)}`)}
+${r(`teststellen`,`Wo man sich testen lassen kann`,i(`Verzeichnis der Teststellen. Erfundene Adressen schicken Menschen an Tueren, hinter denen niemand ist — hier gehoeren geprüfte Angaben hin, etwa vom Gesundheitsamt oder der Aidshilfe.`))}
+${r(`impressum`,`Impressum`,i(`Anbieterkennzeichnung nach § 5 DDG: Name, ladungsfaehige Anschrift und Kontakt. Muss von der verantwortlichen Person kommen und darf nicht geraten werden.`))}
+${r(`datenschutz`,`Datenschutz`,`    <p>
       Diese Seite setzt keine Cookies, bindet nichts von Drittanbietern
       ein und misst nichts. Sie laedt ausschliesslich Dateien von diesem
       Server; auch die Schriften sind mitgeliefert und werden nicht
@@ -140,14 +97,11 @@
       Die App selbst verarbeitet Gesundheitsdaten ausschliesslich auf dem
       Geraet. Es findet keine Uebermittlung an den Anbieter statt.
     </p>
-    <p class="fehlt"><strong>Fehlt noch:</strong> Vollstaendige Erklaerung nach Art. 13 DSGVO samt Verantwortlichem, Rechtsgrundlagen und Betroffenenrechten. Gehoert juristisch geprueft.</p>
-  </section>
+${i(`Vollstaendige Erklaerung nach Art. 13 DSGVO samt Verantwortlichem, Rechtsgrundlagen und Betroffenenrechten. Gehoert juristisch geprueft.`)}`)}
 </main>
 
 <footer>
   <p>
     Kein Medizinprodukt. Ersetzt keine aerztliche Beratung.
   </p>
-</footer></div>
-  </body>
-</html>
+</footer>`}var o=document.getElementById(`root`);if(!o.firstElementChild){let e=document.createElement(`style`);e.textContent=n(),document.head.append(e),o.innerHTML=a()}function s(e){document.documentElement.dataset.theme=e,document.getElementById(`theme`).onclick=()=>{s(e===`dark`?`light`:`dark`)}}s(window.matchMedia?.(`(prefers-color-scheme: dark)`).matches?`dark`:`light`);

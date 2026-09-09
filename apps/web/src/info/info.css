@@ -1,0 +1,116 @@
+/*
+ * Informationsseite. Systemschriften statt geladener — Google Fonts
+ * wurde im Juli 2026 aus Datenschutzgruenden entfernt, und bis die
+ * Atkinson-Dateien mitgeliefert werden, ist eine nicht geladene Schrift
+ * die ehrlichere Loesung als eine verlinkte.
+ */
+* { box-sizing: border-box; }
+
+html { color-scheme: light dark; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--card);
+  color: var(--text);
+  padding: 12px 16px;
+  z-index: 10;
+}
+.skip:focus { left: 8px; top: 8px; }
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px max(20px, calc((100% - 720px) / 2));
+  border-bottom: 1px solid var(--border);
+}
+
+.marke { margin: 0; font-weight: 700; letter-spacing: -0.01em; }
+
+button {
+  font: inherit;
+  font-size: 13px;
+  color: var(--sub);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+button:hover { color: var(--text); }
+
+main { padding: 0 max(20px, calc((100% - 720px) / 2)); }
+
+section { padding: 40px 0; border-bottom: 1px solid var(--border); }
+section:last-child { border-bottom: none; }
+
+.hero { padding: 64px 0 48px; border-bottom: 1px solid var(--border); }
+
+h1 {
+  margin: 0;
+  font-size: clamp(28px, 5vw, 40px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  max-width: 20ch;
+}
+
+.lead { font-size: 18px; color: var(--sub); max-width: 46ch; }
+
+h2 {
+  margin: 0 0 16px;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+}
+
+p { max-width: 62ch; }
+
+ul { max-width: 62ch; padding-left: 20px; }
+li { margin-bottom: 10px; }
+
+a { color: var(--text); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+
+.stis {
+  display: block;
+  margin-top: 8px;
+  color: var(--sub);
+  font-size: 15px;
+}
+
+/*
+ * Der Hinweis auf die ungeprueften Werte und die Platzhalter sind keine
+ * Randnotizen: sie sagen, was diese Seite noch nicht behaupten darf.
+ * Deshalb stehen sie im Textfluss, abgesetzt durch Flaeche statt durch
+ * einen farbigen Streifen an der Kante.
+ */
+.hinweis, .fehlt {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 15px;
+}
+
+.fehlt { color: var(--sub); }
+
+footer {
+  padding: 28px max(20px, calc((100% - 720px) / 2)) 48px;
+  border-top: 1px solid var(--border);
+  color: var(--sub);
+  font-size: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}

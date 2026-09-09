@@ -1,4 +1,4 @@
-import{a as e,i as t,n,o as r,r as i,s as a,t as o,w as s}from"./dist-BAVnPkDZ.js";var c=4.5,l=3,u=a(`de`),d=e=>e.toFixed(2).replace(`.`,`,`);function f(e,n,r){let i=t(e,n),a=i>=r;return`${d(i)}<span class="verdict ${a?`pass`:`fail`}">${a?`erfüllt`:`verfehlt`}</span>`}var p=[{name:`bg`,role:`Bildschirmgrund`,threshold:null},{name:`card`,role:`Fläche darüber`,threshold:null},{name:`text`,role:`Fließtext`,threshold:c},{name:`sub`,role:`Zweitrangiger Text`,threshold:c},{name:`accent`,role:`Die eine Aktionsfarbe`,threshold:l},{name:`border`,role:`Trennlinie, rein dekorativ`,threshold:null}],m=[{name:`good`,role:`Nichts zu tun`,threshold:c},{name:`warn`,role:`Erhöht`,threshold:c},{name:`bad`,role:`Handeln`,threshold:c}];function h(e,t){return`<div class="tokens"><table>
+import{C as e,a as t,i as n,n as r,o as i,r as a,t as o}from"./dist-BsrUrD_w.js";import{t as s}from"./i18n-DB_RjKyM.js";var c=4.5,l=3,u=s(`de`),d=e=>e.toFixed(2).replace(`.`,`,`);function f(e,t,r){let i=n(e,t),a=i>=r;return`${d(i)}<span class="verdict ${a?`pass`:`fail`}">${a?`erfüllt`:`verfehlt`}</span>`}var p=[{name:`bg`,role:`Bildschirmgrund`,threshold:null},{name:`card`,role:`Fläche darüber`,threshold:null},{name:`text`,role:`Fließtext`,threshold:c},{name:`sub`,role:`Zweitrangiger Text`,threshold:c},{name:`accent`,role:`Die eine Aktionsfarbe`,threshold:l},{name:`border`,role:`Trennlinie, rein dekorativ`,threshold:null}],m=[{name:`good`,role:`Nichts zu tun`,threshold:c},{name:`warn`,role:`Erhöht`,threshold:c},{name:`bad`,role:`Handeln`,threshold:c}];function h(e,t){return`<div class="tokens"><table>
     <thead><tr>
       <th></th><th>Token</th><th>Wert</th>
       <th class="num">auf bg</th><th class="num">auf card</th>
@@ -13,11 +13,11 @@ import{a as e,i as t,n,o as r,r as i,s as a,t as o,w as s}from"./dist-BAVnPkDZ.j
         <td><span class="hex">${n}</span></td>
         ${r}
       </tr>`}).join(``)}</tbody>
-  </table></div>`}function g(e){return`<div class="scale">${Object.keys(s).sort((e,t)=>s[e]-s[t]).map(t=>{let n=r(e,t);return`<div class="step">
+  </table></div>`}function g(t){return`<div class="scale">${Object.keys(e).sort((t,n)=>e[t]-e[n]).map(e=>{let n=i(t,e);return`<div class="step">
         <span class="dot" style="background:${n}"></span>
-        <span class="lvl" style="color:${n}">${u(t)}</span>
-        <span class="key">${t} → ${n.toUpperCase()}</span>
-      </div>`}).join(``)}</div>`}function _(r){let a=e(r);return`<div class="page">
+        <span class="lvl" style="color:${n}">${u(e)}</span>
+        <span class="key">${e} → ${n.toUpperCase()}</span>
+      </div>`}).join(``)}</div>`}function _(e){let i=t(e);return`<div class="page">
   <header>
     <p class="eyebrow">Sexdiary · Interne Fassung</p>
     <h1>Ein Designsystem aus zwei Skalen</h1>
@@ -28,7 +28,7 @@ import{a as e,i as t,n,o as r,r as i,s as a,t as o,w as s}from"./dist-BAVnPkDZ.j
     </p>
     <div class="controls">
       <button class="theme" id="theme">
-        ${r===`dark`?`Zur hellen Fassung`:`Zur dunklen Fassung`}
+        ${e===`dark`?`Zur hellen Fassung`:`Zur dunklen Fassung`}
       </button>
       <span class="note">
         Alle Zahlen auf dieser Seite sind gerechnet, nicht eingetragen.
@@ -71,7 +71,7 @@ import{a as e,i as t,n,o as r,r as i,s as a,t as o,w as s}from"./dist-BAVnPkDZ.j
       kostet nichts, und sie hält die gesamte Farbskala für die Semantik
       frei.
     </p>
-    ${h(p,a)}
+    ${h(p,i)}
     <p class="aside">
       Schwellen nach WCAG 2.1 AA, auf das die BITV 2.0 verweist:
       <strong>4,5:1</strong> für Text, <strong>3:1</strong> für
@@ -86,15 +86,15 @@ import{a as e,i as t,n,o as r,r as i,s as a,t as o,w as s}from"./dist-BAVnPkDZ.j
       der Lesbarkeit, wäre die Skala verkehrt herum gebaut — die wichtigste
       Stufe wäre die am schlechtesten sichtbare.
     </p>
-    ${h(m,a)}
+    ${h(m,i)}
     <div class="aside">
       <p>
         Zwei dieser Werte mussten sich ändern. Die alte Warnfarbe
         <code>#B7791F</code> lag bei
-        <strong>${d(t(`#B7791F`,i.bg))}:1</strong> und fiel
+        <strong>${d(n(`#B7791F`,a.bg))}:1</strong> und fiel
         als Text durch. Die alte dunkle Warnfarbe für „handeln“
         <code>#E06A5A</code> lag bei
-        <strong>${d(t(`#E06A5A`,n.card))}:1</strong> auf der
+        <strong>${d(n(`#E06A5A`,r.card))}:1</strong> auf der
         Karte und war damit der schwächste der drei.
       </p>
     </div>
@@ -108,7 +108,7 @@ import{a as e,i as t,n,o as r,r as i,s as a,t as o,w as s}from"./dist-BAVnPkDZ.j
       Kontraste ausgerechnet auf die schwersten Stufen. Unterschieden wird
       über den <em>Namen</em> der Stufe; die Farbe gruppiert nur.
     </p>
-    ${g(a)}
+    ${g(i)}
     <div class="aside">
       <p>
         Farbe bleibt damit ein Kanal von zweien. Der zweite ist heute der
@@ -132,16 +132,16 @@ import{a as e,i as t,n,o as r,r as i,s as a,t as o,w as s}from"./dist-BAVnPkDZ.j
         </div>
         <figcaption>
           Fläche mit <code>${o.onSurface}</code> darauf —
-          ${d(t(o.onSurface,o.surface))}:1
+          ${d(n(o.onSurface,o.surface))}:1
         </figcaption>
       </figure>
       <figure>
-        <div class="demo" style="background:${i.bg};color:${o.surface}">
+        <div class="demo" style="background:${a.bg};color:${o.surface}">
           So nicht
         </div>
         <figcaption>
-          Als Vordergrund auf <code>${i.bg}</code> —
-          ${d(t(o.surface,i.bg))}:1, unter der Schwelle
+          Als Vordergrund auf <code>${a.bg}</code> —
+          ${d(n(o.surface,a.bg))}:1, unter der Schwelle
           für Bedienelemente
         </figcaption>
       </figure>
@@ -149,8 +149,8 @@ import{a as e,i as t,n,o as r,r as i,s as a,t as o,w as s}from"./dist-BAVnPkDZ.j
     <div class="aside">
       <p>
         Auf dunklem Grund würde dasselbe Gelb die Kontrastschwelle übrigens
-        nehmen — ${d(t(o.surface,n.bg))}:1 auf
-        <code>${n.bg}</code>. Es bleibt trotzdem verboten, und daran
+        nehmen — ${d(n(o.surface,r.bg))}:1 auf
+        <code>${r.bg}</code>. Es bleibt trotzdem verboten, und daran
         zeigt sich, welches Argument hier wirklich trägt: Gelb bedeutet auf
         der Risikoskala bereits „erhöht“. Eine Schaltfläche in dieser Farbe
         sähe aus wie eine Warnung, in beiden Themes.
@@ -189,4 +189,4 @@ import{a as e,i as t,n,o as r,r as i,s as a,t as o,w as s}from"./dist-BAVnPkDZ.j
       Tokens und dieselbe Kontrastfunktion — sie kann nicht auseinanderlaufen.
     </p>
   </footer>
-</div>`}function v(){let e=(e,t)=>`${e}{${Object.entries(t).map(([e,t])=>`--${e.replace(/[A-Z]/g,e=>`-`+e.toLowerCase())}:${t};`).join(``)}}`;return e(`:root, :root[data-theme="light"]`,i)+e(`:root[data-theme="dark"]`,n)}var y=document.createElement(`style`);y.textContent=v(),document.head.append(y);var b=document.getElementById(`root`);function x(e){document.documentElement.dataset.theme=e,b.innerHTML=_(e),document.getElementById(`theme`).addEventListener(`click`,()=>{x(e===`dark`?`light`:`dark`)})}x(window.matchMedia?.(`(prefers-color-scheme: dark)`).matches?`dark`:`light`);
+</div>`}function v(){let e=(e,t)=>`${e}{${Object.entries(t).map(([e,t])=>`--${e.replace(/[A-Z]/g,e=>`-`+e.toLowerCase())}:${t};`).join(``)}}`;return e(`:root, :root[data-theme="light"]`,a)+e(`:root[data-theme="dark"]`,r)}var y=document.createElement(`style`);y.textContent=v(),document.head.append(y);var b=document.getElementById(`root`);function x(e){document.documentElement.dataset.theme=e,b.innerHTML=_(e),document.getElementById(`theme`).addEventListener(`click`,()=>{x(e===`dark`?`light`:`dark`)})}x(window.matchMedia?.(`(prefers-color-scheme: dark)`).matches?`dark`:`light`);
