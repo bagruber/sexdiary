@@ -274,7 +274,15 @@ const styles = StyleSheet.create({
  * content that people read in public, and it should not draw a stranger
  * eye more than it has to.
  */
-export function Fab({ label, onPress }: { label: string; onPress: () => void }) {
+export function Fab({
+  label,
+  onPress,
+  onLongPress,
+}: {
+  label: string;
+  onPress: () => void;
+  onLongPress?: () => void;
+}) {
   const { palette } = useApp();
   return (
     <Pressable
@@ -284,6 +292,13 @@ export function Fab({ label, onPress }: { label: string; onPress: () => void }) 
         tapMedium();
         onPress();
       }}
+      onLongPress={
+        onLongPress &&
+        (() => {
+          tapMedium();
+          onLongPress();
+        })
+      }
       style={{
         position: "absolute",
         right: 18,

@@ -18,7 +18,8 @@ import { AppProvider, useApp } from "./src/state/store";
 import { APP_NAME } from "./src/branding";
 import { tapMedium } from "./src/haptics";
 import { DashboardScreen } from "./src/screens/DashboardScreen";
-import { AddEncounter, LogScreen } from "./src/screens/LogScreen";
+import { LogScreen } from "./src/screens/LogScreen";
+import { AddSheet, type AddKind } from "./src/screens/AddSheets";
 import { SettingsScreen } from "./src/screens/SettingsScreen";
 import { LockScreen } from "./src/screens/LockScreen";
 import { DecoyScreen } from "./src/screens/DecoyScreen";
@@ -257,7 +258,8 @@ function Shell() {
   const { data, t, palette, isDark } = useApp();
   const [tab, setTab] = useState<Tab>("dashboard");
   const [decoy, setDecoy] = useState(false);
-  const [logging, setLogging] = useState(false);
+  const [adding, setAdding] = useState<AddKind | null>(null);
+  const [fan, setFan] = useState(false);
 
   // Android: FLAG_SECURE — no screenshots, no screen recording, and a
   // blank tile in the recents switcher. iOS: blocks screen recording.
@@ -336,14 +338,70 @@ function Shell() {
             {tab === "log" && <LogScreen />}
             {tab === "settings" && <SettingsScreen />}
             {tab !== "settings" && (
-              <Fab label={t("intercourse")} onPress={() => setLogging(true)} />
+              <>
+                {/*
+                  Ein Tipp gibt die Begegnung — der haeufigste Fall bleibt
+                  der schnellste. Langes Druecken oeffnet die uebrigen drei.
+                  Wer den Langdruck nicht kennt, kommt ueber die Leiste im
+                  Blatt selbst genauso hin; das ist Absicht.
+                */}
+                <Fab
+                  label={t("intercourse")}
+                  onPress={() => setAdding("intercourse")}
+                  onLongPress={() => setFan(true)}
+                />
+                {fan && (
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={t("cancel")}
+                    onPress={() => setFan(false)}
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      justifyContent: "flex-end",
+                      alignItems: "flex-end",
+                      paddingRight: 18,
+                      paddingBottom: 88,
+                      backgroundColor: "rgba(0,0,0,0.15)",
+                    }}
+                  >
+                    {(
+                      [
+                        ["test", t("testEntry")],
+                        ["contact", t("contact")],
+                        ["vaccination", t("vaccination")],
+                      ] as [AddKind, string][]
+                    ).map(([id, label]) => (
+                      <Pressable
+                        key={id}
+                        accessibilityRole="button"
+                        onPress={() => {
+                          setFan(false);
+                          setAdding(id);
+                        }}
+                        style={{
+                          backgroundColor: palette.card,
+                          borderColor: palette.border,
+                          borderWidth: 1,
+                          borderRadius: 10,
+                          paddingHorizontal: 16,
+                          paddingVertical: 12,
+                          marginBottom: 8,
+                        }}
+                      >
+                        <Text style={{ color: palette.text }}>{label}</Text>
+                      </Pressable>
+                    ))}
+                  </Pressable>
+                )}
+              </>
             )}
           </View>
           <TabBar tab={tab} setTab={setTab} />
           <Modal
-            visible={logging}
+            visible={adding !== null}
             animationType="slide"
-            onRequestClose={() => setLogging(false)}
+            onRequestClose={() => setAdding(null)}
           >
             <View
               style={{
@@ -353,7 +411,13 @@ function Shell() {
                 paddingTop: 48,
               }}
             >
-              <AddEncounter onClose={() => setLogging(false)} />
+              {adding && (
+                <AddSheet
+                  kind={adding}
+                  onKind={setAdding}
+                  onClose={() => setAdding(null)}
+                />
+              )}
             </View>
           </Modal>
         </>
