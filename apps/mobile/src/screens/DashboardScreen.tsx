@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Modal, Pressable, ScrollView, Text, View } from "react-native";
 import {
   calcRisk,
   formatDate,
+  getAlerts,
   nextAction,
   plurals,
   riskColor,
@@ -12,7 +13,8 @@ import {
   type RiskData,
 } from "@sexdiary/core";
 import { useApp } from "../state/store";
-import { Card, Meter, Screen, SectionTitle, Title } from "../ui";
+import { Card, Meter, Row, Screen, SectionTitle, Title } from "../ui";
+import { AlertsScreen } from "./AlertsScreen";
 import { ExplainSheet } from "./ExplainSheet";
 
 /**
@@ -202,6 +204,7 @@ function RiskRow({
 export function DashboardScreen() {
   const { data, t, palette } = useApp();
   const [explain, setExplain] = useState<string | null>(null);
+  const [alerts, setAlerts] = useState(false);
 
   const report = useMemo(
     () =>
@@ -236,12 +239,28 @@ export function DashboardScreen() {
 
   const entries = Object.entries(report.risks);
 
+  // Steht nur da, wenn es etwas zu tun gibt. Ein Dauereintrag "niemanden
+  // zu benachrichtigen" waere eine Zeile, die man lesen lernt zu
+  // ueberspringen — und genau dann uebersieht, wenn sie zaehlt.
+  const alertGroups = useMemo(
+    () => getAlerts(data.tests, data.intercourse, data.contacts),
+    [data.tests, data.intercourse, data.contacts],
+  );
+
   return (
     <Screen>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Title>{t("dashboard")}</Title>
 
         <NextActionCard action={action} color={actionColor} />
+
+        {alertGroups.length > 0 && (
+          <Row
+            label={t("partnerAlerts")}
+            sub={t("partnerAlertsSub")}
+            onPress={() => setAlerts(true)}
+          />
+        )}
 
         <SectionTitle>{t("lastTest")}</SectionTitle>
         <Card>
@@ -292,6 +311,16 @@ export function DashboardScreen() {
           onClose={() => setExplain(null)}
         />
       )}
+
+      <Modal
+        visible={alerts}
+        animationType="slide"
+        onRequestClose={() => setAlerts(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: palette.bg }}>
+          <AlertsScreen onClose={() => setAlerts(false)} />
+        </View>
+      </Modal>
     </Screen>
   );
 }
