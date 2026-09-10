@@ -307,7 +307,13 @@ function AddTest({ onClose }: { onClose: () => void }) {
   );
 }
 
-function AddContact({ onClose }: { onClose: () => void }) {
+function AddContact({
+  onClose,
+  onQr,
+}: {
+  onClose: () => void;
+  onQr?: () => void;
+}) {
   const { dispatch, t, palette } = useApp();
   const [name, setName] = useState("");
   const [notes, setNotes] = useState("");
@@ -341,6 +347,13 @@ function AddContact({ onClose }: { onClose: () => void }) {
   return (
     <ScrollView keyboardShouldPersistTaps="handled">
       <Title>{t("contact")}</Title>
+
+      {/*
+        Steht vor den Feldern, weil Scannen hier fast immer der bessere
+        Weg ist: es bringt den Token gleich mit, und ohne den laesst sich
+        diese Person spaeter nicht anonym benachrichtigen.
+      */}
+      {onQr && <GhostButton label={t("addViaQR")} onPress={onQr} />}
 
       <Text style={{ color: palette.sub, fontSize: 13, marginBottom: 6 }}>
         {t("name")}
@@ -512,7 +525,7 @@ export function AddSheet({
 
       {kind === "intercourse" && <AddEncounter onClose={onClose} />}
       {kind === "test" && <AddTest onClose={onClose} />}
-      {kind === "contact" && <AddContact onClose={onClose} />}
+      {kind === "contact" && <AddContact onClose={onClose} onQr={onQr} />}
       {kind === "vaccination" && <AddVaccination onClose={onClose} />}
     </View>
   );

@@ -15,6 +15,7 @@ import { APP_NAME } from "../branding";
 import { Card, Chip, PrimaryButton, Row, Screen, SectionTitle, Title } from "../ui";
 import { DataScreen } from "./DataScreen";
 import { BackupSheet } from "./BackupSheet";
+import { ListsScreen } from "./ListsScreen";
 import { authenticate, lockAvailability, type LockAvailability } from "../lib/app-lock";
 import {
   cancelReminders,
@@ -34,6 +35,7 @@ export function SettingsScreen() {
   const [showData, setShowData] = useState(false);
   const [backup, setBackup] = useState<"export" | "import" | null>(null);
   const [condOpen, setCondOpen] = useState(false);
+  const [lists, setLists] = useState(false);
 
   const { profile } = data;
   const updProfile = (patch: Partial<typeof profile>) =>
@@ -390,6 +392,11 @@ export function SettingsScreen() {
 
         <SectionTitle>{t("data")}</SectionTitle>
         <Row
+          label={t("manageData")}
+          sub={t("manageDataSub")}
+          onPress={() => setLists(true)}
+        />
+        <Row
           label={t("yourData")}
           sub={t("yourDataSub")}
           onPress={() => setShowData(true)}
@@ -416,6 +423,15 @@ export function SettingsScreen() {
       </ScrollView>
 
       {showData && <DataScreen onClose={() => setShowData(false)} />}
+      <Modal
+        visible={lists}
+        animationType="slide"
+        onRequestClose={() => setLists(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: palette.bg }}>
+          <ListsScreen onClose={() => setLists(false)} />
+        </View>
+      </Modal>
       <Modal
         visible={condOpen}
         animationType="slide"
