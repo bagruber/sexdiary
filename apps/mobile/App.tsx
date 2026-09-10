@@ -16,12 +16,13 @@ import { LogScreen } from "./src/screens/LogScreen";
 import { AddSheet, type AddKind } from "./src/screens/AddSheets";
 import { ConnectScreen } from "./src/screens/ConnectScreen";
 import { SettingsScreen } from "./src/screens/SettingsScreen";
+import { AlertsScreen } from "./src/screens/AlertsScreen";
 import { LockScreen } from "./src/screens/LockScreen";
 import { DecoyScreen } from "./src/screens/DecoyScreen";
 import {
   Card,
   Chip,
-  Fab,
+  FabPair,
   GLYPH,
   GhostButton,
   PrimaryButton,
@@ -30,7 +31,7 @@ import {
   Title,
 } from "./src/ui";
 
-type Tab = "dashboard" | "log" | "settings";
+type Tab = "dashboard" | "log" | "alerts";
 
 function Onboarding() {
   const { data, dispatch, t, palette } = useApp();
@@ -163,14 +164,21 @@ function Onboarding() {
 }
 
 /**
- * App-Name, der Tokentausch, und im Tarnmodus der Griff auf den
+ * App-Name, die Einstellungen, und im Tarnmodus der Griff auf den
  * harmlosen Bildschirm.
  *
- * Der QR-Knopf steht hier fest, weil der Tausch im Moment passiert und
- * nicht danach: erst ein Eingabeblatt oeffnen zu muessen waere ein
- * Umweg an genau der Stelle, an der jemand daneben wartet.
+ * Die Einstellungen sitzen hier statt auf einem Reiter: sie werden
+ * selten gebraucht, und ein Drittel der Grundflaeche dafuer zu vergeben
+ * waere genau die Gleichbehandlung ungleicher Aufgaben, die ADR-0014 am
+ * alten Vierfach-Aufbau kritisiert.
  */
-function TopBar({ onHide, onQr }: { onHide: () => void; onQr: () => void }) {
+function TopBar({
+  onHide,
+  onSettings,
+}: {
+  onHide: () => void;
+  onSettings: () => void;
+}) {
   const { data, t, palette } = useApp();
   const name = data.prefs.disguise ? t("neutralAppName") : APP_NAME;
 
@@ -190,28 +198,30 @@ function TopBar({ onHide, onQr }: { onHide: () => void; onQr: () => void }) {
       <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={t("shareTitle")}
+          accessibilityLabel={t("settings")}
           onPress={() => {
             tapMedium();
-            onQr();
+            onSettings();
           }}
           hitSlop={12}
         >
-          <Text style={{ color: palette.sub, fontSize: 13 }}>{t("qrShort")}</Text>
+          <Text style={{ color: palette.sub, fontSize: 17 }}>⚙</Text>
         </Pressable>
-      {data.prefs.disguise && (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t("hideNow")}
-          onPress={() => {
-            tapMedium();
-            onHide();
-          }}
-          hitSlop={12}
-        >
-          <Text style={{ color: palette.sub, fontSize: 13 }}>{t("hideNow")}</Text>
-        </Pressable>
-      )}
+        {data.prefs.disguise && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t("hideNow")}
+            onPress={() => {
+              tapMedium();
+              onHide();
+            }}
+            hitSlop={12}
+          >
+            <Text style={{ color: palette.sub, fontSize: 13 }}>
+              {t("hideNow")}
+            </Text>
+          </Pressable>
+        )}
       </View>
     </View>
   );
@@ -245,7 +255,7 @@ function TabBar({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
   const tabs: { id: Tab; label: string }[] = [
     { id: "dashboard", label: t("dashboard") },
     { id: "log", label: t("calendar") },
-    { id: "settings", label: t("settings") },
+    { id: "alerts", label: t("partnerAlerts") },
   ];
   return (
     <View
@@ -286,6 +296,7 @@ function Shell() {
   const [adding, setAdding] = useState<AddKind | null>(null);
   const [fan, setFan] = useState(false);
   const [connect, setConnect] = useState(false);
+  const [settings, setSettings] = useState(false);
 
   // Android: FLAG_SECURE — no screenshots, no screen recording, and a
   // blank tile in the recents switcher. iOS: blocks screen recording.
@@ -358,12 +369,12 @@ function Shell() {
         <Onboarding />
       ) : (
         <>
-          <TopBar onHide={() => setDecoy(true)} onQr={() => setConnect(true)} />
+          <TopBar onHide={() => setDecoy(true)} onSettings={() => setSettings(true)} />
           <View style={{ flex: 1 }}>
             {tab === "dashboard" && <DashboardScreen />}
             {tab === "log" && <LogScreen />}
-            {tab === "settings" && <SettingsScreen />}
-            {tab !== "settings" && (
+            {tab === "alerts" && <AlertsScreen />}
+            {(
               <>
                 {/*
                   Ein Tipp gibt die Begegnung — der haeufigste Fall bleibt
@@ -371,10 +382,12 @@ function Shell() {
                   Wer den Langdruck nicht kennt, kommt ueber die Leiste im
                   Blatt selbst genauso hin; das ist Absicht.
                 */}
-                <Fab
-                  label={t("intercourse")}
-                  onPress={() => setAdding("intercourse")}
-                  onLongPress={() => setFan(true)}
+                <FabPair
+                  addLabel={t("intercourse")}
+                  qrLabel={t("shareTitle")}
+                  onAdd={() => setAdding("intercourse")}
+                  onAddLong={() => setFan(true)}
+                  onQr={() => setConnect(true)}
                 />
                 {fan && (
                   <Pressable
@@ -385,9 +398,8 @@ function Shell() {
                       position: "absolute",
                       inset: 0,
                       justifyContent: "flex-end",
-                      alignItems: "flex-end",
-                      paddingRight: 18,
-                      paddingBottom: 88,
+                      alignItems: "center",
+                      paddingBottom: 92,
                       backgroundColor: "rgba(0,0,0,0.15)",
                     }}
                   >
@@ -457,6 +469,16 @@ function Shell() {
                   }}
                 />
               )}
+            </View>
+          </Modal>
+          <Modal
+            visible={settings}
+            animationType="slide"
+            onRequestClose={() => setSettings(false)}
+          >
+            <View style={{ flex: 1, backgroundColor: palette.bg }}>
+              <SettingsScreen />
+              <GhostButton label={t("back")} onPress={() => setSettings(false)} />
             </View>
           </Modal>
           <Modal

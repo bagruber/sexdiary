@@ -17,11 +17,34 @@
  */
 import { useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
-import { formatDate, getAlerts, gid, today, type SentAlert } from "@sexdiary/core";
+import {
+  formatDate,
+  getAlerts,
+  gid,
+  today,
+  type Contact,
+  type SentAlert,
+} from "@sexdiary/core";
 import { useApp } from "../state/store";
-import { Card, GhostButton, PrimaryButton, Screen, SectionTitle, Text, Title} from "../ui";
+import {
+  Card,
+  GhostButton,
+  PrimaryButton,
+  Row,
+  Screen,
+  SectionTitle,
+  Text,
+  Title,
+} from "../ui";
 
-export function AlertsScreen({ onClose }: { onClose: () => void }) {
+export function AlertsScreen({
+  onClose,
+  onEditContact,
+}: {
+  /** Fehlt, wenn der Schirm als Reiter steht statt als Blatt. */
+  onClose?: () => void;
+  onEditContact?: (c: Contact) => void;
+}) {
   const { data, dispatch, t, palette } = useApp();
   const [showPayload, setShowPayload] = useState<string | null>(null);
 
@@ -169,8 +192,33 @@ export function AlertsScreen({ onClose }: { onClose: () => void }) {
           </View>
         ))}
 
-        <GhostButton label={t("back")} onPress={onClose} />
-        <View style={{ height: 32 }} />
+        {/*
+          Kontakte stehen hier, weil man Kontakte benachrichtigt. Sie an
+          einen eigenen Ort zu legen hiesse, im Ernstfall zwischen zwei
+          Bildschirmen zu wechseln.
+        */}
+        <SectionTitle>{t("contactsHeading")}</SectionTitle>
+        {data.contacts.length === 0 ? (
+          <Card>
+            <Text style={{ color: palette.sub }}>{t("noContacts")}</Text>
+          </Card>
+        ) : (
+          data.contacts.map((c) => (
+            <Row
+              key={c.id}
+              label={c.name}
+              sub={
+                Object.entries(c.cx)
+                  .map(([pf, h]) => `${pf}: ${h}`)
+                  .join(" · ") || t("shareTokenOnly")
+              }
+              onPress={onEditContact ? () => onEditContact(c) : undefined}
+            />
+          ))
+        )}
+
+        {onClose && <GhostButton label={t("back")} onPress={onClose} />}
+        <View style={{ height: 96 }} />
       </ScrollView>
     </Screen>
   );

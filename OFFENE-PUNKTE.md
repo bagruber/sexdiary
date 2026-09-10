@@ -94,13 +94,26 @@ Nur nativ, im Web bewusst nicht moeglich: App-Sperre, Bildschirmschutz,
 Tarnmodus, lokale Erinnerungen, verschluesselte Sicherung.
 
 
-## Aufteilung der App ist noch nicht entschieden
+## Aufteilung entschieden
 
-Heute drei Reiter (Heute, Verlauf, Einstellungen) und eine Plus-Taste fuer
-Begegnungen. Offen ist, ob das die richtige Verteilung ist: Einstellungen
-werden selten gebraucht und belegen einen von drei Plaetzen, waehrend die
-Benachrichtigung — laut Konzeptvorstellung eine der beiden Kernfunktionen —
-gar keinen hat. Vorschlaege stehen zur Entscheidung an.
+Seit dem 10.09.2026: **Heute · Kalender · Melden**, dazu zwei Aktionen mittig
+über der Leiste — Plus für die Begegnung (langes Drücken fächert die übrigen
+drei auf) und QR daneben.
+
+Einstellungen, Profil, Sicherung und Datenansicht liegen hinter dem Zahnrad in
+der Kopfzeile. Sie werden selten gebraucht; ein Drittel der Grundfläche dafür
+wäre die Gleichbehandlung ungleicher Aufgaben, die ADR-0014 am alten
+Vierfach-Aufbau kritisiert.
+
+„Melden“ trägt Benachrichtigung **und** Kontakte, weil man Kontakte
+benachrichtigt — sie an getrennte Orte zu legen hiesse, im Ernstfall zwischen
+zwei Bildschirmen zu wechseln.
+
+Ein Einwand bleibt stehen, den ich beim Entscheiden vorgebracht habe: zwei
+gleich grosse runde Ziele nebeneinander werden leichter verwechselt als zwei an
+verschiedenen Orten, und hier legt das eine einen Eintrag an, während das
+andere die Kamera öffnet. Abgemildert durch verschiedene Gestalt — das Plus
+gefüllt, der QR umrandet. Ob das reicht, zeigt der Gebrauch.
 
 
 ## Die App laeuft, und was dabei auffiel

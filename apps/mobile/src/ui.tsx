@@ -353,28 +353,40 @@ const styles = StyleSheet.create({
 });
 
 /**
- * The one action ADR-0014 asks to be reachable at all times.
+ * Die beiden Aktionen, die von jeder Seite aus erreichbar sein muessen.
  *
- * Deliberately a single action, not a menu that fans out: "I had sex"
- * and "am I okay" are together most of why the app is opened, while a
- * vaccination is entered a handful of times ever. Giving all four the
- * same tap target would treat a skewed distribution as a flat one.
+ * Mittig ueber der Reiterleiste, weil beide unter Zeitdruck getroffen
+ * werden. Eine Begegnung traegt man zwar in Ruhe nach; der Tokentausch
+ * passiert im Moment, mit jemandem daneben, und ADR-0014 verlangt fuer
+ * die Begegnung ohnehin einen staendig erreichbaren Platz.
  *
- * Plain circle, plain plus. No colour coding, no glow — it sits over
- * content that people read in public, and it should not draw a stranger
- * eye more than it has to.
+ * Bewusst keine Zwillinge: das Plus ist gefuellt, der QR umrandet. Zwei
+ * gleich aussehende Ziele nebeneinander werden verwechselt, und hier
+ * legt das eine einen Eintrag an, waehrend das andere die Kamera
+ * oeffnet.
  */
-export function Fab({
-  label,
-  onPress,
-  onLongPress,
+export function FabPair({
+  onAdd,
+  onAddLong,
+  onQr,
+  addLabel,
+  qrLabel,
 }: {
-  label: string;
-  onPress: () => void;
-  onLongPress?: () => void;
+  onAdd: () => void;
+  onAddLong?: () => void;
+  onQr: () => void;
+  addLabel: string;
+  qrLabel: string;
 }) {
   const { palette } = useApp();
-  return (
+
+  const knopf = (
+    label: string,
+    zeichen: string,
+    gefuellt: boolean,
+    onPress: () => void,
+    onLongPress?: () => void,
+  ) => (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
@@ -390,28 +402,45 @@ export function Fab({
         })
       }
       style={{
-        position: "absolute",
-        right: 18,
-        bottom: 18,
-        width: 56,
-        height: 56,
-        borderRadius: 28,
-        backgroundColor: palette.accent,
+        width: 58,
+        height: 58,
+        borderRadius: 29,
         alignItems: "center",
         justifyContent: "center",
+        backgroundColor: gefuellt ? palette.accent : palette.card,
+        borderWidth: gefuellt ? 0 : 1,
+        borderColor: palette.border,
         elevation: 3,
       }}
     >
       <Text
         style={{
-          color: palette.accentText,
-          fontSize: 30,
-          lineHeight: 34,
+          color: gefuellt ? palette.accentText : palette.text,
+          fontSize: gefuellt ? 28 : 22,
+          lineHeight: gefuellt ? 32 : 26,
           fontWeight: "300",
         }}
       >
-        +
+        {zeichen}
       </Text>
     </Pressable>
+  );
+
+  return (
+    <View
+      pointerEvents="box-none"
+      style={{
+        position: "absolute",
+        left: 0,
+        right: 0,
+        bottom: 14,
+        flexDirection: "row",
+        justifyContent: "center",
+        gap: 22,
+      }}
+    >
+      {knopf(addLabel, "+", true, onAdd, onAddLong)}
+      {knopf(qrLabel, GLYPH.qr, false, onQr)}
+    </View>
   );
 }
