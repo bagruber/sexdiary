@@ -12,6 +12,7 @@ import {
   vaccineSeries,
   type RiskData,
 } from "@sexdiary/core";
+import { Icon } from "../icons";
 import { useApp } from "../state/store";
 import { Card, Meter, Row, Screen, SectionTitle, Text, Title} from "../ui";
 import { AlertsScreen } from "./AlertsScreen";
@@ -175,7 +176,9 @@ function RiskRow({
             <Text style={{ color, fontSize: 13, fontWeight: "600" }}>
               {status}
             </Text>
-            <Text style={{ color: palette.sub, marginLeft: 8 }}>›</Text>
+            <View style={{ marginLeft: 8 }}>
+              <Icon name="chevronRight" size={18} color={palette.sub} />
+            </View>
           </View>
         </View>
         {risk.exposed && (

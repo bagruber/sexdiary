@@ -19,11 +19,11 @@ import { SettingsScreen } from "./src/screens/SettingsScreen";
 import { AlertsScreen } from "./src/screens/AlertsScreen";
 import { LockScreen } from "./src/screens/LockScreen";
 import { DecoyScreen } from "./src/screens/DecoyScreen";
+import { Icon, type IconName } from "./src/icons";
 import {
   Card,
   Chip,
   FabPair,
-  GLYPH,
   GhostButton,
   PrimaryButton,
   Screen,
@@ -205,7 +205,7 @@ function TopBar({
           }}
           hitSlop={12}
         >
-          <Text style={{ color: palette.sub, fontSize: 17 }}>⚙</Text>
+          <Icon name="gear" size={20} color={palette.sub} />
         </Pressable>
         {data.prefs.disguise && (
           <Pressable
@@ -250,12 +250,20 @@ function Cover() {
   );
 }
 
+/**
+ * Drei Reiter, jeder mit Symbol und Wort.
+ *
+ * Das aktive Ziel steht in einer gefuellten Pille, nicht nur in
+ * Fettschrift: Schriftstaerke allein ist der schwaechste Marker, den es
+ * gibt — sie faellt weg, sobald jemand die Systemschrift vergroessert,
+ * und sie ist auf einem hellen Bildschirm im Freien kaum zu sehen.
+ */
 function TabBar({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
   const { t, palette } = useApp();
-  const tabs: { id: Tab; label: string }[] = [
-    { id: "dashboard", label: t("dashboard") },
-    { id: "log", label: t("calendar") },
-    { id: "alerts", label: t("partnerAlerts") },
+  const tabs: { id: Tab; label: string; icon: IconName }[] = [
+    { id: "dashboard", label: t("dashboard"), icon: "pulse" },
+    { id: "log", label: t("calendar"), icon: "calendar" },
+    { id: "alerts", label: t("partnerAlerts"), icon: "bell" },
   ];
   return (
     <View
@@ -264,27 +272,50 @@ function TabBar({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
         borderTopWidth: 1,
         borderTopColor: palette.border,
         backgroundColor: palette.card,
+        paddingVertical: 6,
       }}
     >
-      {tabs.map(({ id, label }) => (
-        <Pressable
-          key={id}
-          onPress={() => setTab(id)}
-          accessibilityRole="tab"
-          accessibilityState={{ selected: tab === id }}
-          style={{ flex: 1, alignItems: "center", paddingVertical: 12 }}
-        >
-          <Text
-            style={{
-              color: tab === id ? palette.text : palette.sub,
-              fontWeight: tab === id ? "700" : "400",
-              fontSize: 13,
+      {tabs.map(({ id, label, icon }) => {
+        const aktiv = tab === id;
+        return (
+          <Pressable
+            key={id}
+            onPress={() => {
+              tapMedium();
+              setTab(id);
             }}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: aktiv }}
+            style={{ flex: 1, alignItems: "center", paddingVertical: 4 }}
           >
-            {label}
-          </Text>
-        </Pressable>
-      ))}
+            <View
+              style={{
+                paddingHorizontal: 18,
+                paddingVertical: 4,
+                borderRadius: 999,
+                backgroundColor: aktiv ? palette.accent : "transparent",
+              }}
+            >
+              <Icon
+                name={icon}
+                size={21}
+                color={aktiv ? palette.accentText : palette.sub}
+              />
+            </View>
+            <Text
+              numberOfLines={1}
+              style={{
+                color: aktiv ? palette.text : palette.sub,
+                fontWeight: aktiv ? "700" : "400",
+                fontSize: 11,
+                marginTop: 3,
+              }}
+            >
+              {label}
+            </Text>
+          </Pressable>
+        );
+      })}
     </View>
   );
 }
@@ -294,7 +325,6 @@ function Shell() {
   const [tab, setTab] = useState<Tab>("dashboard");
   const [decoy, setDecoy] = useState(false);
   const [adding, setAdding] = useState<AddKind | null>(null);
-  const [fan, setFan] = useState(false);
   const [connect, setConnect] = useState(false);
   const [settings, setSettings] = useState(false);
 
@@ -374,75 +404,26 @@ function Shell() {
             {tab === "dashboard" && <DashboardScreen />}
             {tab === "log" && <LogScreen />}
             {tab === "alerts" && <AlertsScreen />}
-            {(
-              <>
-                {/*
-                  Ein Tipp gibt die Begegnung — der haeufigste Fall bleibt
-                  der schnellste. Langes Druecken oeffnet die uebrigen drei.
-                  Wer den Langdruck nicht kennt, kommt ueber die Leiste im
-                  Blatt selbst genauso hin; das ist Absicht.
-                */}
-                <FabPair
-                  addLabel={t("intercourse")}
-                  qrLabel={t("shareTitle")}
-                  onAdd={() => setAdding("intercourse")}
-                  onAddLong={() => setFan(true)}
-                  onQr={() => setConnect(true)}
-                />
-                {fan && (
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel={t("cancel")}
-                    onPress={() => setFan(false)}
-                    style={{
-                      position: "absolute",
-                      inset: 0,
-                      justifyContent: "flex-end",
-                      alignItems: "center",
-                      paddingBottom: 92,
-                      backgroundColor: "rgba(0,0,0,0.15)",
-                    }}
-                  >
-                    {/*
-                      Begegnung steht redundant im Faecher, obwohl ein
-                      kurzer Tipp sie schon gibt: wer lange drueckt, sucht
-                      eine Liste — und eine Liste, in der genau der
-                      haeufigste Fall fehlt, liest sich wie ein Fehler.
-                    */}
-                    {(
-                      [
-                        ["intercourse", t("intercourse"), GLYPH.intercourse],
-                        ["test", t("testEntry"), GLYPH.test],
-                        ["contact", t("contact"), GLYPH.contact],
-                        ["vaccination", t("vaccination"), GLYPH.vaccination],
-                      ] as [AddKind, string, string][]
-                    ).map(([id, label, icon]) => (
-                      <Pressable
-                        key={id}
-                        accessibilityRole="button"
-                        onPress={() => {
-                          setFan(false);
-                          setAdding(id);
-                        }}
-                        style={{
-                          backgroundColor: palette.card,
-                          borderColor: palette.border,
-                          borderWidth: 1,
-                          borderRadius: 10,
-                          paddingHorizontal: 16,
-                          paddingVertical: 12,
-                          marginBottom: 8,
-                        }}
-                      >
-                        <Text style={{ color: palette.text }}>
-                          {icon}  {label}
-                        </Text>
-                      </Pressable>
-                    ))}
-                  </Pressable>
-                )}
-              </>
-            )}
+            {/*
+              Ein Tipp gibt die Begegnung — der haeufigste Fall bleibt
+              der schnellste. Langes Druecken faechert die vier Arten
+              auf. Wer den Langdruck nicht kennt, kommt ueber die Leiste
+              im Blatt selbst genauso hin; das ist Absicht.
+            */}
+            <FabPair
+              addLabel={t("intercourse")}
+              qrLabel={t("shareTitle")}
+              closeLabel={t("cancel")}
+              kindLabels={{
+                intercourse: t("intercourse"),
+                test: t("testEntry"),
+                contact: t("contact"),
+                vaccination: t("vaccination"),
+              }}
+              onAdd={() => setAdding("intercourse")}
+              onPick={setAdding}
+              onQr={() => setConnect(true)}
+            />
           </View>
           <TabBar tab={tab} setTab={setTab} />
           <Modal

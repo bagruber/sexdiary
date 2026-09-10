@@ -36,7 +36,7 @@ import { AlertsScreen } from "./AlertsScreen";
 import {
   Card,
   Chip,
-  GLYPH,
+  KIND_ICON,
   GhostButton,
   PrimaryButton,
   SectionTitle,
@@ -555,7 +555,8 @@ function AddVaccination({
   );
 }
 
-export type AddKind = "intercourse" | "test" | "contact" | "vaccination";
+/** Deckungsgleich mit der Eintragsart des Kerns; kein zweites Vokabular. */
+export type AddKind = EntryType;
 
 /**
  * Ein bestehender Datensatz, der bearbeitet werden soll. Als Union statt
@@ -622,11 +623,11 @@ export function AddSheet({
   edit?: EditTarget;
 }) {
   const { t } = useApp();
-  const kinds: { id: AddKind; label: string; icon: string }[] = [
-    { id: "intercourse", label: t("intercourse"), icon: GLYPH.intercourse },
-    { id: "test", label: t("testEntry"), icon: GLYPH.test },
-    { id: "contact", label: t("contact"), icon: GLYPH.contact },
-    { id: "vaccination", label: t("vaccination"), icon: GLYPH.vaccination },
+  const kinds: { id: AddKind; label: string }[] = [
+    { id: "intercourse", label: t("intercourse") },
+    { id: "test", label: t("testEntry") },
+    { id: "contact", label: t("contact") },
+    { id: "vaccination", label: t("vaccination") },
   ];
 
   return (
@@ -645,13 +646,13 @@ export function AddSheet({
             <Chip
               key={k.id}
               label={k.label}
-              icon={k.icon}
+              icon={KIND_ICON[k.id]}
               active={kind === k.id}
               onPress={() => onKind(k.id)}
             />
           ))}
         {!edit && onQr && (
-          <Chip label={t("qrShort")} icon={GLYPH.qr} active={false} onPress={onQr} />
+          <Chip label={t("qrShort")} icon="qr" active={false} onPress={onQr} />
         )}
       </ScrollView>
 

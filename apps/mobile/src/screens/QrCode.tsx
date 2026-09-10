@@ -1,18 +1,21 @@
 /**
- * QR-Anzeige ohne react-native-svg.
+ * QR-Anzeige als ein einziger Pfad.
  *
- * `qrcode` liefert die Modulmatrix als reines JavaScript; gezeichnet wird
- * sie hier aus gewoehnlichen Views. Das spart zwei Abhaengigkeiten —
- * react-native-svg und einen Wrapper darum — fuer eine Flaeche, die aus
- * Quadraten besteht.
+ * `qrcode` liefert die Modulmatrix als reines JavaScript. Gezeichnet wurde
+ * sie frueher aus gewoehnlichen Views — ein Rechteck je zusammenhaengendem
+ * dunklen Lauf, bei einem Handle-QR 447 Stueck. Das stand als Verdacht auf
+ * Ruckeln in `OFFENE-PUNKTE.md`.
  *
- * Zusammenhaengende dunkle Module werden zu einem Rechteck
- * zusammengefasst. Ohne das waeren es je nach Datenmenge vierhundert bis
- * tausend Views; mit Zusammenfassung sind es typischerweise unter
- * zweihundert.
+ * Seit ADR-0016 traegt die App ohnehin `react-native-svg` fuer den
+ * Symbolsatz. Damit werden aus den 447 Views 447 Teilstrecken *eines*
+ * Pfades, und die Zeichenlast faellt auf ein Element.
+ *
+ * Die Zusammenfassung der Laeufe bleibt: sie kuerzt jetzt die
+ * Pfadbeschreibung statt der Anzahl Views.
  */
 import { useMemo } from "react";
 import { View } from "react-native";
+import Svg, { Path } from "react-native-svg";
 import QRCode from "qrcode";
 import { useApp } from "../state/store";
 
@@ -59,6 +62,19 @@ export function QrCode({ value, size = 240 }: { value: string; size?: number }) 
   const side = cell * (qr.modules + QUIET * 2);
   const offset = cell * QUIET;
 
+  // Ein Rechteck je Lauf, alle in derselben Pfadbeschreibung.
+  const d = useMemo(
+    () =>
+      qr.runs
+        .map((r) => {
+          const x = offset + r.from * cell;
+          const y = offset + r.row * cell;
+          return `M${x} ${y}h${r.len * cell}v${cell}h-${r.len * cell}z`;
+        })
+        .join(""),
+    [qr.runs, cell, offset],
+  );
+
   return (
     <View
       accessibilityRole="image"
@@ -72,22 +88,14 @@ export function QrCode({ value, size = 240 }: { value: string; size?: number }) 
         borderColor: palette.border,
       }}
     >
-      {qr.runs.map((r) => (
-        <View
-          key={`${r.row}-${r.from}`}
-          style={{
-            position: "absolute",
-            left: offset + r.from * cell,
-            top: offset + r.row * cell,
-            width: r.len * cell,
-            height: cell,
-            // Immer schwarz auf weiss, unabhaengig vom Thema: ein QR im
-            // Dunkelmodus mit invertierten Farben wird von vielen
-            // Kameras nicht erkannt.
-            backgroundColor: "#000000",
-          }}
-        />
-      ))}
+      <Svg width={side} height={side}>
+        {/*
+          Immer schwarz auf weiss, unabhaengig vom Thema: ein QR im
+          Dunkelmodus mit invertierten Farben wird von vielen Kameras
+          nicht erkannt.
+        */}
+        <Path d={d} fill="#000000" />
+      </Svg>
     </View>
   );
 }

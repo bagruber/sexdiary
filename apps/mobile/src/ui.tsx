@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import {
   Pressable,
   StyleSheet,
@@ -9,6 +9,8 @@ import {
   type TextStyle,
   type ViewStyle,
 } from "react-native";
+import { categoryScale, type EntryType } from "@sexdiary/core";
+import { Icon, type IconName } from "./icons";
 import { useApp } from "./state/store";
 import { tapLight, tapMedium } from "./haptics";
 
@@ -95,8 +97,8 @@ export function Chip({
   label: string;
   active: boolean;
   onPress: () => void;
-  /** Ein kurzes Zeichen vor der Beschriftung. Siehe `GLYPH` unten. */
-  icon?: string;
+  /** Symbol vor der Beschriftung. */
+  icon?: IconName;
 }) {
   const { palette } = useApp();
   return (
@@ -116,14 +118,11 @@ export function Chip({
       ]}
     >
       {icon && (
-        <Text
-          style={{
-            color: active ? palette.accentText : palette.sub,
-            fontSize: 13,
-          }}
-        >
-          {icon}
-        </Text>
+        <Icon
+          name={icon}
+          size={15}
+          color={active ? palette.accentText : palette.sub}
+        />
       )}
       <Text
         numberOfLines={1}
@@ -136,23 +135,15 @@ export function Chip({
 }
 
 /**
- * Zeichen fuer die vier Eintragsarten.
- *
- * Bewusst Text statt einer Icon-Bibliothek: @expo/vector-icons ist hier
- * nicht installiert, und ein Schriftpaket von ueber einem Megabyte fuer
- * vier Symbole waere ein schlechter Tausch — zumal die App ohnehin schon
- * drei Drittanbieter-Pakete mit nativem Code traegt.
- *
- * Und bewusst keine Farbcodierung: ADR-0015 haelt Gruen, Gelb und Rot
- * fuer die Risikoskala frei. Zwei Bedeutungen auf derselben Farbe waeren
- * auf einem Bildschirm, der beides zeigt, schlechter als gar keine.
+ * Symbol je Eintragsart. Eine Stelle, damit Faecher, Blattleiste und
+ * Kalender dasselbe Zeichen zeigen — vier Listen, die auseinanderlaufen
+ * koennen, waren vorher genau ein Fehler zu viel.
  */
-export const GLYPH = {
-  intercourse: "♥",
-  test: "✓",
-  contact: "☺",
-  vaccination: "✚",
-  qr: "▣",
+export const KIND_ICON: Record<EntryType, IconName> = {
+  intercourse: "heart",
+  test: "droplet",
+  contact: "user",
+  vaccination: "shield",
 } as const;
 
 /** Horizontal progress meter with an accessible value. */
@@ -223,7 +214,10 @@ export function Row({
           </Text>
         ) : null}
       </View>
-      {right ?? (onPress ? <Text style={{ color: palette.sub }}>›</Text> : null)}
+      {right ??
+        (onPress ? (
+          <Icon name="chevronRight" size={18} color={palette.sub} />
+        ) : null)}
     </View>
   );
   if (!onPress) return <Card>{body}</Card>;
@@ -355,92 +349,188 @@ const styles = StyleSheet.create({
 /**
  * Die beiden Aktionen, die von jeder Seite aus erreichbar sein muessen.
  *
- * Mittig ueber der Reiterleiste, weil beide unter Zeitdruck getroffen
- * werden. Eine Begegnung traegt man zwar in Ruhe nach; der Tokentausch
- * passiert im Moment, mit jemandem daneben, und ADR-0014 verlangt fuer
- * die Begegnung ohnehin einen staendig erreichbaren Platz.
+ * Uebereinander am rechten Rand statt nebeneinander in der Mitte. Zwei
+ * gleich grosse Kreise nebeneinander werden verwechselt — das war beim
+ * alten Aufbau notiert und ist der Grund fuer den Umbau. Hier
+ * unterscheiden sich Ort, Groesse und Fuellung: das Plus oben, gross und
+ * gefuellt, weil daraus der Faecher aufgeht; der QR darunter, kleiner
+ * und umrandet.
  *
- * Bewusst keine Zwillinge: das Plus ist gefuellt, der QR umrandet. Zwei
- * gleich aussehende Ziele nebeneinander werden verwechselt, und hier
- * legt das eine einen Eintrag an, waehrend das andere die Kamera
- * oeffnet.
+ * Der Faecher laeuft auf einem Viertelkreis nach links und oben, also in
+ * den freien Bildschirm hinein und nicht ueber den Daumen. Ein
+ * Drittelkreis, wie zuerst ueberlegt, schoebe den letzten Knopf rechts
+ * am Plus vorbei ueber den Rand.
+ *
+ * Farbe tragen nur die Faecherknoepfe, und nur hier: siehe
+ * `CATEGORY_LIGHT` in `@sexdiary/core`, wo steht, warum das die
+ * Risikoskala nicht antastet.
  */
+
+/** Rechter Abstand und Fusshoehe der ganzen Gruppe. */
+const FAB_EDGE = 16;
+const FAB_BOTTOM = 14;
+const ADD_SIZE = 58;
+const QR_SIZE = 46;
+const FAN_SIZE = 46;
+/** Abstand zwischen Plus und QR. */
+const FAB_GAP = 12;
+/** Radius des Viertelkreises, gemessen von der Mitte des Plus. */
+const FAN_RADIUS = 104;
+/** Breite eines Faechereintrags samt Beschriftung, und deren Hoehe. */
+const FAN_ITEM_W = 72;
+const FAN_LABEL_H = 18;
+
+/** Mitte des Plus-Knopfes, gemessen von der rechten unteren Ecke. */
+const ADD_CX = FAB_EDGE + QR_SIZE / 2;
+const ADD_CY = FAB_BOTTOM + QR_SIZE + FAB_GAP + ADD_SIZE / 2;
+
+/** Vier Winkel von 0 (links) bis 90 (oben). */
+const FAN_ORDER: EntryType[] = ["intercourse", "test", "contact", "vaccination"];
+
 export function FabPair({
   onAdd,
-  onAddLong,
+  onPick,
   onQr,
   addLabel,
   qrLabel,
+  closeLabel,
+  kindLabels,
 }: {
+  /** Kurzer Tipp: der haeufigste Fall, ohne Umweg ueber den Faecher. */
   onAdd: () => void;
-  onAddLong?: () => void;
+  /** Aus dem Faecher gewaehlt. */
+  onPick: (kind: EntryType) => void;
   onQr: () => void;
   addLabel: string;
   qrLabel: string;
+  /** Beschriftung der Flaeche, die den Faecher wieder schliesst. */
+  closeLabel: string;
+  kindLabels: Record<EntryType, string>;
 }) {
-  const { palette } = useApp();
-
-  const knopf = (
-    label: string,
-    zeichen: string,
-    gefuellt: boolean,
-    onPress: () => void,
-    onLongPress?: () => void,
-  ) => (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      onPress={() => {
-        tapMedium();
-        onPress();
-      }}
-      onLongPress={
-        onLongPress &&
-        (() => {
-          tapMedium();
-          onLongPress();
-        })
-      }
-      style={{
-        width: 58,
-        height: 58,
-        borderRadius: 29,
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: gefuellt ? palette.accent : palette.card,
-        borderWidth: gefuellt ? 0 : 1,
-        borderColor: palette.border,
-        elevation: 3,
-      }}
-    >
-      <Text
-        style={{
-          color: gefuellt ? palette.accentText : palette.text,
-          fontSize: gefuellt ? 28 : 22,
-          lineHeight: gefuellt ? 32 : 26,
-          fontWeight: "300",
-        }}
-      >
-        {zeichen}
-      </Text>
-    </Pressable>
-  );
+  const { palette, isDark } = useApp();
+  const [fan, setFan] = useState(false);
+  const cat = categoryScale(isDark ? "dark" : "light");
 
   return (
-    <View
-      pointerEvents="box-none"
-      style={{
-        position: "absolute",
-        left: 0,
-        right: 0,
-        bottom: 14,
-        flexDirection: "row",
-        justifyContent: "center",
-        gap: 22,
-      }}
-    >
-      {knopf(addLabel, "+", true, onAdd, onAddLong)}
-      {knopf(qrLabel, GLYPH.qr, false, onQr)}
+    <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
+      {fan && (
+        <Pressable
+          accessibilityLabel={closeLabel}
+          accessibilityRole="button"
+          onPress={() => setFan(false)}
+          style={[StyleSheet.absoluteFill, { backgroundColor: "rgba(0,0,0,0.35)" }]}
+        />
+      )}
+
+      {fan &&
+        FAN_ORDER.map((kind, i) => {
+          // 0 Grad ist links, 90 ist oben. Drei Schritte zu 30 Grad.
+          const phi = ((i * 30) * Math.PI) / 180;
+          const cx = ADD_CX + FAN_RADIUS * Math.cos(phi);
+          const cy = ADD_CY + FAN_RADIUS * Math.sin(phi);
+          return (
+            <Pressable
+              key={kind}
+              accessibilityRole="button"
+              accessibilityLabel={kindLabels[kind]}
+              onPress={() => {
+                tapMedium();
+                setFan(false);
+                onPick(kind);
+              }}
+              style={{
+                position: "absolute",
+                right: cx - FAN_ITEM_W / 2,
+                bottom: cy - FAN_SIZE / 2 - FAN_LABEL_H,
+                width: FAN_ITEM_W,
+                alignItems: "center",
+              }}
+            >
+              <View
+                style={{
+                  width: FAN_SIZE,
+                  height: FAN_SIZE,
+                  borderRadius: FAN_SIZE / 2,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: cat.fill[kind],
+                  elevation: 4,
+                }}
+              >
+                <Icon name={KIND_ICON[kind]} size={22} color={cat.on} />
+              </View>
+              <Text
+                numberOfLines={1}
+                style={{
+                  color: palette.text,
+                  fontSize: 11,
+                  marginTop: 4,
+                  height: FAN_LABEL_H - 4,
+                }}
+              >
+                {kindLabels[kind]}
+              </Text>
+            </Pressable>
+          );
+        })}
+
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={qrLabel}
+        onPress={() => {
+          tapMedium();
+          setFan(false);
+          onQr();
+        }}
+        style={{
+          position: "absolute",
+          right: FAB_EDGE,
+          bottom: FAB_BOTTOM,
+          width: QR_SIZE,
+          height: QR_SIZE,
+          borderRadius: QR_SIZE / 2,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: palette.card,
+          borderWidth: 1,
+          borderColor: palette.border,
+          elevation: 3,
+        }}
+      >
+        <Icon name="qr" size={22} color={palette.text} />
+      </Pressable>
+
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={addLabel}
+        accessibilityState={{ expanded: fan }}
+        onPress={() => {
+          tapMedium();
+          // Offen heisst: der Faecher ist die Frage, nicht der Eintrag.
+          // Ein zweiter Tipp schliesst ihn, statt hinter ihm etwas
+          // anzulegen.
+          if (fan) setFan(false);
+          else onAdd();
+        }}
+        onLongPress={() => {
+          tapMedium();
+          setFan(true);
+        }}
+        style={{
+          position: "absolute",
+          right: FAB_EDGE + (QR_SIZE - ADD_SIZE) / 2,
+          bottom: FAB_BOTTOM + QR_SIZE + FAB_GAP,
+          width: ADD_SIZE,
+          height: ADD_SIZE,
+          borderRadius: ADD_SIZE / 2,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: palette.accent,
+          elevation: 6,
+        }}
+      >
+        <Icon name={fan ? "close" : "plus"} size={26} color={palette.accentText} />
+      </Pressable>
     </View>
   );
 }

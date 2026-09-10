@@ -13,6 +13,7 @@
 import { useMemo, useState } from "react";
 import { Pressable, View } from "react-native";
 import { formatDate, today, type Lang } from "@sexdiary/core";
+import { Icon, type IconName } from "../icons";
 import { useApp } from "../state/store";
 import { Card, SectionTitle, Text } from "../ui";
 import type { EditTarget } from "./AddSheets";
@@ -69,14 +70,14 @@ export function MonthView({ onPickDay }: { onPickDay: (date: string) => void }) 
     ...Array.from({ length: tage }, (_, i) => i + 1),
   ];
 
-  const pfeil = (richtung: 1 | -1, zeichen: string) => (
+  const pfeil = (richtung: 1 | -1, zeichen: IconName) => (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={richtung === -1 ? t("back") : t("onboardContinue")}
       onPress={() => blaetter(richtung)}
       hitSlop={14}
     >
-      <Text style={{ color: palette.text, fontSize: 20 }}>{zeichen}</Text>
+      <Icon name={zeichen} size={22} color={palette.text} />
     </Pressable>
   );
 
@@ -101,11 +102,11 @@ export function MonthView({ onPickDay }: { onPickDay: (date: string) => void }) 
           marginBottom: 12,
         }}
       >
-        {pfeil(-1, "‹")}
+        {pfeil(-1, "chevronLeft")}
         <Text style={{ color: palette.text, fontSize: 17, fontWeight: "700" }}>
           {monate[monat]} {jahr}
         </Text>
-        {pfeil(1, "›")}
+        {pfeil(1, "chevronRight")}
       </View>
 
       <View style={{ flexDirection: "row" }}>
