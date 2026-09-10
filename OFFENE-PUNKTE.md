@@ -42,6 +42,19 @@ fünf medizinischen Werte.
 `user-scalable=no` in der Demo, Favicon, Merge nach `main`.
 
 
+## Aufwand ist geschätzt
+
+`notes/06-aufwandsschaetzung.md`, Stand 10.09.2026. Kurz: **600–900 Stunden**
+vom Prototyp zur prüffähigen Anwendung, **380–600** wenn man Android-only
+beginnt, als Pilot zuschneidet und NFC streicht. Dazu **160–280 Stunden**
+User Research.
+
+Die Notiz sagt auch, wo die Zahlen **nicht** nachgeben: DSFA, ärztliche Prüfung
+und die Sicherheitsprüfung der Kryptographie. Und wo Sparen teurer wird —
+`apps/mobile` hat null Tests, und grüne Builds haben in diesem Repo mehrfach
+nichts bewiesen.
+
+
 ## Zwei Einwände, die stehen bleiben
 
 Beide beim Entscheiden vorgebracht, beide bewusst überstimmt — sie gehören
