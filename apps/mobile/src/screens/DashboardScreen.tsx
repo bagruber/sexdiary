@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { Modal, Pressable, ScrollView, View } from "react-native";
 import {
   calcRisk,
   formatDate,
@@ -13,7 +13,7 @@ import {
   type RiskData,
 } from "@sexdiary/core";
 import { useApp } from "../state/store";
-import { Card, Meter, Row, Screen, SectionTitle, Title } from "../ui";
+import { Card, Meter, Row, Screen, SectionTitle, Text, Title} from "../ui";
 import { AlertsScreen } from "./AlertsScreen";
 import { ExplainSheet } from "./ExplainSheet";
 

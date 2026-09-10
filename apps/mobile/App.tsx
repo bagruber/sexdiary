@@ -1,16 +1,10 @@
 import { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  AppState,
-  Modal,
-  Pressable,
-  ScrollView,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { ActivityIndicator, AppState, Modal, Pressable, ScrollView, TextInput, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import { useFonts } from "expo-font";
+import AtkinsonRegular from "./assets/fonts/AtkinsonHyperlegible-Regular.ttf";
+import AtkinsonBold from "./assets/fonts/AtkinsonHyperlegible-Bold.ttf";
 import { usePreventScreenCapture } from "expo-screen-capture";
 import { syncReminders } from "./src/lib/reminders";
 import type { Lang, PartnerAnatomy } from "@sexdiary/core";
@@ -24,7 +18,7 @@ import { ConnectScreen } from "./src/screens/ConnectScreen";
 import { SettingsScreen } from "./src/screens/SettingsScreen";
 import { LockScreen } from "./src/screens/LockScreen";
 import { DecoyScreen } from "./src/screens/DecoyScreen";
-import { Card, Chip, Fab, GhostButton, PrimaryButton, Screen, Title } from "./src/ui";
+import { Card, Chip, Fab, GhostButton, PrimaryButton, Screen, Text, Title} from "./src/ui";
 
 type Tab = "dashboard" | "log" | "settings";
 
@@ -462,6 +456,21 @@ function Shell() {
 }
 
 export default function App() {
+  // Mitgeliefert, nie nachgeladen: die Dateien liegen im Paket, es geht
+  // keine Anfrage an einen fremden Server (siehe apps/mobile/assets/fonts).
+  const [fontsReady] = useFonts({
+    Atkinson: AtkinsonRegular,
+    "Atkinson-Bold": AtkinsonBold,
+  });
+
+  if (!fontsReady) {
+    return (
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <ActivityIndicator />
+      </View>
+    );
+  }
+
   return (
     <SafeAreaProvider>
       <AppProvider

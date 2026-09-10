@@ -104,6 +104,23 @@ und im Dunkeln steigt er auf 15,17. Die semantische Skala — grün, gelb, rot �
 ist unberührt; sie beschreibt den Inhalt und hat mit der Identität nichts zu
 tun.
 
+## Nachtrag 10.09.2026 — Schrift
+
+**Atkinson Hyperlegible**, mitgeliefert, nie verlinkt. Die Dateien liegen unter
+`apps/web/public/fonts` (WOFF2, je 23 KB) und `apps/mobile/assets/fonts` (TTF),
+samt Lizenztext; SIL OFL erlaubt das Mitliefern ausdrücklich.
+
+Das ist kein Stilentscheid. Die Schrift ist vom Braille Institute für maximale
+Zeichenunterscheidbarkeit entworfen — 1, l und I sind auseinanderzuhalten, 0
+und O ebenso. Das ist ein BITV-Argument, und es wiegt in einer App, in der eine
+falsch gelesene Zahl ein falsches Datum für einen Test bedeutet.
+
+Auf der App-Seite kostet das eine Hülle: React Native vererbt `fontFamily`
+nicht, und Android synthetisiert bei einer mitgelieferten Schrift kein Fett.
+`Text` in `ui.tsx` setzt beides — Familie und, je nach `fontWeight`, die
+Bold-Datei als eigene Familie. Die Bildschirme importieren `Text` von dort statt
+von react-native; das waren 14 Importzeilen statt 147 Elemente.
+
 ## Konsequenzen
 
 **Positiv**

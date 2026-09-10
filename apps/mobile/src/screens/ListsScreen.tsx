@@ -12,10 +12,10 @@
  * Person je anonym zu benachrichtigen.
  */
 import { useState } from "react";
-import { Alert, Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, Modal, Pressable, ScrollView, View } from "react-native";
 import { formatDate, type EntryType } from "@sexdiary/core";
 import { useApp } from "../state/store";
-import { Card, Chip, GhostButton, Screen, Title } from "../ui";
+import { Card, Chip, GhostButton, Screen, Text, Title} from "../ui";
 import { AddSheet, type EditTarget } from "./AddSheets";
 
 type Kind = "contact" | "test" | "vaccination";

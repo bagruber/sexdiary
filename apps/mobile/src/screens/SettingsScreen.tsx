@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, Modal, ScrollView, Switch, Text, TextInput, View } from "react-native";
+import { Alert, Modal, ScrollView, Switch, TextInput, View } from "react-native";
 import {
   CONTACT_PLATFORMS,
   COUNTRIES,
@@ -12,7 +12,7 @@ import {
 } from "@sexdiary/core";
 import { useApp } from "../state/store";
 import { APP_NAME } from "../branding";
-import { Card, Chip, PrimaryButton, Row, Screen, SectionTitle, Title } from "../ui";
+import { Card, Chip, PrimaryButton, Row, Screen, SectionTitle, Text, Title} from "../ui";
 import { DataScreen } from "./DataScreen";
 import { BackupSheet } from "./BackupSheet";
 import { ListsScreen } from "./ListsScreen";

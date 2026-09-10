@@ -5,7 +5,7 @@
  * risk engine emits alongside the score. Nothing is recomputed in the UI,
  * so what the user reads is exactly what the engine used.
  */
-import { Modal, ScrollView, Text, View } from "react-native";
+import { Modal, ScrollView, View } from "react-native";
 import {
   WIKI,
   formatDate,
@@ -15,7 +15,7 @@ import {
   type RiskData,
 } from "@sexdiary/core";
 import { useApp } from "../state/store";
-import { Card, GhostButton, SectionTitle } from "../ui";
+import { Card, GhostButton, SectionTitle, Text } from "../ui";
 
 export function ExplainSheet({
   sti,

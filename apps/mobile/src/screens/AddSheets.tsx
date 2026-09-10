@@ -11,13 +11,7 @@
  * ihn nicht kennt, kommt ueber diese Leiste trotzdem ueberall hin.
  */
 import { useState } from "react";
-import {
-  ScrollView,
-  Switch,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { ScrollView, Switch, TextInput, View } from "react-native";
 import {
   ACT_KEYS,
   ACT_NEEDS,
@@ -38,14 +32,7 @@ import {
 } from "@sexdiary/core";
 import { useApp } from "../state/store";
 import { AlertsScreen } from "./AlertsScreen";
-import {
-  Card,
-  Chip,
-  GhostButton,
-  PrimaryButton,
-  SectionTitle,
-  Title,
-} from "../ui";
+import { Card, Chip, GhostButton, PrimaryButton, SectionTitle, Text, Title} from "../ui";
 
 function DateField({
   value,

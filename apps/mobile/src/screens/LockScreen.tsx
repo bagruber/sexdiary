@@ -11,7 +11,8 @@
  * before it does anything is a lock people switch off.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
+import { Text } from "../ui";
 import { useApp } from "../state/store";
 import { notifyError, notifySuccess } from "../haptics";
 import { APP_NAME } from "../branding";

@@ -2,13 +2,45 @@ import type { ReactNode } from "react";
 import {
   Pressable,
   StyleSheet,
-  Text,
+  Text as RNText,
   View,
   type StyleProp,
+  type TextProps,
+  type TextStyle,
   type ViewStyle,
 } from "react-native";
 import { useApp } from "./state/store";
 import { tapLight, tapMedium } from "./haptics";
+
+/**
+ * Text mit Atkinson Hyperlegible.
+ *
+ * React Native vererbt `fontFamily` nicht — sie muss an jedes Element.
+ * Statt sie hundertfach hinzuschreiben, sitzt sie hier einmal, und die
+ * Bildschirme importieren `Text` von hier statt von react-native.
+ *
+ * Der zweite Schnitt ist die Staerke: Android synthetisiert bei einer
+ * mitgelieferten Schrift kein Fett, es braucht die Bold-Datei als eigene
+ * Familie. Deshalb wird `fontWeight` ausgewertet und umgesetzt, statt
+ * sich auf den Renderer zu verlassen.
+ */
+export function Text({ style, ...rest }: TextProps) {
+  const flat = StyleSheet.flatten(style) as TextStyle | undefined;
+  const w = flat?.fontWeight;
+  const fett = w === "bold" || (typeof w === "string" && Number(w) >= 600);
+  return (
+    <RNText
+      {...rest}
+      style={[
+        { fontFamily: fett ? "Atkinson-Bold" : "Atkinson" },
+        style,
+        // Die Familie traegt die Staerke; ein zusaetzliches fontWeight
+        // liesse Android zusaetzlich synthetisch fetten.
+        fett ? { fontWeight: "normal" } : null,
+      ]}
+    />
+  );
+}
 
 export function Screen({ children }: { children: ReactNode }) {
   const { palette } = useApp();

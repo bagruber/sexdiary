@@ -4,9 +4,9 @@
  * be checkable rather than believed.
  */
 import { useMemo, useState } from "react";
-import { Modal, Platform, ScrollView, Text, View } from "react-native";
+import { Modal, Platform, ScrollView, View } from "react-native";
 import { useApp } from "../state/store";
-import { Card, GhostButton, Row, SectionTitle } from "../ui";
+import { Card, GhostButton, Row, SectionTitle, Text } from "../ui";
 
 export function DataScreen({ onClose }: { onClose: () => void }) {
   const { data, t, palette } = useApp();

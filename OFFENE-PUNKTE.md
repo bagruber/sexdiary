@@ -60,19 +60,6 @@ schreiben, nur schwerer zu bemerken. Das ist der Kernnutzen der App — es
 gehört einer Infektiologin vorgelegt, bevor jemand die App benutzt.
 
 
-## Schriftentscheidung wartet auf die Schriftdateien
-
-Farben sind entschieden ([ADR-0015](architecture/adr/0015-farbtokens.md)),
-die Schrift nicht. **Atkinson Hyperlegible durchgehend** bleibt die
-Empfehlung — vom Braille Institute für maximale Zeichenunterscheidbarkeit
-entworfen, also ein BITV-Argument statt eines Stilentscheids.
-
-Sie kommt erst in die Tokens, wenn die Dateien mitgeliefert werden: nativ in
-Welle 3, Infoseite in Welle 4. Ein Token, das auf eine nicht mitgelieferte
-Schrift zeigt, wäre genau der Fehler, den `FONT` drei Wellen lang vorgemacht
-hat. **Schriftdateien mitliefern, niemals Google Fonts verlinken.**
-
-
 ## Was der Web-Prototyp kann und die App noch nicht
 
 Vollstaendige Gegenueberstellung, aufgenommen am 09.09.2026. Nichts davon soll

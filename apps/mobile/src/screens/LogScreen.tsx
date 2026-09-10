@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Modal, ScrollView, Text, View } from "react-native";
+import { Modal, ScrollView, View } from "react-native";
 import {
   ACT_KEYS,
   PROTECTABLE_ACTS,
@@ -7,7 +7,7 @@ import {
   type Intercourse,
 } from "@sexdiary/core";
 import { useApp } from "../state/store";
-import { Card, Chip, GhostButton, Screen, SectionTitle, Title } from "../ui";
+import { Card, Chip, GhostButton, Screen, SectionTitle, Text, Title} from "../ui";
 import { AddSheet, type AddKind } from "./AddSheets";
 import { DayDetail, MonthView } from "./MonthView";
 

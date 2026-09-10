@@ -1,9 +1,30 @@
 /*
- * Informationsseite. Systemschriften statt geladener — Google Fonts
- * wurde im Juli 2026 aus Datenschutzgruenden entfernt, und bis die
- * Atkinson-Dateien mitgeliefert werden, ist eine nicht geladene Schrift
- * die ehrlichere Loesung als eine verlinkte.
+ * Informationsseite.
+ *
+ * Atkinson Hyperlegible, mitgeliefert aus /fonts — nie verlinkt. Google
+ * Fonts wurde im Juli 2026 aus Datenschutzgruenden entfernt, und ein
+ * Verweis auf einen fremden Server waere derselbe Fehler mit anderem
+ * Absender.
+ *
+ * Die Schrift ist vom Braille Institute fuer maximale
+ * Zeichenunterscheidbarkeit entworfen. Das ist hier ein
+ * Barrierefreiheits-Argument, kein Stilentscheid: 1, l und I sind
+ * unterscheidbar, 0 und O ebenso.
  */
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("/fonts/AtkinsonHyperlegible-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("/fonts/AtkinsonHyperlegible-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 * { box-sizing: border-box; }
 
 html { color-scheme: light dark; }
@@ -12,7 +33,8 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font: 16px/1.6 "Atkinson Hyperlegible", system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
   -webkit-text-size-adjust: 100%;
 }
 

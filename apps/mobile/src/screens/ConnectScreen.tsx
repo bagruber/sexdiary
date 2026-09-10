@@ -11,11 +11,11 @@
  * Testergebnis oder nichts davon ist. Die Kamera liefert nur Text.
  */
 import { useState } from "react";
-import { ScrollView, Text, TextInput, View } from "react-native";
+import { ScrollView, TextInput, View } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { parseImportPayload } from "@sexdiary/core";
 import { useApp } from "../state/store";
-import { Card, Chip, GhostButton, PrimaryButton, SectionTitle, Title } from "../ui";
+import { Card, Chip, GhostButton, PrimaryButton, SectionTitle, Text, Title} from "../ui";
 import { QrCode } from "./QrCode";
 import { PositivePrompt } from "./AddSheets";
 

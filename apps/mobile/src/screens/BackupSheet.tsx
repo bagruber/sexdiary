@@ -6,13 +6,13 @@
  * everything on the device. Each says so before the button, not after.
  */
 import { useState } from "react";
-import { ScrollView, Text, TextInput, View } from "react-native";
+import { ScrollView, TextInput, View } from "react-native";
 import { File, Paths } from "expo-file-system";
 import * as Sharing from "expo-sharing";
 import { today, type AppData } from "@sexdiary/core";
 import { useApp } from "../state/store";
 import { createBackup, restoreBackup } from "../lib/backup";
-import { Card, GhostButton, PrimaryButton, Title } from "../ui";
+import { Card, GhostButton, PrimaryButton, Text, Title} from "../ui";
 
 const MIN_LENGTH = 8;
 

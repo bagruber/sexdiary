@@ -11,10 +11,10 @@
  * hiesse, zwei Bedeutungen um dieselbe Farbe konkurrieren zu lassen.
  */
 import { useMemo, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { formatDate, today, type Lang } from "@sexdiary/core";
 import { useApp } from "../state/store";
-import { Card, SectionTitle } from "../ui";
+import { Card, SectionTitle, Text } from "../ui";
 
 /** Montag als erster Tag der Woche, wie `daysShort` es vorgibt. */
 function firstWeekday(year: number, month: number): number {

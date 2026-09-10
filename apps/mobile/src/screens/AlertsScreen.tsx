@@ -16,10 +16,10 @@
  * weitergegeben, der niemanden erreicht hat.
  */
 import { useMemo, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { formatDate, getAlerts, gid, today, type SentAlert } from "@sexdiary/core";
 import { useApp } from "../state/store";
-import { Card, GhostButton, PrimaryButton, Screen, SectionTitle, Title } from "../ui";
+import { Card, GhostButton, PrimaryButton, Screen, SectionTitle, Text, Title} from "../ui";
 
 export function AlertsScreen({ onClose }: { onClose: () => void }) {
   const { data, dispatch, t, palette } = useApp();

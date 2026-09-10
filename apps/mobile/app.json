@@ -45,7 +45,8 @@
           "backgroundColor": "#F5F3EF"
         }
       ],
-      "expo-sharing"
+      "expo-sharing",
+      "expo-font"
     ]
   }
 }
