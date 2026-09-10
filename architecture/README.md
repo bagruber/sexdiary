@@ -13,6 +13,7 @@ Entscheidungslog der laufenden Arbeit, also Rohmaterial, nicht Ergebnis.
 | Datei | Format | Für wen |
 |---|---|---|
 | [`arc42.md`](arc42.md) | arc42 | Architekturüberblick in zwölf Abschnitten, mit C4-Diagrammen |
+| [`anforderungen.md`](anforderungen.md) | FA/NFA mit Kennungen | Was die Anwendung können muss, mit Ist-Status und Nachverfolgbarkeit |
 | [`threat-model.md`](threat-model.md) | angreiferzentriert | Sicherheitsprüfung: was erfährt wer in welcher Lage |
 | [`data-flow.md`](data-flow.md) | Verarbeitungsübersicht | Datenschutz: Vorarbeit für Art. 30 und die Folgenabschätzung |
 | [`adr/`](adr/) | MADR | Einzelne Entscheidungen mit Kontext und Konsequenz |

@@ -3,7 +3,90 @@
 Reverse-chronological decision log. Read this first each session; append
 before ending one. `docs/` is GitHub Pages build output — notes live here.
 
-## 2026-09-10 (latest) — The information page became the pitch
+## 2026-09-10 (latest) — Real icons, and the two round buttons stopped being twins
+
+Benedict brought a folder of screenshots — DB, MVG, Play, Signal, Telegram,
+Threema, Discord, Instagram — and asked what would make the app look less like
+a prototype. The red marks in them are redactions, not annotations.
+
+**The screenshots agree with each other more than expected.** Every one uses
+stroked vector icons at a single weight. Every one puts the active tab in a
+filled pill rather than marking it with bold text alone. The ones with two
+floating actions — Signal, Telegram — **stack** them at the right edge with
+different sizes, never side by side. And Signal and Threema keep the QR in the
+header or profile, not in the action area, because scanning is an identity
+action.
+
+**The glyphs are gone.** `GLYPH = { ♥ ✓ ☺ ✚ ▣ }` was the single largest reason
+the app read as unfinished — a character from the text font follows that font's
+formal language, not its own, and `☺` in Atkinson Hyperlegible looks like an
+emoticon. Fourteen paths in `src/icons.tsx`, written for this project rather
+than lifted from a library, because the repo still has no licence and carrying
+someone else's icon paths makes that question bigger.
+
+The cost is `react-native-svg`, a fourth native module. It was worth it because
+it pays twice: `QrCode.tsx` drew 447 views for a handle QR and now draws one
+`Path`. That was an open point about jank on older phones, and it closed as a
+side effect of the icon work rather than on its own.
+
+**The two round buttons are no longer a mitigated objection.** They were
+centred over the tab bar, same size, differing only in fill — recorded in
+`OFFENE-PUNKTE.md` as an objection raised and deliberately overruled. They are
+now stacked at the right edge: plus on top at 58 px and filled, QR below at
+46 px and outlined. Benedict's correction, and it is the better version — the
+plus goes on top because the fan opens out of it.
+
+**The fan runs on a quarter circle**, left to up, radius 104, four positions
+30 degrees apart. A third of a circle was asked for first and does not fit: it
+pushes the last button past the plus and off the right edge. It moved out of
+`App.tsx` into `FabPair`, so the geometry lives with the buttons it belongs to.
+
+**A third colour scale, and it needed defending.** Benedict asked for coloured
+fan buttons. ADR-0015 reserves green, amber and red for risk, and the old
+`GLYPH` comment cites exactly that as the reason there was no colour. It is
+allowed here under three conditions, all of them in the code: the scale exists
+only in the fan, which is a dimmed overlay that lives seconds; its four hues sit
+between 190 and 330 degrees, at least 25 degrees off every risk hue and 30 apart
+from each other; and both of those are assertions in `tokens.test.ts`, not
+claims in a comment. Colour is also the second marker there — every button
+carries its icon. ADR-0016.
+
+**One cleanup the change forced.** Adding a category scale needed a name for
+"the four entry kinds", and there were already two: `EntryType` in `reducer.ts`
+and `AddKind` in `AddSheets.tsx`. Briefly three, because the first pass added
+`EntryKind`. `EntryType` moved to `domain.ts` where the vocabulary belongs, and
+the others now alias it.
+
+**Verified, and where it stops.** Lint, three typechecks, 135 tests, build, and
+a Metro export that bundles 931 modules. A probe against the Hermes bundle finds
+the icon paths, the category hex values and `RNSVGPath`, and finds none of the
+old glyphs — run with a control string, after a first probe silently passed
+against a path that did not exist. `expo-doctor` fails on two counts, both
+pre-existing and neither about `react-native-svg`: the New Architecture warning
+for `react-native-nfc-manager`, and three Expo patch versions behind.
+
+**None of that says how it looks.** A native module means rebuilding the Android
+project, and nothing here has run on a screen. That is the next step and it is
+Benedict's.
+
+**Deliberately not animated.** A fan that springs open is what would make it
+feel smooth, but it has to honour `prefs.reducedMotion` and cannot be judged
+without a device.
+
+**Documentation started alongside.** `architecture/anforderungen.md` — FA and
+NFA with fixed identifiers, present-state status rather than intended state,
+what is explicitly *not* required, and a traceability table from requirement to
+ADR to code. It is the document a public authority asks for first, and the
+diagrams still to come — data model, state machines, screen flow — can point at
+its numbers instead of restating them.
+
+Writing it surfaced nothing new but sharpened two things: FA-63 and FA-64 are
+both "teilweise" for the same reason, and FA-45 — the app does not fake a send —
+is the reason FA-42 is allowed to stay open.
+
+---
+
+## 2026-09-10 — The information page became the pitch
 
 Benedict's call: the pitch does not get its own artifact. It *is* the page
 GitHub Pages serves at `index`. One surface, one source, and whoever gets shown

@@ -1,6 +1,6 @@
 # Offene Punkte
 
-*Notiert am 26.08.2026, zuletzt fortgeschrieben am 10.09.2026. Erledigte Punkte
+*Notiert am 26.08.2026, zuletzt fortgeschrieben am 10.09.2026 (abends). Erledigte Punkte
 bitte streichen, nicht abhaken — die Datei soll kurz bleiben.*
 
 
@@ -28,7 +28,8 @@ Papier umgesetzt. Die Infoseite sagt das seit dem 10.09.2026 offen.
 
 - Läuft `qrcode` zur Laufzeit? Es ist eine Browser-Bibliothek, Metro bündelt
   sie, aber ohne Node-Polyfills ist das ungeprüft.
-- Ruckeln die 447 Views eines Handle-QR auf einem älteren Telefon?
+- Zeichnen sich der neue Symbolsatz und der Fächer auf einem Bildschirm so,
+  wie sie gedacht sind? Nichts davon lief bisher auf einem Gerät.
 - Lesen sich die Kalender-Marker in drei Grauwerten überhaupt?
 - NFC ist ungetestet — es braucht ein NFC-Telefon und eine beschreibbare
   NDEF-Karte.
@@ -55,19 +56,50 @@ und die Sicherheitsprüfung der Kryptographie. Und wo Sparen teurer wird —
 nichts bewiesen.
 
 
-## Zwei Einwände, die stehen bleiben
+## Ein Einwand bleibt stehen
 
-Beide beim Entscheiden vorgebracht, beide bewusst überstimmt — sie gehören
-notiert, nicht weggelassen.
-
-**Die zwei runden Knöpfe** über der Reiterleiste sehen ähnlich aus und stehen
-nebeneinander. Das eine legt einen Eintrag an, das andere öffnet die Kamera.
-Abgemildert durch verschiedene Gestalt — Plus gefüllt, QR umrandet. Ob das
-reicht, zeigt der Gebrauch.
+Beim Entscheiden vorgebracht, bewusst überstimmt — gehört notiert, nicht
+weggelassen.
 
 **Küssen bekommt einen Schutzschalter**, weil Mpox dort einen Kondomeffekt von
 0,2 führt. Der Wert ist als fünfter Befund notiert und bleibt unverändert
 stehen, bis eine Infektiologin darauf geschaut hat.
+
+Der zweite Einwand — **die zwei runden Knöpfe** — ist am 10.09.2026 erledigt.
+Sie stehen nicht mehr nebeneinander in der Mitte, sondern übereinander am
+rechten Rand, und unterscheiden sich jetzt in Ort, Grösse und Füllung statt nur
+in der Füllung. [ADR-0016](architecture/adr/0016-symbolsatz-und-kategoriefarbe.md).
+
+
+## Die Oberfläche ist halb umgebaut
+
+Seit dem 10.09.2026 gebaut: eigener Symbolsatz statt der Schriftzeichen,
+Reiterleiste mit Symbol und gefüllter Pille, gestapelte Knöpfe mit
+Viertelkreis-Fächer, QR als ein Pfad statt 447 Views.
+
+**Noch offen aus derselben Durchsicht**, nach Wirkung geordnet:
+
+- **Zeilen in eine Karte gruppieren.** Jede `Row` ist heute eine eigene `Card`
+  mit 10 px Abstand — ein Stapel schwebender Kästchen. Die Referenzen setzen ein
+  gedämpftes Label über *eine* Karte mit Haarlinien zwischen den Zeilen. Nach
+  den Symbolen der zweitgrösste Effekt.
+- **Rahmen *und* Füllung** auf jeder Karte. Beides zusammen sieht nach Wireframe
+  aus; die Haarlinie gehört nach innen als Trenner.
+- **`SectionTitle` in Grossversalien** mit Sperrung. Keine der Referenzen macht
+  das noch.
+- **Die Kopfzeile trägt den App-Namen** in 13 px, und darunter rendert jeder
+  Bildschirm nochmal seinen eigenen `Title`. Die Referenzen setzen den
+  Seitentitel gross in die Kopfzeile und lassen den Namen weg — er steht auf dem
+  Icon.
+- **Typo-Sprung zu klein** (26/15/12 gegen ~30/16/13), und 12 px Sekundärtext
+  untergräbt die Entscheidung für Atkinson Hyperlegible.
+- **Abstände nach Gefühl** — `marginVertical: 12`, `marginTop: 18`,
+  `padding: 14`, `gap: 22`. Eine 4er-Skala als Token neben den Farben.
+- **Der Fächer bewegt sich nicht.** Eine Animation muss `prefs.reducedMotion`
+  achten und ist ohne Gerät nicht zu beurteilen.
+
+Nicht anzufassen: die Palette. Gerechnet, getestet, und die Trennung von
+Interaktions- und Risikoskala ist eine der besseren Entscheidungen im Repo.
 
 
 ## Fünf medizinische Befunde warten auf ärztliche Prüfung
@@ -112,9 +144,10 @@ Zwei Dinge sind **anders** gelöst als im Web, beide bewusst:
 
 ## Aufteilung entschieden
 
-Seit dem 10.09.2026: **Heute · Kalender · Melden**, dazu zwei Aktionen mittig
-über der Leiste — Plus für die Begegnung (langes Drücken fächert die übrigen
-drei auf) und QR daneben.
+Seit dem 10.09.2026: **Heute · Kalender · Melden**, jeder Reiter mit Symbol,
+das aktive Ziel in einer gefüllten Pille. Dazu zwei Aktionen übereinander am
+rechten Rand — das Plus oben für die Begegnung (langes Drücken fächert alle
+vier Arten auf einem Viertelkreis auf), der QR darunter.
 
 Einstellungen, Profil, Sicherung und Datenansicht liegen hinter dem Zahnrad in
 der Kopfzeile. Sie werden selten gebraucht; ein Drittel der Grundfläche dafür
@@ -124,13 +157,6 @@ Vierfach-Aufbau kritisiert.
 „Melden“ trägt Benachrichtigung **und** Kontakte, weil man Kontakte
 benachrichtigt — sie an getrennte Orte zu legen hiesse, im Ernstfall zwischen
 zwei Bildschirmen zu wechseln.
-
-Ein Einwand bleibt stehen, den ich beim Entscheiden vorgebracht habe: zwei
-gleich grosse runde Ziele nebeneinander werden leichter verwechselt als zwei an
-verschiedenen Orten, und hier legt das eine einen Eintrag an, während das
-andere die Kamera öffnet. Abgemildert durch verschiedene Gestalt — das Plus
-gefüllt, der QR umrandet. Ob das reicht, zeigt der Gebrauch.
-
 
 ## Gepusht, CI läuft, nichts ist in `main`
 
@@ -147,6 +173,24 @@ dort bis dahin Gesundheitsdaten im Browser ab.
 Weiter offen: zwei Änderungen im Working Tree von `hausbasis`, beide uncommitted
 — der gegenstandslose Ausnahme-Eintrag für sexdiary ist entfernt, und
 `baseline.json` führt die sechs ESLint-Pakete.
+
+## Die Anforderungen stehen jetzt geschrieben
+
+`architecture/anforderungen.md`, seit dem 10.09.2026: FA und NFA mit festen
+Kennungen, Ist-Status statt Soll-Status, was ausdrücklich *nicht* gefordert ist,
+und eine Nachverfolgbarkeitstabelle Anforderung → ADR → Code.
+
+**Als Nächstes daneben**, jeweils eine Datei: `datenmodell.md`
+(Klassendiagramm der Domäne plus das eine MySQL-Schema des Relays — ein
+klassisches DB-Schema gibt es nicht, die App führt ein verschlüsseltes
+JSON-Dokument, und genau das gehört aufgeschrieben), `zustaende.md` (Lock,
+Benachrichtigungs-Lebenszyklus, und der wichtigste: der Testfenster-Zustand je
+Erreger) und `bildschirmfluss.md`.
+
+Was `architecture/` schon hat und in keiner neuen Datei wiederholt gehört:
+Architekturdiagramm als C4 Stufe 1 bis 3, drei Sequenzdiagramme und die
+Verteilungssicht stehen in `arc42.md`, die Schnittstellen in `interfaces/`.
+
 
 ## Lizenz weiterhin offen
 
