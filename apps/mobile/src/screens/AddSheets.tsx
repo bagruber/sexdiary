@@ -77,12 +77,22 @@ function DateField({
   );
 }
 
-export function AddEncounter({ onClose }: { onClose: () => void }) {
+export function AddEncounter({
+  onClose,
+  edit,
+}: {
+  onClose: () => void;
+  edit?: Intercourse;
+}) {
   const { data, dispatch, t, palette } = useApp();
-  const [date, setDate] = useState(today());
-  const [acts, setActs] = useState<Set<ActKey>>(new Set());
-  const [prot, setProt] = useState<Set<ActKey>>(new Set());
-  const [cid, setCid] = useState<string | null>(null);
+  const [date, setDate] = useState(edit?.date ?? today());
+  const [acts, setActs] = useState<Set<ActKey>>(
+    () => new Set(ACT_KEYS.filter((k) => edit?.t[k])),
+  );
+  const [prot, setProt] = useState<Set<ActKey>>(
+    () => new Set(ACT_KEYS.filter((k) => edit?.p[k])),
+  );
+  const [cid, setCid] = useState<string | null>(edit?.cid ?? null);
 
   // The chosen acts where a barrier changes the arithmetic at all.
   // The set comes from the STI table, so it cannot drift away from
@@ -106,7 +116,9 @@ export function AddEncounter({ onClose }: { onClose: () => void }) {
       tf[a] = 1;
       if (prot.has(a)) pf[a] = 1;
     }
-    const entry: Intercourse = { id: gid("i"), date, cid, t: tf, p: pf };
+    // Dieselbe id heisst aendern statt anlegen: upsert im Reducer
+    // ersetzt den Eintrag, statt einen zweiten danebenzulegen.
+    const entry: Intercourse = { id: edit?.id ?? gid("i"), date, cid, t: tf, p: pf };
     dispatch({ type: "saveIntercourse", payload: entry });
     onClose();
   };
@@ -200,14 +212,18 @@ export function AddEncounter({ onClose }: { onClose: () => void }) {
   );
 }
 
-function AddTest({ onClose }: { onClose: () => void }) {
+function AddTest({ onClose, edit }: { onClose: () => void; edit?: TestRecord }) {
   const { dispatch, t, palette } = useApp();
-  const [date, setDate] = useState(today());
-  const [facility, setFacility] = useState("");
-  const [panel, setPanel] = useState<Set<string>>(
-    new Set(["HIV", "Gonorrhea", "Chlamydia", "Syphilis"]),
+  const [date, setDate] = useState(edit?.date ?? today());
+  const [facility, setFacility] = useState(edit?.fac ?? "");
+  const [panel, setPanel] = useState<Set<string>>(() =>
+    edit
+      ? new Set(Object.keys(edit.ts))
+      : new Set(["HIV", "Gonorrhea", "Chlamydia", "Syphilis"]),
   );
-  const [results, setResults] = useState<Record<string, TestResultValue>>({});
+  const [results, setResults] = useState<Record<string, TestResultValue>>(
+    () => ({ ...(edit?.results ?? {}) }) as Record<string, TestResultValue>,
+  );
 
   const save = () => {
     const ts: Record<string, 0 | 1> = {};
@@ -217,9 +233,9 @@ function AddTest({ onClose }: { onClose: () => void }) {
       res[sti] = results[sti] ?? "negative";
     }
     const record: TestRecord = {
-      id: gid("t"),
+      id: edit?.id ?? gid("t"),
       date,
-      num: "",
+      num: edit?.num ?? "",
       fac: facility,
       ts,
       results: res,
@@ -310,13 +326,15 @@ function AddTest({ onClose }: { onClose: () => void }) {
 function AddContact({
   onClose,
   onQr,
+  edit,
 }: {
   onClose: () => void;
   onQr?: () => void;
+  edit?: Contact;
 }) {
   const { dispatch, t, palette } = useApp();
-  const [name, setName] = useState("");
-  const [notes, setNotes] = useState("");
+  const [name, setName] = useState(edit?.name ?? "");
+  const [notes, setNotes] = useState(edit?.notes ?? "");
 
   const field = {
     borderWidth: 1,
@@ -331,14 +349,17 @@ function AddContact({
     dispatch({
       type: "saveContact",
       payload: {
-        id: gid("c"),
+        id: edit?.id ?? gid("c"),
         name: name.trim(),
         notes: notes.trim() || null,
         // Every contact gets a token the moment it is created. Anonymous
         // notification must not depend on having thought of it earlier —
         // by the time it is needed, the conversation is hard enough.
-        token: genToken(),
-        cx: {},
+        // Ein bestehender Kontakt behaelt seinen Token. Ein neuer waere
+        // ein anderer Mensch fuer jede Benachrichtigung, die schon
+        // unterwegs ist.
+        token: edit?.token ?? genToken(),
+        cx: edit?.cx ?? {},
       } satisfies Contact,
     });
     onClose();
@@ -377,13 +398,19 @@ function AddContact({
  * answer the same question — what was protecting you on a given date —
  * but they carry different fields, so the form follows the choice.
  */
-function AddVaccination({ onClose }: { onClose: () => void }) {
+function AddVaccination({
+  onClose,
+  edit,
+}: {
+  onClose: () => void;
+  edit?: Vaccination;
+}) {
   const { dispatch, t, palette } = useApp();
-  const [kind, setKind] = useState<VaccineKind>("vaccine");
-  const [type, setType] = useState("Hep B");
-  const [manufacturer, setManufacturer] = useState("");
-  const [date, setDate] = useState(today());
-  const [endDate, setEndDate] = useState("");
+  const [kind, setKind] = useState<VaccineKind>(edit?.kind ?? "vaccine");
+  const [type, setType] = useState(edit?.type ?? "Hep B");
+  const [manufacturer, setManufacturer] = useState(edit?.manufacturer ?? "");
+  const [date, setDate] = useState(edit?.date ?? edit?.startDate ?? today());
+  const [endDate, setEndDate] = useState(edit?.endDate ?? "");
 
   const kinds: { id: VaccineKind; label: string }[] = [
     { id: "vaccine", label: t("vaccine") },
@@ -397,7 +424,7 @@ function AddVaccination({ onClose }: { onClose: () => void }) {
   const types = ["Hep B", "Mpox"];
 
   const save = () => {
-    const base = { id: gid("v"), kind };
+    const base = { id: edit?.id ?? gid("v"), kind };
     const record: Vaccination =
       kind === "vaccine"
         ? {
@@ -484,11 +511,23 @@ function AddVaccination({ onClose }: { onClose: () => void }) {
 
 export type AddKind = "intercourse" | "test" | "contact" | "vaccination";
 
+/**
+ * Ein bestehender Datensatz, der bearbeitet werden soll. Als Union statt
+ * vier optionaler Felder, damit der Typechecker Art und Datensatz nicht
+ * auseinanderlaufen laesst.
+ */
+export type EditTarget =
+  | { kind: "intercourse"; record: Intercourse }
+  | { kind: "test"; record: TestRecord }
+  | { kind: "contact"; record: Contact }
+  | { kind: "vaccination"; record: Vaccination };
+
 export function AddSheet({
   kind,
   onKind,
   onClose,
   onQr,
+  edit,
 }: {
   kind: AddKind;
   onKind: (k: AddKind) => void;
@@ -496,6 +535,7 @@ export function AddSheet({
   /** Token tauschen. Steht neben den Eintragsarten, weil es im selben
    *  Moment gebraucht wird wie eine Begegnung — nur schneller. */
   onQr?: () => void;
+  edit?: EditTarget;
 }) {
   const { t } = useApp();
   const kinds: { id: AddKind; label: string }[] = [
@@ -512,21 +552,49 @@ export function AddSheet({
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 4 }}
       >
-        {kinds.map((k) => (
-          <Chip
-            key={k.id}
-            label={k.label}
-            active={kind === k.id}
-            onPress={() => onKind(k.id)}
-          />
-        ))}
-        {onQr && <Chip label={t("qrShort")} active={false} onPress={onQr} />}
+        {/*
+          Beim Bearbeiten steht die Art fest: ein Wechsel wuerde den
+          Datensatz hinter sich lassen, ohne dass jemand danach fragt.
+        */}
+        {!edit &&
+          kinds.map((k) => (
+            <Chip
+              key={k.id}
+              label={k.label}
+              active={kind === k.id}
+              onPress={() => onKind(k.id)}
+            />
+          ))}
+        {!edit && onQr && (
+          <Chip label={t("qrShort")} active={false} onPress={onQr} />
+        )}
       </ScrollView>
 
-      {kind === "intercourse" && <AddEncounter onClose={onClose} />}
-      {kind === "test" && <AddTest onClose={onClose} />}
-      {kind === "contact" && <AddContact onClose={onClose} onQr={onQr} />}
-      {kind === "vaccination" && <AddVaccination onClose={onClose} />}
+      {kind === "intercourse" && (
+        <AddEncounter
+          onClose={onClose}
+          edit={edit?.kind === "intercourse" ? edit.record : undefined}
+        />
+      )}
+      {kind === "test" && (
+        <AddTest
+          onClose={onClose}
+          edit={edit?.kind === "test" ? edit.record : undefined}
+        />
+      )}
+      {kind === "contact" && (
+        <AddContact
+          onClose={onClose}
+          onQr={onQr}
+          edit={edit?.kind === "contact" ? edit.record : undefined}
+        />
+      )}
+      {kind === "vaccination" && (
+        <AddVaccination
+          onClose={onClose}
+          edit={edit?.kind === "vaccination" ? edit.record : undefined}
+        />
+      )}
     </View>
   );
 }

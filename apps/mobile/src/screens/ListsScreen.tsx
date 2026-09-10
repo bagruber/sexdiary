@@ -12,16 +12,18 @@
  * Person je anonym zu benachrichtigen.
  */
 import { useState } from "react";
-import { Alert, ScrollView, Text, View } from "react-native";
+import { Alert, Modal, Pressable, ScrollView, Text, View } from "react-native";
 import { formatDate, type EntryType } from "@sexdiary/core";
 import { useApp } from "../state/store";
 import { Card, Chip, GhostButton, Screen, Title } from "../ui";
+import { AddSheet, type EditTarget } from "./AddSheets";
 
 type Kind = "contact" | "test" | "vaccination";
 
 export function ListsScreen({ onClose }: { onClose: () => void }) {
   const { data, dispatch, t, palette } = useApp();
   const [kind, setKind] = useState<Kind>("contact");
+  const [edit, setEdit] = useState<EditTarget | null>(null);
 
   const kinds: { id: Kind; label: string }[] = [
     { id: "contact", label: t("contactsHeading") },
@@ -44,8 +46,10 @@ export function ListsScreen({ onClose }: { onClose: () => void }) {
     titel: string,
     unter: string,
     onDelete: () => void,
+    onEdit: () => void,
   ) => (
     <Card key={key}>
+      <Pressable accessibilityRole="button" onPress={onEdit}>
       <View
         style={{
           flexDirection: "row",
@@ -69,6 +73,7 @@ export function ListsScreen({ onClose }: { onClose: () => void }) {
           {t("delete")}
         </Text>
       </View>
+      </Pressable>
     </Card>
   );
 
@@ -105,6 +110,7 @@ export function ListsScreen({ onClose }: { onClose: () => void }) {
                     .map(([p, h]) => `${p}: ${h}`)
                     .join(" · ") || t("shareTokenOnly"),
                   () => remove("contact", c.id, c.name),
+                  () => setEdit({ kind: "contact", record: c }),
                 ),
               ))}
 
@@ -120,6 +126,7 @@ export function ListsScreen({ onClose }: { onClose: () => void }) {
                     .map(([sti, v]) => `${sti}: ${t(v as "negative" | "positive")}`)
                     .join(" · ") || Object.keys(r.ts).join(" · "),
                   () => remove("test", r.id, formatDate(r.date, data.prefs.lang)),
+                  () => setEdit({ kind: "test", record: r }),
                 ),
               ))}
 
@@ -132,12 +139,32 @@ export function ListsScreen({ onClose }: { onClose: () => void }) {
                   v.type ?? t(v.kind === "prep" ? "prep" : "doxyPep"),
                   formatDate(v.date ?? v.startDate ?? "", data.prefs.lang),
                   () => remove("vaccination", v.id, v.type ?? v.kind),
+                  () => setEdit({ kind: "vaccination", record: v }),
                 ),
               ))}
 
         <GhostButton label={t("back")} onPress={onClose} />
         <View style={{ height: 32 }} />
       </ScrollView>
+
+      <Modal
+        visible={edit !== null}
+        animationType="slide"
+        onRequestClose={() => setEdit(null)}
+      >
+        <View
+          style={{ flex: 1, backgroundColor: palette.bg, padding: 16, paddingTop: 48 }}
+        >
+          {edit && (
+            <AddSheet
+              kind={edit.kind}
+              onKind={() => undefined}
+              onClose={() => setEdit(null)}
+              edit={edit}
+            />
+          )}
+        </View>
+      </Modal>
     </Screen>
   );
 }
