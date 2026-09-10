@@ -150,6 +150,13 @@ footer {
   border-radius: 10px;
   padding: 16px;
 }
+.karte .icon {
+  width: 24px;
+  height: 24px;
+  display: block;
+  margin-bottom: 12px;
+  color: var(--sub);
+}
 .karte h3 { margin: 0 0 8px; font-size: 15px; }
 .karte p { margin: 0; font-size: 15px; color: var(--sub); }
 
@@ -190,6 +197,12 @@ section > h3:first-of-type { margin-top: 0; }
  * Abläufe. Links die Handlung, darunter was das Werkzeug damit tut —
  * die Einrückung ist das Argument: die App handelt nie zuerst.
  */
+.pointe {
+  margin-top: 20px;
+  font-size: 17px;
+  color: var(--text);
+}
+
 .vorspann {
   font-size: 17px;
   color: var(--sub);

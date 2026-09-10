@@ -5,59 +5,64 @@ before ending one. `docs/` is GitHub Pages build output — notes live here.
 
 ## 2026-09-10 (latest) — The information page became the pitch
 
-Benedict's call: the pitch does not get its own artifact. It *is* the page that
+Benedict's call: the pitch does not get its own artifact. It *is* the page
 GitHub Pages serves at `index`. One surface, one source, and whoever gets shown
 it can read it again afterwards without a deck being mailed around.
 
-That decision costs something and it is worth naming: a pitch has a slide
-saying what the speaker wants out of the meeting, and a public page cannot
-carry that. What replaces it is the "Klare Augen" section, which now names the
-open questions by group — medical, legal, operational, effect.
+**Written twice.** The first pass was too wordy — my own register, not
+Benedict's. The rewrite is short lines and bullets, headings that name the
+thing instead of framing it. "Sex Diary / STI Tracing mittels App." at the top;
+the old "Es scheitert nicht am Willen" hero and the "Klare Augen" heading are
+gone. Worth keeping in mind for anything else written for him.
 
-**Structure, in the order a reader meets it.** Two flows before any feature
-list: Julia, who wants to reach someone she does not want to see again, and
-Max, who exchanges nothing but a random number off an NFC card. Then the three
-motives the flows demonstrate, then the modules split into the three that make
-it a product and the eight that come after, each with its actual state. Then
-architecture, the server, and what is unresolved.
+**Structure.** Three problems with hand-drawn icons, two flows, three motives,
+Basis- and Sollfunktionen each with their real state, architecture, server,
+open questions. The flows come before any feature list because they carry the
+argument; the feature lists only say what exists.
 
-**The conflict that had to be decided before writing.** The brief listed
-notification *by phone number* under the base functions. ADR-0008 rejects
-exactly that in its list of discarded alternatives, and the May pitch still
-carried it — the ADR closed the path in July without the pitch following. It is
-now a **Sollfunktion marked "rechtlich ungeklärt"**, and the Julia flow says so
-at the step where it breaks: her story does not complete today. Showing that
-gap is worth more than a story that quietly assumes the unresolved part.
+**The SMS decision moved twice in one session.** The brief listed notification
+by phone number under the base functions; ADR-0008 rejects exactly that, so it
+first became a Sollfunktion marked "rechtlich ungeklärt". Then Benedict named
+the sender: **the Gesundheitsreferat, not us.** That is a different
+architecture and a better one — a public authority with a statutory
+contact-tracing mandate sends the SMS, and the operator of the app never sees a
+number. The open question is narrower now: does that mandate carry it? It stays
+marked open, and the Julia flow marks step 6 as the one that does not resolve
+today.
 
-The precise objection, which the page states: the service would see a phone
-number, would have to hand it to a delivery provider, and the recipient
-consented to none of it. That is three separate problems, not one.
+**Max's flow was reversed on Benedict's note**, and it is the stronger version:
+the phone stays home, the *other* person scans Max's card, and the card is the
+passive thing. The arc now runs through problem 1 — Max judges the risk as low
+and lets it go, the notification arrives, he tests after all. One line closes
+it: without the notification he would not have gone. Two stories, two different
+failure modes, rather than two demonstrations of the same feature.
 
-**Two diagrams, written by hand.** A library would be a third-party script, and
-this page loads nothing. Data flow first — the asymmetry between one thick box
-on the device and one thin box on the server *is* the argument, so the boxes
-are sized to it. Layers second, with `@sexdiary/core` as the inverted band: the
-audit surface is the one thing worth making unmissable. Both carry a
-`role="img"` label and the prose beside them says the same thing; nothing is
-lost when the SVG is not seen.
+**Two diagrams, written by hand** — a library would be a third-party script.
+Data flow, where the size asymmetry between device and server *is* the
+argument, plus a dashed box for the planned SMS path so the picture matches the
+story. Layers second, with `@sexdiary/core` inverted: the audit surface is
+worth making unmissable. Both carry `role="img"` labels and the prose beside
+them says the same thing.
 
-Checked by rendering, not by counting tags — headless Chrome, both themes.
-That caught the thing a build never would: three-sentence bold lead-ins in the
-flows read as block text. Each step is one short sentence now, with the detail
-underneath.
+Checked by rendering in headless Chrome, both themes — not by counting tags.
+That caught three-sentence bold lead-ins reading as block text, and an "er"
+that could have been Max or the test.
 
-**A finding while writing the module states.** `verifySignedResult` exists in
-core and is tested, and **no app calls it**. The scanner reads QR codes and
-imports them unverified. The page says so rather than claiming a signature
-check that does not happen; `OFFENE-PUNKTE.md` was stale on this and is
-corrected.
+**A finding while writing the states.** `verifySignedResult` exists in core and
+is tested, and **no app calls it**. The scanner imports unverified, so ADR-0007
+is implemented on paper only. The page says so; `OFFENE-PUNKTE.md` was stale
+and is corrected.
 
-Status markers stay neutral, no semantic colour. "gebaut" in green and
-"ungeklärt" in red would be the risk scale used where it means nothing —
-in this app that scale means infection risk (ADR-0015).
+Status markers stay neutral. "gebaut" in green and "offen" in red would be the
+risk scale where it means nothing — in this app that scale means infection risk
+(ADR-0015).
 
-Green: lint, 115 tests, three typechecks, build. `.gegenueber` was removed from
-`info.css`; the rewrite orphaned it.
+Green throughout: lint, 115 tests, three typechecks, build, CI on PR #1.
+`.gegenueber` was removed from `info.css`; the rewrite orphaned it.
+
+**Not merged.** `main` still serves the old tracker. The merge of PR #1 — 52
+commits, all of waves 0 to 3 — is Benedict's to run; it was refused to me as an
+outward-facing action, correctly.
 
 ---
 
