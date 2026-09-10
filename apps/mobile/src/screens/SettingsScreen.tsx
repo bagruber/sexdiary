@@ -1,6 +1,15 @@
 import { useEffect, useState } from "react";
-import { Alert, Modal, ScrollView, Switch, Text, View } from "react-native";
-import { formatDate, type Lang, type Theme } from "@sexdiary/core";
+import { Alert, Modal, ScrollView, Switch, Text, TextInput, View } from "react-native";
+import {
+  CONTACT_PLATFORMS,
+  COUNTRIES,
+  STI_NAMES,
+  formatDate,
+  type ContactHandlePlatform,
+  type Lang,
+  type PartnerAnatomy,
+  type Theme,
+} from "@sexdiary/core";
 import { useApp } from "../state/store";
 import { APP_NAME } from "../branding";
 import { Card, Chip, PrimaryButton, Row, Screen, SectionTitle, Title } from "../ui";
@@ -24,6 +33,23 @@ export function SettingsScreen() {
   const { data, dispatch, t, palette } = useApp();
   const [showData, setShowData] = useState(false);
   const [backup, setBackup] = useState<"export" | "import" | null>(null);
+  const [condOpen, setCondOpen] = useState(false);
+
+  const { profile } = data;
+  const updProfile = (patch: Partial<typeof profile>) =>
+    dispatch({ type: "updateProfile", patch });
+  const updPrefs = (patch: Partial<typeof data.prefs>) =>
+    dispatch({ type: "updatePrefs", patch });
+
+  const feld = {
+    borderWidth: 1,
+    borderColor: palette.border,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    color: palette.text,
+    marginTop: 8,
+  };
   const [canLock, setCanLock] = useState<LockAvailability | null>(null);
   const [pending, setPending] = useState<Date[] | null>(null);
   const [testSent, setTestSent] = useState(false);
@@ -91,6 +117,42 @@ export function SettingsScreen() {
     <Screen>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Title>{t("settings")}</Title>
+
+        <SectionTitle>{t("profile")}</SectionTitle>
+        <Card>
+          <Text style={{ color: palette.text }}>{t("age")}</Text>
+          <TextInput
+            value={profile.age}
+            onChangeText={(v) => updProfile({ age: v })}
+            keyboardType="number-pad"
+            accessibilityLabel={t("age")}
+            style={feld}
+          />
+        </Card>
+        <Card>
+          <Text style={{ color: palette.text, marginBottom: 8 }}>
+            {t("partnerAnatomy")}
+          </Text>
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            {(["both", "penis", "vagina"] as PartnerAnatomy[]).map((a) => (
+              <Chip
+                key={a}
+                label={t(a === "both" ? "both" : a)}
+                active={profile.pa === a}
+                onPress={() => updProfile({ pa: a })}
+              />
+            ))}
+          </View>
+        </Card>
+        <Row
+          label={t("knownConditions")}
+          sub={
+            profile.conditions.length
+              ? profile.conditions.join(", ")
+              : t("knownConditionsSub")
+          }
+          onPress={() => setCondOpen(true)}
+        />
 
         <SectionTitle>{t("general")}</SectionTitle>
         <Card>
@@ -230,6 +292,90 @@ export function SettingsScreen() {
           </Card>
         )}
 
+        <Card>
+          <Text style={{ color: palette.text, marginBottom: 4 }}>{t("region")}</Text>
+          <Text style={{ color: palette.sub, fontSize: 12, marginBottom: 8 }}>
+            {t("regionSub")}
+          </Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {COUNTRIES.map((c) => (
+              <Chip
+                key={c}
+                label={c}
+                active={data.prefs.country === c}
+                onPress={() => updPrefs({ country: c })}
+              />
+            ))}
+          </ScrollView>
+        </Card>
+        {(
+          [
+            ["highPrev", "highPrevToggle", "highPrevToggleSub"],
+            ["reducedMotion", "reducedMotion", "reducedMotionSub"],
+            ["hideLowRisk", "hideLowRisk", "hideLowRiskSub"],
+          ] as const
+        ).map(([key, label, sub]) => (
+          <Row
+            key={key}
+            label={t(label)}
+            sub={t(sub)}
+            right={
+              <Switch
+                value={data.prefs[key]}
+                onValueChange={(v) => updPrefs({ [key]: v })}
+                accessibilityLabel={t(label)}
+              />
+            }
+          />
+        ))}
+
+        <SectionTitle>{t("sharingPrefs")}</SectionTitle>
+        <Card>
+          <Text style={{ color: palette.text, marginBottom: 8 }}>{t("shareMode")}</Text>
+          <View style={{ flexDirection: "row" }}>
+            <Chip
+              label={t("shareTokenOnlyLabel")}
+              active={data.prefs.shareMode === "token"}
+              onPress={() => updPrefs({ shareMode: "token" })}
+            />
+            <Chip
+              label={t("shareWithHandle")}
+              active={data.prefs.shareMode === "handle"}
+              onPress={() => updPrefs({ shareMode: "handle" })}
+            />
+          </View>
+        </Card>
+        {data.prefs.shareMode === "handle" && (
+          <Card>
+            <Text style={{ color: palette.text, marginBottom: 8 }}>
+              {t("sharePlatform")}
+            </Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {CONTACT_PLATFORMS.map((pf) => (
+                <Chip
+                  key={pf}
+                  label={pf}
+                  active={data.prefs.sharePlatform === pf}
+                  onPress={() =>
+                    updPrefs({ sharePlatform: pf as ContactHandlePlatform })
+                  }
+                />
+              ))}
+            </ScrollView>
+            <Text style={{ color: palette.text, marginTop: 12 }}>
+              {t("shareHandle")}
+            </Text>
+            <TextInput
+              value={data.prefs.shareHandle}
+              onChangeText={(v) => updPrefs({ shareHandle: v })}
+              autoCapitalize="none"
+              autoCorrect={false}
+              accessibilityLabel={t("shareHandle")}
+              style={feld}
+            />
+          </Card>
+        )}
+
         <SectionTitle>{t("backupSection")}</SectionTitle>
         <Row
           label={t("backupExport")}
@@ -270,6 +416,36 @@ export function SettingsScreen() {
       </ScrollView>
 
       {showData && <DataScreen onClose={() => setShowData(false)} />}
+      <Modal
+        visible={condOpen}
+        animationType="slide"
+        onRequestClose={() => setCondOpen(false)}
+      >
+        <View
+          style={{ flex: 1, backgroundColor: palette.bg, padding: 16, paddingTop: 48 }}
+        >
+          <Title>{t("knownConditions")}</Title>
+          <Text style={{ color: palette.sub, marginBottom: 12, lineHeight: 19 }}>
+            {t("knownConditionsHint")}
+          </Text>
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            {STI_NAMES.map((sti) => (
+              <Chip
+                key={sti}
+                label={sti}
+                active={profile.conditions.includes(sti)}
+                onPress={() => {
+                  const set = new Set(profile.conditions);
+                  if (set.has(sti)) set.delete(sti);
+                  else set.add(sti);
+                  updProfile({ conditions: [...set] });
+                }}
+              />
+            ))}
+          </View>
+          <PrimaryButton label={t("save")} onPress={() => setCondOpen(false)} />
+        </View>
+      </Modal>
       <Modal
         visible={backup !== null}
         animationType="slide"

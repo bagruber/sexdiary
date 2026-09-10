@@ -1,4 +1,4 @@
-import{a as e,b as t}from"./dist-j-gOHOtk.js";function n(){let t=e=>Object.entries(e).map(([e,t])=>`--${e}: ${t};`).join(``);return[`:root{${t(e(`light`))}}`,`:root[data-theme="dark"]{${t(e(`dark`))}}`].join(`
+import{a as e,b as t}from"./dist-CMLI26IT.js";function n(){let t=e=>Object.entries(e).map(([e,t])=>`--${e}: ${t};`).join(``);return[`:root{${t(e(`light`))}}`,`:root[data-theme="dark"]{${t(e(`dark`))}}`].join(`
 `)}var r=(e,t,n)=>`
   <section id="${e}" aria-labelledby="${e}-h">
     <h2 id="${e}-h">${t}</h2>

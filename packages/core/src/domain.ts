@@ -35,12 +35,14 @@ export const emptyActs = (): ActFlags =>
 
 export type PartnerAnatomy = "penis" | "vagina" | "both";
 
-export type ContactHandlePlatform =
-  | "instagram"
-  | "telegram"
-  | "signal"
-  | "whatsapp"
-  | "snapchat";
+export const CONTACT_PLATFORMS = [
+  "instagram",
+  "telegram",
+  "signal",
+  "whatsapp",
+  "snapchat",
+] as const;
+export type ContactHandlePlatform = (typeof CONTACT_PLATFORMS)[number];
 
 export interface Contact {
   id: string;
