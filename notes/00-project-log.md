@@ -3,7 +3,80 @@
 Reverse-chronological decision log. Read this first each session; append
 before ending one. `docs/` is GitHub Pages build output — notes live here.
 
-## 2026-09-10 (latest) — Real icons, and the two round buttons stopped being twins
+## 2026-09-10 (latest) — The signature check is wired, and it rejects
+
+New APK first (`a89e320`, 96 MB, ten and a half minutes). The commit was read
+*before* the build, not at copy time — that is the 09.09 lesson — and the tree
+was clean, so the name is honest. Probed against the bundle inside the APK, not
+against its filename: the icon paths and category hex values are there, none of
+the old glyphs are, and the later core changes are absent, which is how the
+name is confirmed rather than assumed. Still the debug key. `react-native-svg`
+across four ABIs costs 4.5 MB: 91.5 → 96.0.
+
+**The info page then said something that was no longer true**, in three places:
+"seven third-party packages". My own change made it eight. Corrected, including
+inside the layer diagram's `aria-label`.
+
+**The icon paths moved into the core.** The page drew its own three at stroke
+1.6 while the app drew fourteen at 1.7 — two sets that only ever drift, because
+nobody sees them side by side. Both now read `ICON_PATHS` from
+`@sexdiary/core`, where the colour tokens already live. Rendering the result in
+headless Chrome in both themes found three things no amount of reading would
+have: the pictograms in `--sub` at 24 px were nearly invisible on dark, the
+handoff arrowhead touched the right circle and merged into something that read
+like a letter, and the gauge's pivot dot vanished. All three fixed by measuring,
+not by taste.
+
+A rendering harness trap worth remembering: the first screenshot came out
+completely unstyled and looked like a broken page. It was `file://` — the built
+CSS never loaded. Serving over HTTP showed the page was fine all along.
+
+---
+
+**Then the oldest lie in the repo got closed.** `verifySignedResult` had lived
+in core, tested, since 28.08 — and **no app called it**. Scanning went through
+`parseImportPayload`, which accepts a JSON test result unverified and has no
+reader for the signed format at all. ADR-0007 was implemented on paper.
+
+**The switch lives in `core/src/scan.ts`, not in the screen.** It decides what
+*provenance* a record gets, and that is the whole claim signed results make. A
+decision like that sitting in a `.tsx` under a camera callback is one no
+auditor reads. Ed25519 comes from `@noble/curves` — same family as the ciphers
+already shipped, pure TypeScript, no native module — and is injected, so core
+keeps its zero runtime dependencies.
+
+**The trust list ships empty, and that is the honest state.** No test centre
+takes part; there is no public key it would be truthful to enter. A made-up
+demo issuer would be worse than an empty list — it would fake exactly the
+assurance at stake. So every signed code is rejected today with
+`unknown_issuer`, and the spec's own escape hatch carries it: a rejected code
+may be kept as a **self-entered** record on an explicit choice, with the reason
+shown in plain words. The draft deliberately carries no `signed` field and no
+facility name — the centre confirmed nothing.
+
+**Fourteen new tests**, and the one that matters is not the forged signature but
+the *real signature over altered content*: take a genuine QR, rewrite
+`"Gonorrhea":"positive"` to `"negative"`, keep the signature. It has two
+assertions inside it that prove the tampering actually happened, so it cannot
+pass by doing nothing.
+
+**Green does not prove it is called** — this repo has learned that twice. So the
+app's real `verifySignature` and its real shipped `TRUST_LIST` were run against
+core's real `readScannedCode` in Node (`trust.ts` has no React Native import, so
+it just runs): genuine signature accepted, forged rejected as `bad_signature`,
+and against the shipped empty list rejected as `unknown_issuer` with a draft
+that carries no provenance. Exit code checked without a pipe, because piping
+Gradle through `tail` once reported a failed build as a success.
+
+Lint, three typechecks, 149 tests, build, Metro export. Bundle 2.3 → 2.5 MB.
+
+**ADR-0007 still says "vorgeschlagen".** It is now built, so that status is
+arguably stale — but an ADR's status is a governance call, so it is flagged
+rather than flipped.
+
+---
+
+## 2026-09-10 — Real icons, and the two round buttons stopped being twins
 
 Benedict brought a folder of screenshots — DB, MVG, Play, Signal, Telegram,
 Threema, Discord, Instagram — and asked what would make the app look less like

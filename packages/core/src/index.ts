@@ -11,6 +11,7 @@ export * from "./stis.js";
 export * from "./risk.js";
 export * from "./reducer.js";
 export * from "./schema.js";
+export * from "./scan.js";
 export * from "./seed.js";
 export * from "./storage.js";
 export * from "./backup.js";

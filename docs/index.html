@@ -10,7 +10,7 @@
     />
     <title>Sex Diary — STI Tracing mittels App</title>
   <style>:root{--bg: #F5F3EF;--card: #FFFFFF;--text: #14262B;--sub: #5A6B70;--border: #E3E0D8;--accent: #14262B;--accentText: #FFFFFF;--good: #2B7A4E;--warn: #8C6208;--bad: #C0392B;}
-:root[data-theme="dark"]{--bg: #0D1A1E;--card: #142429;--text: #E6EFEF;--sub: #8FA5AA;--border: #234047;--accent: #E6EFEF;--accentText: #0D1A1E;--good: #5BBB8A;--warn: #D9A441;--bad: #E87A6A;}</style>  <script type="module" crossorigin src="./assets/index-D0pzZsok.js"></script>
+:root[data-theme="dark"]{--bg: #0D1A1E;--card: #142429;--text: #E6EFEF;--sub: #8FA5AA;--border: #234047;--accent: #E6EFEF;--accentText: #0D1A1E;--good: #5BBB8A;--warn: #D9A441;--bad: #E87A6A;}</style>  <script type="module" crossorigin src="./assets/index-BW87fDlc.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/dist-FzsQM_we.js">
   <link rel="stylesheet" crossorigin href="./assets/index-BtRRXkC6.css">
 </head>
@@ -154,8 +154,12 @@
     <h2 id="soll-h">Sollfunktionen</h2>
     <ul class="module">
       <li>
-        <h3>QR-Code für Tests und Kontakte <span class="stand">gebaut, Signaturprüfung fehlt</span></h3>
-        <p>Format und Prüfverfahren liegen getestet im Kern, im Scanpfad wird die Signatur noch nicht geprüft.</p>
+        <h3>QR-Code für Tests und Kontakte <span class="stand ist">gebaut</span></h3>
+        <p>Ein signierter Befund wird beim Einlesen kryptographisch geprüft (Ed25519). Was nicht durchkommt, wird nicht stillschweigend übernommen — es steht dann als selbst eingetragen da, oder gar nicht.</p>
+      </li>
+      <li>
+        <h3>Teilnehmende Teststellen <span class="stand">keine</span></h3>
+        <p>Die Prüfung läuft, das Verzeichnis der Aussteller ist leer. Solange keine Teststelle einen Schlüssel veröffentlicht, wird jeder signierte Code abgelehnt — richtig so, aber ohne Nutzen. Das ist eine Frage der Beteiligung, keine technische.</p>
       </li>
       <li>
         <h3>NFC für Kontakte <span class="stand">gebaut, auf Gerät ungetestet</span></h3>

@@ -17,12 +17,23 @@ Zeitstempel}`, drei Vorgänge — ablegen, zum eigenen Token abholen, löschen.
 `DELETE` ab dem ersten Tag (Art. 17). Ein pseudonymisiertes Token darf für den
 Prototyp dort liegen; die rechtliche Frage darüber hinaus bleibt offen.
 
-**Der Ed25519-Verifizierer hängt in der Luft.** `verifySignedResult` liegt im
-Kern und ist getestet, aber **keine App ruft es auf** — der Scanpfad geht über
-`parseImportPayload` und importiert ungeprüft. Ein eingelesenes Testergebnis
-ist damit heute nicht mehr wert als ein von Hand eingetragenes, und
-[ADR-0007](architecture/adr/0007-signierte-testergebnisse.md) ist nur auf dem
-Papier umgesetzt. Die Infoseite sagt das seit dem 10.09.2026 offen.
+**Der Ed25519-Verifizierer hängt nicht mehr in der Luft** — seit dem
+10.09.2026 abends. Die Weiche liegt als `readScannedCode` im Kern, Ed25519
+kommt aus `@noble/curves` und wird hereingereicht, und ein signierter Befund
+wird beim Einlesen geprüft. Was durchfällt, wird nicht stillschweigend
+übernommen; der Nutzer bekommt den Grund im Klartext und darf den Eintrag
+ausdrücklich als selbst eingetragen behalten.
+
+Was **bleibt**, ist keine technische Frage: die ausgelieferte Vertrauensliste
+ist leer, weil keine Teststelle teilnimmt. Jeder signierte Code wird deshalb
+heute mit `unknown_issuer` abgelehnt — richtig, aber ohne Nutzen. Ein
+erfundener Demo-Aussteller wäre schlimmer als eine leere Liste: er täuschte
+genau die Zusicherung vor, um die es geht. Es braucht eine Teststelle, die
+einen Schlüssel veröffentlicht (FA-67).
+
+Nebenbefund fürs Protokoll: `apps/web` liest weiterhin über
+`parseImportPayload`. Der Web-Prototyp speichert nichts und ist nach ADR-0001
+keine Produktfläche, deshalb bewusst nicht mitgezogen.
 
 **Auf einem Gerät zu prüfen**, alles drei nur dort feststellbar:
 

@@ -383,8 +383,13 @@ ${section(
   funktionen([
     [
       "QR-Code für Tests und Kontakte",
-      "gebaut, Signaturprüfung fehlt",
-      "Format und Prüfverfahren liegen getestet im Kern, im Scanpfad wird die Signatur noch nicht geprüft.",
+      "gebaut",
+      "Ein signierter Befund wird beim Einlesen kryptographisch geprüft (Ed25519). Was nicht durchkommt, wird nicht stillschweigend übernommen — es steht dann als selbst eingetragen da, oder gar nicht.",
+    ],
+    [
+      "Teilnehmende Teststellen",
+      "keine",
+      "Die Prüfung läuft, das Verzeichnis der Aussteller ist leer. Solange keine Teststelle einen Schlüssel veröffentlicht, wird jeder signierte Code abgelehnt — richtig so, aber ohne Nutzen. Das ist eine Frage der Beteiligung, keine technische.",
     ],
     [
       "NFC für Kontakte",

@@ -204,6 +204,20 @@ export const de: Dict = {
   importPaste: "Code einfügen",
   importPasteHint: "JSON-Daten von Testanbieter oder Kontakt einfügen",
   importInvalid: "Ungültiger oder unbekannter Code.",
+  importedSigned: "Befund von {name} — Signatur geprüft",
+  importedSelfEntered: "Als selbst eingetragen übernommen",
+  sigRejected: "Signatur nicht bestätigt",
+  sigUnknownIssuer:
+    "Diese Teststelle ist der App nicht bekannt. Bisher nimmt keine teil, deshalb kann die App für keinen Befund bürgen.",
+  sigRevoked: "Der Schlüssel dieser Teststelle wurde gesperrt.",
+  sigOutsideValidity:
+    "Der Schlüssel war zum Zeitpunkt der Probe nicht gültig.",
+  sigBadSignature:
+    "Die Signatur passt nicht zum Inhalt. Der Code wurde nachträglich verändert oder stammt nicht von der genannten Stelle.",
+  sigMalformed: "Der Code ist beschädigt oder unvollständig.",
+  sigKeepAnyway: "Trotzdem als selbst eingetragen übernehmen",
+  sigKeepAnywayNote:
+    "Der Eintrag zählt dann wie ein von Hand getippter. Datum und Befunde werden übernommen, die Einrichtung nicht — sie hat nichts bestätigt.",
   importedTest: "Testergebnis importiert",
   importedContact: "Kontakt importiert",
   cameraDenied: "Kamerazugriff verweigert.",

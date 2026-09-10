@@ -6,21 +6,47 @@
  * der Sache ist. Er muss deshalb ohne Nachdenken erreichbar sein und
  * ohne Eingabe funktionieren.
  *
- * Gelesen wird mit derselben Funktion wie im Web: `parseImportPayload`
- * liegt im Kern und entscheidet, ob ein Code ein Kontakt, ein
- * Testergebnis oder nichts davon ist. Die Kamera liefert nur Text.
+ * Gelesen wird mit `readScannedCode` aus dem Kern. Die Weiche liegt
+ * dort und nicht hier, weil sie entscheidet, welche *Herkunft* ein
+ * Datensatz bekommt — signiert und geprueft, oder selbst eingetragen.
+ * Die Kamera liefert nur Text.
+ *
+ * Bis zum 10.09.2026 ging jeder Code durch `parseImportPayload` und ein
+ * Testergebnis wurde ungeprueft uebernommen; das signierte Format hatte
+ * gar keinen Leser. Jetzt wird geprueft, und was nicht durchkommt, darf
+ * der Nutzer ausdruecklich als selbst eingetragen behalten
+ * (ADR-0007, `interfaces/signed-results.md`).
  */
 import { useState } from "react";
 import { ScrollView, TextInput, View } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
-import { parseImportPayload } from "@sexdiary/core";
+import {
+  readScannedCode,
+  type RejectionReason,
+  type TestRecord,
+} from "@sexdiary/core";
 import { useApp } from "../state/store";
 import { Card, Chip, GhostButton, PrimaryButton, SectionTitle, Text, Title} from "../ui";
 import { QrCode } from "./QrCode";
 import { PositivePrompt } from "./AddSheets";
 import { karteLesen, karteSchreiben, nfcAbbrechen, nfcVerfuegbar } from "../lib/nfc";
+import { TRUST_LIST, verifySignature } from "../lib/trust";
 
 type Tab = "share" | "import";
+
+/**
+ * Ein Grund, ein Satz. Die Zuordnung steht als Tabelle da, damit der
+ * Compiler meckert, sobald der Kern einen Ablehnungsgrund dazubekommt —
+ * bei einem `switch` mit `default` faellt ein neuer Grund still
+ * hindurch und niemand erfaehrt, warum.
+ */
+const REJECTION_TEXT: Record<RejectionReason, "sigUnknownIssuer" | "sigRevoked" | "sigOutsideValidity" | "sigBadSignature" | "sigMalformed"> = {
+  unknown_issuer: "sigUnknownIssuer",
+  revoked: "sigRevoked",
+  outside_validity: "sigOutsideValidity",
+  bad_signature: "sigBadSignature",
+  malformed: "sigMalformed",
+};
 
 export function ConnectScreen({ onClose }: { onClose: () => void }) {
   const { data, dispatch, t, palette } = useApp();
@@ -32,6 +58,15 @@ export function ConnectScreen({ onClose }: { onClose: () => void }) {
   const [permission, requestPermission] = useCameraPermissions();
   const [positiv, setPositiv] = useState<string[] | null>(null);
   const [nfcBusy, setNfcBusy] = useState<"read" | "write" | null>(null);
+  /**
+   * Ein abgelehnter Befund, der noch nicht weggeworfen ist. Solange er
+   * hier liegt, steht dem Nutzer der Weg offen, ihn als selbst
+   * eingetragen zu behalten — und nur dieser Weg, nicht der stille.
+   */
+  const [abgelehnt, setAbgelehnt] = useState<{
+    reason: RejectionReason;
+    draft: TestRecord | null;
+  } | null>(null);
 
   const { shareMode, sharePlatform, shareHandle } = data.prefs;
   const withHandle = shareMode === "handle" && !!sharePlatform && !!shareHandle;
@@ -47,28 +82,64 @@ export function ConnectScreen({ onClose }: { onClose: () => void }) {
       : { v: 1, type: "contact", token: data.myToken },
   );
 
-  const take = (raw: string) => {
-    const r = parseImportPayload(raw);
-    if (r.kind === "test") {
-      dispatch({ type: "saveTest", payload: r.record });
-      setStatus({ ok: true, msg: t("importedTest") });
-      // Ein eingelesener Befund ist derselbe Befund wie ein getippter.
-      // Ohne das haette ausgerechnet der Weg, den die App bewirbt --
-      // Ergebnis per QR aus dem Testangebot -- keinen Anschluss an die
-      // Benachrichtigung gehabt.
-      const pos = Object.entries(r.record.results ?? {})
-        .filter(([, v]) => v === "positive")
-        .map(([sti]) => sti);
-      if (pos.length) setPositiv(pos);
-    } else if (r.kind === "contact") {
-      dispatch({ type: "saveContact", payload: r.record });
-      setStatus({ ok: true, msg: t("importedContact") });
-    } else {
-      setStatus({ ok: false, msg: t("importInvalid") });
-    }
+  /** Ein Testergebnis liegt vor — der Positiv-Ablauf haengt daran. */
+  const nachTest = (record: TestRecord) => {
+    // Ein eingelesener Befund ist derselbe Befund wie ein getippter.
+    // Ohne das haette ausgerechnet der Weg, den die App bewirbt --
+    // Ergebnis per QR aus dem Testangebot -- keinen Anschluss an die
+    // Benachrichtigung gehabt.
+    const pos = Object.entries(record.results ?? {})
+      .filter(([, v]) => v === "positive")
+      .map(([sti]) => sti);
+    if (pos.length) setPositiv(pos);
+  };
+
+  const schliessen = () => {
     setScanning(false);
     setPasting(false);
     setBuf("");
+  };
+
+  const take = (raw: string) => {
+    const r = readScannedCode(raw, {
+      trust: TRUST_LIST,
+      verify: verifySignature,
+      now: new Date().toISOString(),
+    });
+
+    if (r.kind === "signed") {
+      dispatch({ type: "saveTest", payload: r.record });
+      setAbgelehnt(null);
+      setStatus({ ok: true, msg: t("importedSigned", { name: r.issuer }) });
+      nachTest(r.record);
+    } else if (r.kind === "test") {
+      dispatch({ type: "saveTest", payload: r.record });
+      setAbgelehnt(null);
+      setStatus({ ok: true, msg: t("importedTest") });
+      nachTest(r.record);
+    } else if (r.kind === "contact") {
+      dispatch({ type: "saveContact", payload: r.record });
+      setAbgelehnt(null);
+      setStatus({ ok: true, msg: t("importedContact") });
+    } else if (r.kind === "rejected") {
+      // Nichts wird gespeichert. Der Entwurf wartet auf eine
+      // ausdrueckliche Entscheidung.
+      setAbgelehnt({ reason: r.reason, draft: r.draft });
+      setStatus({ ok: false, msg: t("sigRejected") });
+    } else {
+      setAbgelehnt(null);
+      setStatus({ ok: false, msg: t("importInvalid") });
+    }
+    schliessen();
+  };
+
+  /** Der ausdrueckliche Weg aus `interfaces/signed-results.md`. */
+  const trotzdemBehalten = () => {
+    if (!abgelehnt?.draft) return;
+    dispatch({ type: "saveTest", payload: abgelehnt.draft });
+    setStatus({ ok: true, msg: t("importedSelfEntered") });
+    nachTest(abgelehnt.draft);
+    setAbgelehnt(null);
   };
 
   /**
@@ -239,6 +310,34 @@ export function ConnectScreen({ onClose }: { onClose: () => void }) {
           <Text style={{ color: status.ok ? palette.good : palette.bad, fontSize: 13 }}>
             {status.msg}
           </Text>
+        </Card>
+      )}
+
+      {/*
+        Warum abgelehnt wurde, im Klartext. Eine pauschale Absage laesst
+        Leute glauben, die App sei kaputt, und sagt der Teststelle
+        nichts darueber, was zu beheben waere.
+      */}
+      {abgelehnt && (
+        <Card>
+          <Text style={{ color: palette.text, fontSize: 13, lineHeight: 19 }}>
+            {t(REJECTION_TEXT[abgelehnt.reason])}
+          </Text>
+          {abgelehnt.draft && (
+            <>
+              <Text
+                style={{
+                  color: palette.sub,
+                  fontSize: 12,
+                  lineHeight: 18,
+                  marginTop: 10,
+                }}
+              >
+                {t("sigKeepAnywayNote")}
+              </Text>
+              <GhostButton label={t("sigKeepAnyway")} onPress={trotzdemBehalten} />
+            </>
+          )}
         </Card>
       )}
 

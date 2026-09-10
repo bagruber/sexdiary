@@ -135,15 +135,24 @@ Aus dem Bedrohungsmodell: der realistische Angreifer ist die Person daneben.
 |---|---|---|
 | FA-61 | Der Nutzer kann eine **passwortverschlüsselte Sicherungsdatei** erzeugen und wieder einlesen. | gebaut |
 | FA-62 | Der Nutzer kann in die **Cloud seiner Wahl** sichern. | offen |
-| FA-63 | Ein von einer Teststelle **signiertes Ergebnis** wird beim Einlesen kryptographisch geprüft. | teilweise |
-| FA-64 | Ein eingelesenes Ergebnis ist als **signiert oder selbst eingetragen** erkennbar. | teilweise |
+| FA-63 | Ein von einer Teststelle **signiertes Ergebnis** wird beim Einlesen kryptographisch geprüft. | gebaut |
+| FA-64 | Ein eingelesenes Ergebnis ist als **signiert oder selbst eingetragen** erkennbar. | gebaut |
+| FA-66 | Ein **abgelehnter** Code darf auf ausdrückliche Wahl als selbst eingetragener Datensatz übernommen werden. | gebaut |
+| FA-67 | Mindestens eine **Teststelle nimmt teil** — die ausgelieferte Vertrauensliste hat einen Eintrag. | offen |
 | FA-65 | Der Nutzer kann **freiwillig anonymisierte Daten** zur Forschung beitragen. | offen |
 
-FA-63 ist die grösste Lücke zwischen Papier und Programm. `verifySignedResult`
-liegt im Kern und ist getestet; **keine App ruft es auf**. Der Scanpfad geht
-über `parseImportPayload` und importiert ungeprüft, damit ist ein eingelesenes
-Testergebnis heute nicht mehr wert als ein von Hand eingetragenes — und FA-64
-zeigt eine Herkunft an, die nie gesetzt wird.
+Seit dem 10.09.2026 hängt der Verifizierer nicht mehr in der Luft. Die Weiche
+liegt als `readScannedCode` im Kern — nicht im Bildschirm, weil sie entscheidet,
+welche *Herkunft* ein Datensatz bekommt, und das ist die Aussage, um die es bei
+signierten Befunden geht. Ed25519 kommt aus `@noble/curves` und wird
+hereingereicht; der Kern bleibt abhängigkeitsfrei.
+
+**FA-67 ist der Rest, und er ist keine technische Frage.** Die ausgelieferte
+Vertrauensliste ist leer, weil keine Teststelle teilnimmt. Ein erfundener
+Demo-Aussteller wäre schlimmer als eine leere Liste — er würde genau die
+Zusicherung vortäuschen, um die es hier geht. Die Folge ist gewollt: jeder
+signierte Code wird heute mit `unknown_issuer` abgelehnt, und FA-66 fängt den
+Fall auf.
 
 ## FA-7x — Relay-Server
 
@@ -222,7 +231,7 @@ offensichtlich ist.
 | FA-52 | [ADR-0005](adr/0005-verschluesselung-at-rest.md) | `lib/app-lock.ts`, `screens/LockScreen.tsx` |
 | FA-55, FA-56 | — | `branding.ts`, `screens/DecoyScreen.tsx` |
 | FA-61, FA-62 | [ADR-0009](adr/0009-backup-modell.md) | `core/src/backup.ts`, `screens/BackupSheet.tsx` |
-| FA-63, FA-64 | [ADR-0007](adr/0007-signierte-testergebnisse.md) | `core/src/signed-result.ts` — **ohne Aufrufer** |
+| FA-63, FA-64, FA-66 | [ADR-0007](adr/0007-signierte-testergebnisse.md) | `core/src/scan.ts`, `core/src/signed-result.ts`, `mobile/src/lib/trust.ts` |
 | FA-65 | [ADR-0013](adr/0013-forschungsdaten.md) | — |
 | FA-71 … FA-75 | [ADR-0008](adr/0008-anonyme-benachrichtigung.md) | — |
 | NFA-03, NFA-05 | [ADR-0015](adr/0015-farbtokens.md) | `core/src/tokens.ts`, `core/test/tokens.test.ts` |

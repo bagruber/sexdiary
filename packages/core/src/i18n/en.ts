@@ -215,6 +215,19 @@ export const en = {
   importPaste: "Paste code",
   importPasteHint: "Paste a JSON payload from a test provider or contact",
   importInvalid: "Invalid or unrecognized code.",
+  importedSigned: "Result from {name} — signature verified",
+  importedSelfEntered: "Kept as self-entered",
+  sigRejected: "Signature not confirmed",
+  sigUnknownIssuer:
+    "This test centre is not known to the app. None takes part yet, so the app cannot vouch for any result.",
+  sigRevoked: "This test centre's key has been revoked.",
+  sigOutsideValidity: "The key was not valid when the sample was taken.",
+  sigBadSignature:
+    "The signature does not match the content. The code was altered, or it did not come from the stated centre.",
+  sigMalformed: "The code is damaged or incomplete.",
+  sigKeepAnyway: "Keep it as self-entered anyway",
+  sigKeepAnywayNote:
+    "The entry then counts like a hand-typed one. Date and findings are taken over, the facility is not — it confirmed nothing.",
   importedTest: "Test result imported",
   importedContact: "Contact imported",
   cameraDenied: "Camera access denied.",

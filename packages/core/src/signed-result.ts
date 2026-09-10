@@ -265,6 +265,46 @@ export function verifySignedResult(
 }
 
 /**
+ * Liest die Nutzlast, **ohne die Signatur zu pruefen**.
+ *
+ * Das ist nicht die Abkuerzung, nach der es aussieht. Die Spezifikation
+ * verlangt, dass ein abgelehnter QR auf ausdrueckliche Wahl als *selbst
+ * eingetragener* Datensatz uebernommen werden darf — sonst waere die
+ * App bei einer nicht teilnehmenden Teststelle schlechter benutzbar als
+ * ganz ohne diese Funktion. Dafuer muss der Inhalt lesbar sein, obwohl
+ * ihm nicht zu trauen ist.
+ *
+ * Der Name sagt das, und `draftFromPayload` erzeugt bewusst einen
+ * Datensatz **ohne** `signed`: die Herkunft bleibt „selbst eingetragen",
+ * und genau das ist die Wahrheit ueber ihn.
+ */
+export function parseSignedPayload(qr: string): SignedPayload | null {
+  const parts = qr.split(".");
+  if (parts.length !== 3 || parts[0] !== RESULT_PREFIX) return null;
+  return parsePayload(parts[1] as string);
+}
+
+/**
+ * Aus einer ungeprueften Nutzlast einen selbst eingetragenen Datensatz.
+ *
+ * `fac` bleibt leer: die Einrichtung stuende sonst da, als haette sie
+ * den Befund bestaetigt. Wer den Datensatz behaelt, traegt sie selbst
+ * ein — und das ist dann seine Angabe, nicht ihre.
+ */
+export function draftFromPayload(payload: SignedPayload, id: string): TestRecord {
+  const ts: Partial<Record<string, 0 | 1>> = {};
+  for (const analyte of Object.keys(payload.res)) ts[analyte] = 1;
+  return {
+    id,
+    date: payload.smp,
+    num: payload.nce,
+    fac: "",
+    ts,
+    results: { ...payload.res },
+  };
+}
+
+/**
  * Turn a verified result into a record for the diary.
  *
  * The sample date becomes the record's date, not the issue date: the
