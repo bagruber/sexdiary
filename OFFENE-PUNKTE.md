@@ -1,44 +1,53 @@
 # Offene Punkte
 
-*Notiert am 26.08.2026, fortgeschrieben am 27.08.2026 nach Welle 2. Erledigte
-Punkte bitte streichen, nicht abhaken — die Datei soll kurz bleiben.*
+*Notiert am 26.08.2026, zuletzt fortgeschrieben am 10.09.2026. Erledigte Punkte
+bitte streichen, nicht abhaken — die Datei soll kurz bleiben.*
 
 
-## Welle 3 ist zur Hälfte gebaut
+## Was als Nächstes ansteht
 
-Fertig: echter App-Lock, Bildschirmschutz, Erinnerungen, und das Format der
-signierten Befunde samt Vertrauensliste.
+**Der Relay-Server ist das Nadelöhr.** Alles andere in Welle 3 steht. Der
+anonyme Versand zeigt in der App sichtbar, dass der Server fehlt — bewusst,
+statt einen Versand vorzutäuschen. Daran hängen auch die Rückmeldungen aus
+[ADR-0011](architecture/adr/0011-rueckmeldung.md), die im Modell liegen und
+keine Oberfläche haben.
 
-Offen, in dieser Reihenfolge sinnvoll:
+Zuschnitt steht: PHP mit MySQL auf Shared Hosting, `{Empfänger-Token, Erreger,
+Zeitstempel}`, drei Vorgänge — ablegen, zum eigenen Token abholen, löschen.
+`DELETE` ab dem ersten Tag (Art. 17). Ein pseudonymisiertes Token darf für den
+Prototyp dort liegen; die rechtliche Frage darüber hinaus bleibt offen.
 
-1. **Backup ([ADR-0009](architecture/adr/0009-backup-modell.md)).** Der
-   **verschlüsselte Dateiexport steht** seit dem 09.09.2026: scrypt über eine
-   Passphrase, AES-256-GCM, selbstbeschreibendes Format. Offen bleibt die
-   Cloud-Sicherung — und die ist es, die den Lock-Härtungsschritt freigibt,
-   denn ein Dateiexport verlangt Disziplin und existiert im Ernstfall nicht.
-   Auf einem Gerät ist der Export noch nicht geprüft, auch nicht, wie lange
-   scrypt dort braucht.
-2. **QR-Scanner und Ed25519-Verifizierer auf dem Gerät.** Das Format steht und
-   ist getestet, gescannt wird noch nichts. Braucht einen Kamerabildschirm.
-3. **Verteilung ([ADR-0010](architecture/adr/0010-verteilung-erprobung.md)).**
-   `eas.json` liegt mit beiden Profilen bereit. Der lokale Bauweg
-   **erzeugt seit dem 28.08.2026 ein APK** (71 MB, alle vier ABIs); das
-   Rezept samt der drei nicht offensichtlichen Voraussetzungen steht im
-   README von `apps/mobile`. Offen bleibt: **eigener Keystore** statt des
-   Debug-Schluessels (geprueft: `CN=Android Debug`), bevor irgendetwas
-   verteilt wird.
-4. **Alternatives Icon.** Der OS-Name ist seit dem 10.09.2026 dauerhaft
-   „Journal“ — eine Benachrichtigung auf dem Sperrbildschirm nennt damit keinen
-   verräterischen Absender mehr. Das **Icon** bleibt das eigene: es zur Laufzeit
-   zu wechseln geht auf Android nur über `activity-alias` und eine weitere
-   Drittanbieter-Abhängigkeit. Bewusst vertagt, bis klar ist, ob es das wert
-   ist.
+**Auf einem Gerät zu prüfen**, alles drei nur dort feststellbar:
 
-Bewusst nicht gebaut: der Schlüssel ist **nicht** an die Authentisierung
-gebunden (`SecureStore` mit `requireAuthentication`). Das wäre der stärkere
-Schutz, aber Android verwirft den Schlüssel, wenn sich die hinterlegte
-Biometrie ändert. Ohne Backup ist das ein Datenverlust ohne Ausweg. Nach
-Punkt 1 neu zu bewerten.
+- Läuft `qrcode` zur Laufzeit? Es ist eine Browser-Bibliothek, Metro bündelt
+  sie, aber ohne Node-Polyfills ist das ungeprüft.
+- Ruckeln die 447 Views eines Handle-QR auf einem älteren Telefon?
+- Lesen sich die Kalender-Marker in drei Grauwerten überhaupt?
+- NFC ist ungetestet — es braucht ein NFC-Telefon und eine beschreibbare
+  NDEF-Karte.
+
+**Entscheidungen, die niemand außer Benedict treffen kann:** eigener Keystore
+statt des Debug-Schlüssels, Lizenz, die Angaben für Impressum und
+Datenschutzerklärung, das Teststellenverzeichnis, und die ärztliche Prüfung der
+fünf medizinischen Werte.
+
+**Kleiner:** Cloud-Sicherung (der Dateiexport steht), Alternativ-Icon,
+`user-scalable=no` in der Demo, Favicon, Merge nach `main`.
+
+
+## Zwei Einwände, die stehen bleiben
+
+Beide beim Entscheiden vorgebracht, beide bewusst überstimmt — sie gehören
+notiert, nicht weggelassen.
+
+**Die zwei runden Knöpfe** über der Reiterleiste sehen ähnlich aus und stehen
+nebeneinander. Das eine legt einen Eintrag an, das andere öffnet die Kamera.
+Abgemildert durch verschiedene Gestalt — Plus gefüllt, QR umrandet. Ob das
+reicht, zeigt der Gebrauch.
+
+**Küssen bekommt einen Schutzschalter**, weil Mpox dort einen Kondomeffekt von
+0,2 führt. Der Wert ist als fünfter Befund notiert und bleibt unverändert
+stehen, bis eine Infektiologin darauf geschaut hat.
 
 
 ## Fünf medizinische Befunde warten auf ärztliche Prüfung
@@ -64,35 +73,22 @@ schreiben, nur schwerer zu bemerken. Das ist der Kernnutzen der App — es
 gehört einer Infektiologin vorgelegt, bevor jemand die App benutzt.
 
 
-## Was der Web-Prototyp kann und die App noch nicht
+## Der Web-Prototyp ist eingeholt
 
-Vollstaendige Gegenueberstellung, aufgenommen am 09.09.2026. Nichts davon soll
-verlorengehen. Reihenfolge = Vorschlag fuer die Umsetzung.
+Die Gegenüberstellung vom 09.09.2026 hatte elf Lücken. Sie sind zu. Gebaut sind
+seither: Schutz pro Praktik, Onboarding mit Profil, Kontakte, Impfungen,
+Bearbeiten und Löschen, Monatsansicht mit Tagesblatt, QR teilen und scannen,
+Code einfügen, NFC-Karten, Benachrichtigung mit persönlichem Weg, Positiv-Ablauf
+und die fehlenden Einstellungen.
 
-| Funktion | Web | App |
-|---|---|---|
-| **Token teilen per QR** (eigenes Token oder Handle) | ja | **fehlt** |
-| **QR scannen** — Kontakt oder Testergebnis importieren | ja | **fehlt** |
-| **Code einfuegen** statt scannen | ja | **fehlt** |
-| **NFC** | nur Platzhalter | **fehlt** |
-| **Benachrichtigungsansicht**: wen informieren, pro Infektion | ja | **fehlt** |
-| **Anonym benachrichtigen** ueber das Relay | ja | **fehlt** |
-| **Persoenlich benachrichtigt** manuell markieren | ja | **fehlt** |
-| **Rueckmeldungen**: wartet, bestaetigt, negativ getestet | ja | **fehlt** |
-| **Positiv-Ablauf** (eigener Befund, wer ist betroffen) | ja | **fehlt** |
-| **Kalender** mit Monatsansicht und Tagesblatt | ja | Liste statt Kalender |
-| **Kontaktliste** verwalten, Tokens einsehen | ja | nur anlegen |
-| **Testliste** | ja | nur anlegen |
-| Einstellung **Token oder Handle**, Plattform, Handle | ja | **fehlt** |
-| Einstellung **bekannte Vorerkrankungen** | ja | **fehlt** |
-| Einstellung **Region** | ja | **fehlt** |
-| Einstellung **hohe Praevalenz**, **wenig Bewegung**, **Risikoarmes ausblenden** | ja | **fehlt** |
-| Onboarding mit Profil | ja | seit 09.09. auch nativ |
-| Schutz pro Praktik | im Tagesblatt | seit 09.09. auch nativ |
+Zwei Dinge sind **anders** gelöst als im Web, beide bewusst:
 
-Nur nativ, im Web bewusst nicht moeglich: App-Sperre, Bildschirmschutz,
-Tarnmodus, lokale Erinnerungen, verschluesselte Sicherung.
-
+- **NFC ist eine Karte, kein Telefonpaar.** Android Beam ist seit Android 10
+  abgekündigt und entfernt; von Telefon zu Telefon geht es nicht mehr. Eine
+  NDEF-Karte geht — und ist das, was die Konzeptvorstellung unter „Smartwatch /
+  NFC-Karte“ ohnehin nennt.
+- **Der anonyme Versand täuscht nichts vor.** Er zeigt, was übertragen würde,
+  und sagt dann, dass der Server fehlt.
 
 ## Aufteilung entschieden
 
@@ -116,47 +112,21 @@ andere die Kamera öffnet. Abgemildert durch verschiedene Gestalt — das Plus
 gefüllt, der QR umrandet. Ob das reicht, zeigt der Gebrauch.
 
 
-## Die App laeuft, und was dabei auffiel
+## Gepusht, CI läuft, nichts ist in `main`
 
-Am 09.09.2026 zum ersten Mal auf einem Geraet gelaufen — der aelteste offene
-Punkt, seit dem 10.07.2026. App-Lock, Tarnmodus und die Berechtigungsabfrage
-fuer Benachrichtigungen funktionieren.
+30 Commits auf `refactor/wellen-0-bis-3`, PR #1 gegen `main`. Die Prüfung läuft
+seit dem 09.09.2026 und war durchgehend grün — auch der Schritt, der lange
+ungeprüft war: Linux erzeugt dieselben `docs/`-Hashes wie Windows.
 
-Aufgefallen ist, dass die App ein unfertiger Port des Web-Trackers war: das
-Datenmodell konnte alles, die Oberflaeche fehlte. Seither gebaut sind
-Onboarding mit Profil, Schutz pro Akt, Kontakte, Impfungen und eine Zeile, mit
-der sich die Erinnerungen pruefen lassen, ohne bis 10 Uhr zu warten.
+**GitHub Pages liefert weiterhin den alten, speichernden Tracker aus `main`.**
+Bewusst so gelassen, bis die Infoseite mitgemerged wird. Wer die URL hat, legt
+dort bis dahin Gesundheitsdaten im Browser ab.
 
-**Noch nicht auf einem Geraet geprueft** ist genau das, was seitdem entstanden
-ist. Der Build dazu liegt unter `dist/`, benannt nach Commit.
+`pnpm/action-setup@v4` läuft auf Node 20, das GitHub als veraltet meldet.
 
-Offen bleibt aus der Beobachtungsliste:
-
-- **QR und NFC.** Das Web hat einen QR-Scanner, die App nicht. NFC existiert
-  nirgends ausser als Platzhalter mit dem Text „erfordert native App“.
-- **Einstellungen.** Die Web-Einstellungen sind reicher als die der App:
-  bekannte Vorerkrankungen, Region, Token-oder-Handle samt Plattform und
-  Handle. All das fehlt nativ.
-
-
-## Gepusht, CI laeuft
-
-Seit dem 09.09.2026 auf `refactor/wellen-0-bis-3` (umbenannt, der alte Name
-trug laengst mehr als Welle 0), PR #1 gegen `main`. Die Pruefung ist mehrfach
-gruen gelaufen — auch der Schritt, der lange ungeprueft war: Linux erzeugt
-dieselben `docs/`-Hashes wie Windows.
-
-`pnpm/action-setup@v4` laeuft auf Node 20, das GitHub als veraltet meldet und
-auf 24 zwingt. Noch kein Fehler.
-
-**Weiter offen: zwei Aenderungen ausserhalb dieses Repos**, beide uncommitted
-im Working Tree von `hausbasis`:
-
-- Der Ausnahme-Eintrag fuer sexdiary ist entfernt (gegenstandslos, seit web und
-  mobile auf derselben React-Version stehen).
-- `baseline.json` fuehrt jetzt die sechs ESLint-Pakete als Zielversionen, in
-  denselben Ranges wie freshdoc und freshpost.
-
+Weiter offen: zwei Änderungen im Working Tree von `hausbasis`, beide uncommitted
+— der gegenstandslose Ausnahme-Eintrag für sexdiary ist entfernt, und
+`baseline.json` führt die sechs ESLint-Pakete.
 
 ## Lizenz weiterhin offen
 

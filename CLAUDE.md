@@ -35,12 +35,13 @@ Gerät bleiben?**
 | Pfad | Was | Achtung |
 |---|---|---|
 | `packages/core` | Gesundheitslogik, Schemata, Speicherhülle, i18n | **Null Runtime-Dependencies, keine Ein-/Ausgabe.** Das ist die Audit-Fläche — die Regel verteidigen. |
-| `apps/mobile` | Expo/React Native — **das Produkt** | Lief noch nie auf einem Gerät |
-| `apps/web` | Alter Tracker | Nicht mehr das Produkt. Wird durch die Infoseite ersetzt (Welle 4) |
+| `apps/mobile` | Expo/React Native — **das Produkt** | Läuft. Bauweg im README, er braucht CMake 3.31.6 |
+| `apps/web` | Infoseite (`index`) + Demo (`demo.html`) | Die Demo speichert nichts. Infoseite folgt dem Pitch |
 | `architecture/` | arc42, ADRs, Threat Model, Schnittstellen, Risikomodell-Quellen | Auf Deutsch, echte Umlaute |
 | `notes/` | Entscheidungslog, Audits, Roadmap | Rohmaterial, nicht Lieferobjekt |
 | `design/` | Screen-Entwürfe als Quelldateien | Keine Produktivdateien. Zeigen noch die heutige Palette |
 | `docs/` | **Build-Output** der Webseite | Keine Dokumentation. Soll perspektivisch aus dem Repo. Enthält `design.html`, die interne Designsystem-Seite |
+| `dist/` | Gebaute APKs | Gitignored. Nach Commit benannt |
 
 ## Arbeitsregeln in diesem Repo
 
@@ -75,6 +76,10 @@ In diesem Repo hat sich mehrfach gezeigt, dass grüne Builds wenig beweisen:
   Code-Fences beweisen nicht, dass ein Diagramm parst.
 - `apps/mobile`: `npx expo-doctor` und ein Metro-Export. Beides sagt nichts
   darüber, ob die App auf einem Gerät startet — das ist ein eigener Schritt.
+- **Gebaute Pakete gegen ihren Inhalt prüfen, nicht gegen ihren Namen.** Am
+  09.09.2026 trug ein APK den falschen Commit im Dateinamen, weil das Bauskript
+  den Stand erst beim Kopieren las. Sonden gegen das JS-Bundle taugen nur für
+  Zeichenketten, die zur Laufzeit existieren — ein TypeScript-Typ ist keine.
 
 ## Stand und Reihenfolge
 
@@ -83,14 +88,22 @@ In diesem Repo hat sich mehrfach gezeigt, dass grüne Builds wenig beweisen:
 | 0 | Versionen, Expo 57, pnpm | erledigt 27.08.2026 |
 | 1 | Architektur festschreiben | erledigt 27.08.2026 |
 | 2 | Design-Tokens in den Kern, Lint und CI, tote Konstanten, Quellenangaben an den medizinischen Zahlen, Kern als echtes Paket | erledigt 27.08.2026 |
-| 3 | Mobile wird das Produkt: echter Lock, Screenshot-Schutz, Erinnerungen, signierte QRs, Backup, Verteilung | **teilweise**, siehe unten |
-| 4 | Infoseite ersetzt den Web-Tracker | offen |
-| 5 | Server: Alert-Relay, Schlüsselverzeichnis, Deployment-Artefakt | offen |
+| 3 | Mobile wird das Produkt: Lock, Screenshot-Schutz, Erinnerungen, signierte QRs, Backup, Verteilung | erledigt bis auf Cloud-Sicherung |
+| 4 | Infoseite ersetzt den Web-Tracker | erledigt 10.09.2026 |
+| 5 | Server: Alert-Relay, Schlüsselverzeichnis, Deployment-Artefakt | **das Nadelöhr**, siehe unten |
 
-Von Welle 3 stehen **Lock, Bildschirmschutz, Erinnerungen und das Format der
-signierten Befunde**. Offen sind **Backup (ADR-0009), Verteilung (ADR-0010)
-und der QR-Scanner**. Die drei gebauten Features sind auf keinem Gerät
-gelaufen — das ist in dieser Welle das Nadelöhr, nicht eine Randnotiz.
+Die App **lief am 09.09.2026 zum ersten Mal auf einem Gerät** und hat seither
+den Web-Prototyp funktional eingeholt: Schutz pro Praktik, Onboarding mit
+Profil, Kontakte, Impfungen, Bearbeiten und Löschen, Monatsansicht, QR teilen
+und scannen, NFC-Karten, Benachrichtigung und Positiv-Ablauf.
+
+**Das Nadelöhr ist jetzt der Relay-Server.** Der anonyme Versand zeigt in der
+App sichtbar an, dass er fehlt — bewusst, statt einen Versand vorzutäuschen.
+Geklärt: Hostinger ist Shared Hosting, also PHP mit MySQL, kein Node-Dienst.
+Ein pseudonymisiertes Token darf für den Prototyp dort liegen.
+
+Ebenfalls offen aus Welle 3: die **Cloud-Sicherung** (der verschlüsselte
+Dateiexport steht) und ein **eigener Keystore** statt des Debug-Schlüssels.
 
 Aus Welle 2 mitgenommen: die **vier medizinischen Befunde** in
 `architecture/risikomodell-quellen.md`, Abschnitt 7. Zwei diagnostische Fenster

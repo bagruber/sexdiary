@@ -3,7 +3,143 @@
 Reverse-chronological decision log. Read this first each session; append
 before ending one. `docs/` is GitHub Pages build output — notes live here.
 
-## 2026-08-28 (latest) — Design-system page, and half of wave 3
+## 2026-09-10 (latest) — The app ran, and wave 3 caught up with the web prototype
+
+**The oldest open point is closed.** The app ran on a device on 09.09.2026,
+first time since it was written in July. Lock, disguise mode and the
+notification permission all work. What the run exposed was not a bug but a
+shape: the native app was an *unfinished port* of the web tracker. The data
+model could do everything; the surfaces were missing.
+
+That framing drove most of this session.
+
+---
+
+**Getting a build at all took three findings**, none of them about the app.
+`executionHistory.bin` failing reads like a Gradle bug and was a full disk. The
+JDK is the one bundled with Android Studio; there is no standalone one on this
+machine. And the real blocker: Windows caps paths at 260 characters, CMake
+3.22.1 encodes the absolute source path into the object path, and a codegen file
+under `react-native-safe-area-context` came out at 396. CMake **3.31.6** hashes
+that segment instead. Two things that look like fixes are not, both measured:
+moving the repo somewhere shallow (still 308) and enabling Windows long paths
+(the ninja in 3.22.1 has no `longPathAware` manifest). The recipe is in
+`apps/mobile/README.md`.
+
+`nodeLinker: hoisted` came out of the same hunt and is now in
+`pnpm-workspace.yaml`. It cut the longest source path from 293 to 213. The
+lockfile did not move — a layout change, not a version drift, so no other repo
+pays for it. Worth knowing: the hoisted layout is the family that caused the
+duplicate-React crash in August, so the runtime probe matters more, not less.
+Checked after the switch: exactly one React copy.
+
+---
+
+**The web tracker is now a demo that stores nothing.** ADR-0001 left its fate
+open and recommended retirement; Benedict chose the labelled demo, because
+whoever gets a demonstration does not install an APK in the same moment. What
+separates it from a second product is not the banner but that state lives in
+the tab and a reload starts over. A banner people can close is a banner people
+close.
+
+Verifying that found a leftover: `lib/mock-server.ts` still wrote to
+localStorage, and a row there pairs a recipient token with an infection name —
+exactly the trace this product exists not to leave. In memory now. The built
+bundle contains no `localStorage` at all.
+
+**The information page exists**, at `index`, with the tracker moved to
+`demo.html`. It follows the concept presentation of 21.05.2026: three gaps, two
+functions, "Lokal denken, minimal zentralisieren", "Klare Augen". It is
+rendered at *build* time — a page carrying an Impressum that needs JavaScript to
+show anything shows nothing without it. That is what `render()` without a DOM
+was always for; the design page claimed the ability and never used it.
+
+Two things the page deliberately does not do: name the diagnostic windows (five
+values are under clinical review; two would say "testable" too early), and
+invent an Impressum. Both stand as visible placeholders.
+
+While writing it, a factual error of mine: the page claimed "no server". ADR-0008
+and the pitch both describe a minimal relay. Device and server are now set side
+by side.
+
+---
+
+**Feature parity, and then some.** Built this session: protection *per act*
+(the engine always computed it, only one switch existed), onboarding with
+profile, contacts and vaccinations, editing and deleting, month view, QR share
+and scan, NFC cards, the alerts screen, the positive-result flow, and the
+settings the web had and the app did not.
+
+Three of those are worth remembering for the reasons rather than the feature:
+
+- `PROTECTABLE_ACTS` is *derived* from `STI_DB`, so a corrected rate cannot
+  leave the interface offering a switch that does nothing. Writing the test for
+  it caught a wrong assumption of mine — kissing does transmit — and surfaced a
+  **fifth** questionable value: Mpox lists a condom effect of 0.2 for kissing
+  where syphilis correctly lists 0. Recorded, not changed.
+- The positive-result prompt lives in the test sheet, not the shell, so it
+  fires no matter which way the result arrived. Checking that found that the QR
+  import would have skipped it — the very path the pitch advertises.
+- Deleting a contact takes their token, and with it any chance of notifying
+  that person anonymously. The confirmation says so.
+
+**Schema v4** adds `alerts`: who was told about which finding, and how.
+"Personal" is not a second-class channel; it is often the better one. The reply
+vocabulary follows ADR-0011, not the older web mock.
+
+**Backup, first leg** (ADR-0009): an encrypted file, scrypt over a passphrase,
+AES-256-GCM — the cipher already used at rest, rather than a second scheme to
+review. N = 2^15 is *below* the usual recommendation and chosen for older
+phones; the parameters travel inside the file so the cost can be raised without
+orphaning old backups. Cloud backup is still open, and it is the leg that
+actually removes the data-loss cliff.
+
+---
+
+**Look and feel.** The neutrals were purple throughout and read as generic;
+they are on petrol now, in the same range as the concept presentation, so
+presentation, site and app speak one language. Contrast was computed before the
+change, not checked after. **Atkinson Hyperlegible** is bundled at last — the
+condition was always shipping the files rather than linking them. React Native
+does not inherit `fontFamily` and Android will not synthesise bold for a bundled
+face, so `Text` in `ui.tsx` sets both; the screens import it from there. Fourteen
+import lines instead of 147 elements.
+
+**Navigation, decided after the functions existed rather than before:** Heute ·
+Kalender · Melden, with two actions centred above the bar. Settings sit behind a
+gear. Melden carries alerts *and* contacts. One objection of mine stands
+recorded in `OFFENE-PUNKTE.md`: two equally sized round targets side by side get
+confused, and here one creates an entry while the other opens the camera.
+
+---
+
+**Decided, and it shapes wave 5:** the Hostinger plan is **shared**, so the
+relay is PHP with MySQL, not a Node service. For `{token, pathogen, timestamp}`
+and three operations that is no loss, and a readable PHP file is easier to audit
+than a serverless function. Docker, own ports and background processes are out,
+which also touches ADR-0012. A pseudonymised token **may** sit on the server for
+the prototype; the legal question stays open beyond it.
+
+---
+
+**What a next session should know.** `OFFENE-PUNKTE.md` is current and is the
+place to start. The relay is the only substantial thing still missing — the
+anonymous notification path visibly waits on it, and so do the ADR-0011
+replies. Everything else is either a decision for Benedict (own keystore,
+licence, Impressum data, the clinical review of five values) or small.
+
+Three things exist only as claims until someone looks at a phone: whether
+`qrcode` survives at runtime, whether the 447 views of a handle QR stutter, and
+whether the calendar markers in three greys read at all.
+
+Also unmerged: 30 commits on `refactor/wellen-0-bis-3`, PR #1. CI has been green
+throughout, including the `docs/` comparison that was unverified for weeks.
+GitHub Pages still serves the old, persisting tracker from `main` — deliberately,
+until that merge.
+
+---
+
+## 2026-08-28 — Design-system page, and half of wave 3
 
 **The design-system page.** Benedict asked for the design system to be visible
 on the web presence, as part of a small doc — for showing, not necessarily for
