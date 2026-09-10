@@ -153,15 +153,6 @@ footer {
 .karte h3 { margin: 0 0 8px; font-size: 15px; }
 .karte p { margin: 0; font-size: 15px; color: var(--sub); }
 
-/* Geraet gegen Server. */
-.gegenueber {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 24px;
-  max-width: 720px;
-}
-.gegenueber ul { margin-top: 8px; }
-
 h3 { margin: 24px 0 8px; font-size: 16px; }
 section > h3:first-of-type { margin-top: 0; }
 
@@ -194,3 +185,122 @@ section > h3:first-of-type { margin-top: 0; }
   color: var(--sub);
   line-height: 1.4;
 }
+
+/*
+ * Abläufe. Links die Handlung, darunter was das Werkzeug damit tut —
+ * die Einrückung ist das Argument: die App handelt nie zuerst.
+ */
+.vorspann {
+  font-size: 17px;
+  color: var(--sub);
+  max-width: 52ch;
+}
+
+.ablauf {
+  list-style: none;
+  counter-reset: schritt;
+  padding: 0;
+  margin: 20px 0 0;
+  max-width: 62ch;
+}
+.ablauf > li {
+  counter-increment: schritt;
+  position: relative;
+  padding: 0 0 20px 44px;
+  margin: 0;
+  border-left: 1px solid var(--border);
+}
+.ablauf > li:last-child { border-left-color: transparent; padding-bottom: 0; }
+.ablauf > li::before {
+  content: counter(schritt);
+  position: absolute;
+  left: -13px;
+  top: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--sub);
+  font-size: 13px;
+  line-height: 24px;
+  text-align: center;
+}
+.ablauf .tat { margin: 0 0 6px; font-weight: 700; }
+.ablauf .folge { margin: 0; color: var(--sub); font-size: 15px; }
+
+/*
+ * Der offene Schritt ist keine Randnotiz, sondern die eine Stelle, an
+ * der die Geschichte heute noch nicht aufgeht. Er wird durch Fläche
+ * hervorgehoben, nicht durch eine Semantikfarbe — die gehört der
+ * Risikoskala (ADR-0015).
+ */
+.ablauf > li.offen {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px 16px 44px;
+  margin-left: -1px;
+}
+.ablauf > li.offen::before { background: var(--card); }
+
+/* Module mit Stand. */
+.module {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 0;
+  max-width: 62ch;
+}
+.module > li {
+  padding: 16px 0;
+  margin: 0;
+  border-top: 1px solid var(--border);
+}
+.module > li:last-child { border-bottom: 1px solid var(--border); }
+.module h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+}
+.module p { margin: 0; color: var(--sub); font-size: 15px; }
+
+/*
+ * Der Stand steht neutral. „gebaut“ in Grün und „ungeklärt“ in Rot
+ * waere die Semantikskala an einer Stelle, an der sie nichts zu suchen
+ * hat: sie bedeutet in dieser App Infektionsrisiko.
+ */
+.stand {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--sub);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+
+/*
+ * Diagramme, von Hand geschrieben statt aus einer Bibliothek — eine
+ * waere ein Drittanbieter-Skript. Sie scrollen für sich, damit die
+ * Seite selbst nie seitlich läuft.
+ */
+.diagramm {
+  overflow-x: auto;
+  margin: 20px 0;
+  padding-bottom: 4px;
+}
+.diagramm svg {
+  display: block;
+  width: 100%;
+  min-width: 620px;
+  height: auto;
+}
+.d-titel { font-size: 15px; font-weight: 700; fill: var(--text); }
+.d-titel-klein { font-size: 13px; font-weight: 700; fill: var(--text); }
+.d-zeile { font-size: 12px; fill: var(--text); }
+.d-leise { font-size: 12px; fill: var(--sub); }
+.d-marke { font-size: 11px; fill: var(--sub); text-anchor: middle; }
+.d-invers { fill: var(--bg); }

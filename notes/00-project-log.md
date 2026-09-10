@@ -3,7 +3,65 @@
 Reverse-chronological decision log. Read this first each session; append
 before ending one. `docs/` is GitHub Pages build output — notes live here.
 
-## 2026-09-10 (latest) — The app ran, and wave 3 caught up with the web prototype
+## 2026-09-10 (latest) — The information page became the pitch
+
+Benedict's call: the pitch does not get its own artifact. It *is* the page that
+GitHub Pages serves at `index`. One surface, one source, and whoever gets shown
+it can read it again afterwards without a deck being mailed around.
+
+That decision costs something and it is worth naming: a pitch has a slide
+saying what the speaker wants out of the meeting, and a public page cannot
+carry that. What replaces it is the "Klare Augen" section, which now names the
+open questions by group — medical, legal, operational, effect.
+
+**Structure, in the order a reader meets it.** Two flows before any feature
+list: Julia, who wants to reach someone she does not want to see again, and
+Max, who exchanges nothing but a random number off an NFC card. Then the three
+motives the flows demonstrate, then the modules split into the three that make
+it a product and the eight that come after, each with its actual state. Then
+architecture, the server, and what is unresolved.
+
+**The conflict that had to be decided before writing.** The brief listed
+notification *by phone number* under the base functions. ADR-0008 rejects
+exactly that in its list of discarded alternatives, and the May pitch still
+carried it — the ADR closed the path in July without the pitch following. It is
+now a **Sollfunktion marked "rechtlich ungeklärt"**, and the Julia flow says so
+at the step where it breaks: her story does not complete today. Showing that
+gap is worth more than a story that quietly assumes the unresolved part.
+
+The precise objection, which the page states: the service would see a phone
+number, would have to hand it to a delivery provider, and the recipient
+consented to none of it. That is three separate problems, not one.
+
+**Two diagrams, written by hand.** A library would be a third-party script, and
+this page loads nothing. Data flow first — the asymmetry between one thick box
+on the device and one thin box on the server *is* the argument, so the boxes
+are sized to it. Layers second, with `@sexdiary/core` as the inverted band: the
+audit surface is the one thing worth making unmissable. Both carry a
+`role="img"` label and the prose beside them says the same thing; nothing is
+lost when the SVG is not seen.
+
+Checked by rendering, not by counting tags — headless Chrome, both themes.
+That caught the thing a build never would: three-sentence bold lead-ins in the
+flows read as block text. Each step is one short sentence now, with the detail
+underneath.
+
+**A finding while writing the module states.** `verifySignedResult` exists in
+core and is tested, and **no app calls it**. The scanner reads QR codes and
+imports them unverified. The page says so rather than claiming a signature
+check that does not happen; `OFFENE-PUNKTE.md` was stale on this and is
+corrected.
+
+Status markers stay neutral, no semantic colour. "gebaut" in green and
+"ungeklärt" in red would be the risk scale used where it means nothing —
+in this app that scale means infection risk (ADR-0015).
+
+Green: lint, 115 tests, three typechecks, build. `.gegenueber` was removed from
+`info.css`; the rewrite orphaned it.
+
+---
+
+## 2026-09-10 — The app ran, and wave 3 caught up with the web prototype
 
 **The oldest open point is closed.** The app ran on a device on 09.09.2026,
 first time since it was written in July. Lock, disguise mode and the

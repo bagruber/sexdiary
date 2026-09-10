@@ -17,6 +17,13 @@ Zeitstempel}`, drei Vorgänge — ablegen, zum eigenen Token abholen, löschen.
 `DELETE` ab dem ersten Tag (Art. 17). Ein pseudonymisiertes Token darf für den
 Prototyp dort liegen; die rechtliche Frage darüber hinaus bleibt offen.
 
+**Der Ed25519-Verifizierer hängt in der Luft.** `verifySignedResult` liegt im
+Kern und ist getestet, aber **keine App ruft es auf** — der Scanpfad geht über
+`parseImportPayload` und importiert ungeprüft. Ein eingelesenes Testergebnis
+ist damit heute nicht mehr wert als ein von Hand eingetragenes, und
+[ADR-0007](architecture/adr/0007-signierte-testergebnisse.md) ist nur auf dem
+Papier umgesetzt. Die Infoseite sagt das seit dem 10.09.2026 offen.
+
 **Auf einem Gerät zu prüfen**, alles drei nur dort feststellbar:
 
 - Läuft `qrcode` zur Laufzeit? Es ist eine Browser-Bibliothek, Metro bündelt
