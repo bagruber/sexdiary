@@ -90,10 +90,13 @@ export function Chip({
   label,
   active,
   onPress,
+  icon,
 }: {
   label: string;
   active: boolean;
   onPress: () => void;
+  /** Ein kurzes Zeichen vor der Beschriftung. Siehe `GLYPH` unten. */
+  icon?: string;
 }) {
   const { palette } = useApp();
   return (
@@ -112,12 +115,45 @@ export function Chip({
         },
       ]}
     >
-      <Text style={{ color: active ? palette.accentText : palette.text, fontSize: 13 }}>
+      {icon && (
+        <Text
+          style={{
+            color: active ? palette.accentText : palette.sub,
+            fontSize: 13,
+          }}
+        >
+          {icon}
+        </Text>
+      )}
+      <Text
+        numberOfLines={1}
+        style={{ color: active ? palette.accentText : palette.text, fontSize: 13 }}
+      >
         {label}
       </Text>
     </Pressable>
   );
 }
+
+/**
+ * Zeichen fuer die vier Eintragsarten.
+ *
+ * Bewusst Text statt einer Icon-Bibliothek: @expo/vector-icons ist hier
+ * nicht installiert, und ein Schriftpaket von ueber einem Megabyte fuer
+ * vier Symbole waere ein schlechter Tausch — zumal die App ohnehin schon
+ * drei Drittanbieter-Pakete mit nativem Code traegt.
+ *
+ * Und bewusst keine Farbcodierung: ADR-0015 haelt Gruen, Gelb und Rot
+ * fuer die Risikoskala frei. Zwei Bedeutungen auf derselben Farbe waeren
+ * auf einem Bildschirm, der beides zeigt, schlechter als gar keine.
+ */
+export const GLYPH = {
+  intercourse: "♥",
+  test: "✓",
+  contact: "☺",
+  vaccination: "✚",
+  qr: "▣",
+} as const;
 
 /** Horizontal progress meter with an accessible value. */
 export function Meter({
@@ -242,9 +278,16 @@ export function PrimaryButton({
 export function GhostButton({
   label,
   onPress,
+  danger,
 }: {
   label: string;
   onPress: () => void;
+  /**
+   * Zerstoerend, aber zweitrangig. Rot in der Schrift statt in der
+   * Flaeche: ein vollflaechig roter Knopf neben "Speichern" zoege den
+   * Blick auf sich, obwohl er der seltenere Fall ist.
+   */
+  danger?: boolean;
 }) {
   const { palette } = useApp();
   return (
@@ -254,9 +297,16 @@ export function GhostButton({
         onPress();
       }}
       accessibilityRole="button"
-      style={[styles.button, { borderWidth: 1, borderColor: palette.border }]}
+      style={[
+        styles.button,
+        { borderWidth: 1, borderColor: danger ? palette.bad : palette.border },
+      ]}
     >
-      <Text style={{ color: palette.text, fontWeight: "600" }}>{label}</Text>
+      <Text
+        style={{ color: danger ? palette.bad : palette.text, fontWeight: "600" }}
+      >
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -285,6 +335,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginRight: 8,
     marginBottom: 8,
+    // Ohne die drei Zeilen wird der Chip in einer Zeile so hoch wie der
+    // groesste daneben (alignItems faellt sonst auf "stretch"), und in
+    // einer horizontalen ScrollView schrumpft er, bis das Wort umbricht.
+    alignSelf: "flex-start",
+    flexShrink: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
   },
   button: {
     borderRadius: 14,

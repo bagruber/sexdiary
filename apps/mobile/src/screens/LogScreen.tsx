@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Modal, ScrollView, View } from "react-native";
+import { Modal, Pressable, ScrollView, View } from "react-native";
 import {
   ACT_KEYS,
   PROTECTABLE_ACTS,
@@ -8,7 +8,7 @@ import {
 } from "@sexdiary/core";
 import { useApp } from "../state/store";
 import { Card, Chip, GhostButton, Screen, SectionTitle, Text, Title} from "../ui";
-import { AddSheet, type AddKind } from "./AddSheets";
+import { AddSheet, type AddKind, type EditTarget } from "./AddSheets";
 import { DayDetail, MonthView } from "./MonthView";
 
 /**
@@ -37,6 +37,7 @@ export function LogScreen() {
   const [adding, setAdding] = useState<AddKind | null>(null);
   const [ansicht, setAnsicht] = useState<"list" | "month">("list");
   const [tag, setTag] = useState<string | null>(null);
+  const [edit, setEdit] = useState<EditTarget | null>(null);
 
   const timeline = useMemo(() => {
     const enc = data.intercourse.map((e) => ({ kind: "enc" as const, date: e.date, e }));
@@ -70,7 +71,7 @@ export function LogScreen() {
         {ansicht === "month" && (
           <>
             <MonthView onPickDay={setTag} />
-            {tag && <DayDetail date={tag} />}
+            {tag && <DayDetail date={tag} onEdit={setEdit} />}
           </>
         )}
         <GhostButton label={`+ ${t("testEntry")}`} onPress={() => setAdding("test")} />
@@ -90,7 +91,13 @@ export function LogScreen() {
         )}
         {timeline.map((item) =>
           item.kind === "enc" ? (
-            <Card key={item.e.id}>
+            <Pressable
+              key={item.e.id}
+              accessibilityRole="button"
+              accessibilityHint={t("edit")}
+              onPress={() => setEdit({ kind: "intercourse", record: item.e })}
+            >
+            <Card>
               <Text style={{ color: palette.text, fontWeight: "600" }}>
                 {formatDate(item.e.date, data.prefs.lang)} ·{" "}
                 {contactName(item.e.cid)}
@@ -100,8 +107,15 @@ export function LogScreen() {
               </Text>
               <ProtectionLine e={item.e} />
             </Card>
+            </Pressable>
           ) : (
-            <Card key={item.r.id}>
+            <Pressable
+              key={item.r.id}
+              accessibilityRole="button"
+              accessibilityHint={t("edit")}
+              onPress={() => setEdit({ kind: "test", record: item.r })}
+            >
+            <Card>
               <Text style={{ color: palette.text, fontWeight: "600" }}>
                 {formatDate(item.r.date, data.prefs.lang)} · {t("testEntry")}
               </Text>
@@ -134,12 +148,32 @@ export function LogScreen() {
                 </Text>
               )}
             </Card>
+            </Pressable>
           ),
         )}
           </>
         )}
         <View style={{ height: 24 }} />
       </ScrollView>
+
+      <Modal
+        visible={edit !== null}
+        animationType="slide"
+        onRequestClose={() => setEdit(null)}
+      >
+        <View
+          style={{ flex: 1, backgroundColor: palette.bg, padding: 16, paddingTop: 48 }}
+        >
+          {edit && (
+            <AddSheet
+              kind={edit.kind}
+              onKind={() => undefined}
+              onClose={() => setEdit(null)}
+              edit={edit}
+            />
+          )}
+        </View>
+      </Modal>
 
       <Modal visible={adding !== null} animationType="slide" onRequestClose={() => setAdding(null)}>
         <View style={{ flex: 1, backgroundColor: palette.bg, padding: 16, paddingTop: 48 }}>

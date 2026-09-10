@@ -11,7 +11,7 @@
  * ihn nicht kennt, kommt ueber diese Leiste trotzdem ueberall hin.
  */
 import { useState } from "react";
-import { ScrollView, Switch, TextInput, View } from "react-native";
+import { Alert, ScrollView, Switch, TextInput, View } from "react-native";
 import {
   ACT_KEYS,
   ACT_NEEDS,
@@ -28,11 +28,21 @@ import {
   type TestRecord,
   type TestResultValue,
   type VaccineKind,
+  type EntryType,
   type Vaccination,
 } from "@sexdiary/core";
 import { useApp } from "../state/store";
 import { AlertsScreen } from "./AlertsScreen";
-import { Card, Chip, GhostButton, PrimaryButton, SectionTitle, Text, Title} from "../ui";
+import {
+  Card,
+  Chip,
+  GLYPH,
+  GhostButton,
+  PrimaryButton,
+  SectionTitle,
+  Text,
+  Title,
+} from "../ui";
 
 function DateField({
   value,
@@ -558,6 +568,44 @@ export type EditTarget =
   | { kind: "contact"; record: Contact }
   | { kind: "vaccination"; record: Vaccination };
 
+/**
+ * Loeschen sitzt im Bearbeiten-Blatt, nicht neben jedem Eintrag.
+ *
+ * Wer eine Zeile antippt, will sie meist aendern; loeschen ist der
+ * seltenere und der endgueltige Fall. Ein Loeschziel neben jeder Zeile
+ * waere haeufiger falsch getroffen als richtig gebraucht.
+ */
+function DeleteRow({
+  entry,
+  id,
+  onDone,
+}: {
+  entry: EntryType;
+  id: string;
+  onDone: () => void;
+}) {
+  const { dispatch, t } = useApp();
+  return (
+    <GhostButton
+      label={t("delete")}
+      danger
+      onPress={() =>
+        Alert.alert(t("delete"), t("deleteEntryConfirm"), [
+          { text: t("cancel"), style: "cancel" },
+          {
+            text: t("delete"),
+            style: "destructive",
+            onPress: () => {
+              dispatch({ type: "deleteEntry", entry, id });
+              onDone();
+            },
+          },
+        ])
+      }
+    />
+  );
+}
+
 export function AddSheet({
   kind,
   onKind,
@@ -574,11 +622,11 @@ export function AddSheet({
   edit?: EditTarget;
 }) {
   const { t } = useApp();
-  const kinds: { id: AddKind; label: string }[] = [
-    { id: "intercourse", label: t("intercourse") },
-    { id: "test", label: t("testEntry") },
-    { id: "contact", label: t("contact") },
-    { id: "vaccination", label: t("vaccination") },
+  const kinds: { id: AddKind; label: string; icon: string }[] = [
+    { id: "intercourse", label: t("intercourse"), icon: GLYPH.intercourse },
+    { id: "test", label: t("testEntry"), icon: GLYPH.test },
+    { id: "contact", label: t("contact"), icon: GLYPH.contact },
+    { id: "vaccination", label: t("vaccination"), icon: GLYPH.vaccination },
   ];
 
   return (
@@ -597,12 +645,13 @@ export function AddSheet({
             <Chip
               key={k.id}
               label={k.label}
+              icon={k.icon}
               active={kind === k.id}
               onPress={() => onKind(k.id)}
             />
           ))}
         {!edit && onQr && (
-          <Chip label={t("qrShort")} active={false} onPress={onQr} />
+          <Chip label={t("qrShort")} icon={GLYPH.qr} active={false} onPress={onQr} />
         )}
       </ScrollView>
 
@@ -629,6 +678,22 @@ export function AddSheet({
         <AddVaccination
           onClose={onClose}
           edit={edit?.kind === "vaccination" ? edit.record : undefined}
+        />
+      )}
+
+      {edit && (
+        <DeleteRow
+          entry={
+            edit.kind === "intercourse"
+              ? "intercourse"
+              : edit.kind === "test"
+                ? "test"
+                : edit.kind === "contact"
+                  ? "contact"
+                  : "vaccination"
+          }
+          id={edit.record.id}
+          onDone={onClose}
         />
       )}
     </View>

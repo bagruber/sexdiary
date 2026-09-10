@@ -15,6 +15,7 @@ import { Pressable, View } from "react-native";
 import { formatDate, today, type Lang } from "@sexdiary/core";
 import { useApp } from "../state/store";
 import { Card, SectionTitle, Text } from "../ui";
+import type { EditTarget } from "./AddSheets";
 
 /** Montag als erster Tag der Woche, wie `daysShort` es vorgibt. */
 function firstWeekday(year: number, month: number): number {
@@ -197,7 +198,13 @@ export function MonthView({ onPickDay }: { onPickDay: (date: string) => void }) 
 }
 
 /** Was an einem Tag steht, als Abschnitt unter dem Raster. */
-export function DayDetail({ date }: { date: string }) {
+export function DayDetail({
+  date,
+  onEdit,
+}: {
+  date: string;
+  onEdit?: (ziel: EditTarget) => void;
+}) {
   const { data, t, palette } = useApp();
 
   const ic = data.intercourse.filter((e) => e.date === date);
@@ -216,7 +223,12 @@ export function DayDetail({ date }: { date: string }) {
         </Card>
       )}
       {ic.map((e) => (
-        <Card key={e.id}>
+        <Pressable
+          key={e.id}
+          accessibilityRole="button"
+          onPress={() => onEdit?.({ kind: "intercourse", record: e })}
+        >
+        <Card>
           <Text style={{ color: palette.text, fontWeight: "600" }}>
             {t("intercourse")}
           </Text>
@@ -227,9 +239,15 @@ export function DayDetail({ date }: { date: string }) {
               : t("anonymousPartner")}
           </Text>
         </Card>
+        </Pressable>
       ))}
       {te.map((r) => (
-        <Card key={r.id}>
+        <Pressable
+          key={r.id}
+          accessibilityRole="button"
+          onPress={() => onEdit?.({ kind: "test", record: r })}
+        >
+        <Card>
           <Text style={{ color: palette.text, fontWeight: "600" }}>
             {t("testEntry")}
           </Text>
@@ -237,6 +255,7 @@ export function DayDetail({ date }: { date: string }) {
             {Object.keys(r.ts).join(" · ")}
           </Text>
         </Card>
+        </Pressable>
       ))}
       {vx.map((v) => (
         <Card key={v.id}>

@@ -18,7 +18,17 @@ import { ConnectScreen } from "./src/screens/ConnectScreen";
 import { SettingsScreen } from "./src/screens/SettingsScreen";
 import { LockScreen } from "./src/screens/LockScreen";
 import { DecoyScreen } from "./src/screens/DecoyScreen";
-import { Card, Chip, Fab, GhostButton, PrimaryButton, Screen, Text, Title} from "./src/ui";
+import {
+  Card,
+  Chip,
+  Fab,
+  GLYPH,
+  GhostButton,
+  PrimaryButton,
+  Screen,
+  Text,
+  Title,
+} from "./src/ui";
 
 type Tab = "dashboard" | "log" | "settings";
 
@@ -381,13 +391,20 @@ function Shell() {
                       backgroundColor: "rgba(0,0,0,0.15)",
                     }}
                   >
+                    {/*
+                      Begegnung steht redundant im Faecher, obwohl ein
+                      kurzer Tipp sie schon gibt: wer lange drueckt, sucht
+                      eine Liste — und eine Liste, in der genau der
+                      haeufigste Fall fehlt, liest sich wie ein Fehler.
+                    */}
                     {(
                       [
-                        ["test", t("testEntry")],
-                        ["contact", t("contact")],
-                        ["vaccination", t("vaccination")],
-                      ] as [AddKind, string][]
-                    ).map(([id, label]) => (
+                        ["intercourse", t("intercourse"), GLYPH.intercourse],
+                        ["test", t("testEntry"), GLYPH.test],
+                        ["contact", t("contact"), GLYPH.contact],
+                        ["vaccination", t("vaccination"), GLYPH.vaccination],
+                      ] as [AddKind, string, string][]
+                    ).map(([id, label, icon]) => (
                       <Pressable
                         key={id}
                         accessibilityRole="button"
@@ -405,7 +422,9 @@ function Shell() {
                           marginBottom: 8,
                         }}
                       >
-                        <Text style={{ color: palette.text }}>{label}</Text>
+                        <Text style={{ color: palette.text }}>
+                          {icon}  {label}
+                        </Text>
                       </Pressable>
                     ))}
                   </Pressable>
