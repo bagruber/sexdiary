@@ -150,12 +150,18 @@ footer {
   border-radius: 10px;
   padding: 16px;
 }
+/*
+ * In `--sub` und auf 24px waren die Piktogramme im Dunkelmodus kaum zu
+ * sehen — nachgemessen im gerenderten Bild, nicht im Kopf. Die
+ * Referenzapps setzen das Symbol einer Karte auf dieselbe Farbe wie
+ * deren Überschrift; der gedämpfte Ton gehört dem Fliesstext darunter.
+ */
 .karte .icon {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   display: block;
   margin-bottom: 12px;
-  color: var(--sub);
+  color: var(--text);
 }
 .karte h3 { margin: 0 0 8px; font-size: 15px; }
 .karte p { margin: 0; font-size: 15px; color: var(--sub); }
@@ -293,6 +299,19 @@ section > h3:first-of-type { margin-top: 0; }
   border-radius: 999px;
   padding: 2px 9px;
   white-space: nowrap;
+}
+
+/*
+ * Was wirklich gebaut ist, steht gefuellt — dieselbe Unterscheidung, die
+ * die App zwischen dem aktiven Reiter und den uebrigen macht. Gefuellt
+ * heisst „das ist", umrandet „das steht daneben". Weiterhin ohne
+ * Semantikfarbe: Gruen fuer „gebaut" waere die Risikoskala an einer
+ * Stelle, an der sie nichts bedeutet.
+ */
+.stand.ist {
+  color: var(--bg);
+  background: var(--text);
+  border-color: var(--text);
 }
 
 /*

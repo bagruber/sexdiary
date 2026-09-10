@@ -18,4 +18,5 @@ export * from "./date.js";
 export * from "./id.js";
 export * from "./i18n/index.js";
 export * from "./tokens.js";
+export * from "./icons.js";
 export * from "./signed-result.js";

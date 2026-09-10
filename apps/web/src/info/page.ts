@@ -11,7 +11,13 @@
  * Die Seite kennt keinen Nutzer, verarbeitet keine Gesundheitsdaten und
  * lädt nichts von Drittanbietern.
  */
-import { STI_NAMES, paletteFor } from "@sexdiary/core";
+import {
+  ICON_PATHS,
+  ICON_STROKE,
+  STI_NAMES,
+  paletteFor,
+  type IconName,
+} from "@sexdiary/core";
 
 export function themeStyles(): string {
   const vars = (p: ReturnType<typeof paletteFor>) =>
@@ -31,23 +37,23 @@ ${body}
   </section>`;
 
 /**
- * Piktogramme von Hand, 24×24, `currentColor`. Eine Icon-Bibliothek
- * waere ein Paket mehr im Bundle für drei Bilder.
+ * Symbole aus dem gemeinsamen Satz im Kern — dieselben Pfade und
+ * dieselbe Strichstaerke, die die App zeichnet. Frueher lagen sie hier
+ * als eigene Kopie, was zwei Saetze bedeutete, die nur niemand
+ * nebeneinander sieht.
  */
-const ICONS: Record<string, string> = {
-  messgeraet:
-    '<path d="M3 17a9 9 0 0 1 18 0" /><path d="M12 17l4.5-4.5" /><circle cx="12" cy="17" r="1.6" fill="currentColor" stroke="none" />',
-  weitergabe:
-    '<circle cx="4.5" cy="12" r="2.5" /><circle cx="19.5" cy="12" r="2.5" /><path d="M8 12h8" /><path d="M13.5 9.5 16.5 12l-3 2.5" />',
-  schloss:
-    '<rect x="4" y="10.5" width="16" height="9.5" rx="2" /><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" /><path d="M12 14.5v2" />',
-};
+const icon = (name: IconName, klasse = "icon"): string =>
+  `<svg class="${klasse}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${ICON_STROKE}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON_PATHS[
+    name
+  ]
+    .map((d) => `<path d="${d}" />`)
+    .join("")}</svg>`;
 
-const problemKarten = (items: [string, string, string][]): string => `    <div class="karten">
+const problemKarten = (items: [IconName, string, string][]): string => `    <div class="karten">
 ${items
   .map(
-    ([icon, t, b]) => `      <div class="karte">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[icon]}</svg>
+    ([name, t, b]) => `      <div class="karte">
+        ${icon(name)}
         <h3>${t}</h3>
         <p>${b}</p>
       </div>`,
@@ -81,14 +87,20 @@ ${schritte
     </ol>`;
 
 /**
- * Funktionen mit Stand. Der Stand steht neutral, nicht in den
- * Semantikfarben (ADR-0015): die Farbskala gehört der Risikobewertung.
+ * Funktionen mit Stand.
+ *
+ * Der Stand steht weiterhin ohne Semantikfarbe (ADR-0015) — die gehört
+ * der Risikobewertung. Unterschieden wird stattdessen wie in der App
+ * zwischen Bedienelementen: gefüllt heisst da, was wirklich ist, und
+ * umrandet, was daneben steht. „gebaut" ist gefüllt, alles andere
+ * umrandet. Zwei Zustände, ohne dass Farbe eine Bedeutung bekommt, die
+ * sie in dieser Anwendung schon hat.
  */
 const funktionen = (items: [string, string, string][]): string => `    <ul class="module">
 ${items
   .map(
     ([name, stand, text]) => `      <li>
-        <h3>${name} <span class="stand">${stand}</span></h3>
+        <h3>${name} <span class="stand${stand === "gebaut" ? " ist" : ""}">${stand}</span></h3>
         <p>${text}</p>
       </li>`,
   )
@@ -183,7 +195,7 @@ ${pfeile("fluss")}
     </div>`;
 
 const schichtenSvg = (): string => `    <div class="diagramm">
-      <svg viewBox="0 0 720 250" role="img" aria-label="Vier Schichten: die Bildschirme der App, darunter die Gerätefunktionen mit sieben Fremdpaketen, darunter der Kern @sexdiary/core ohne Runtime-Abhängigkeiten und ohne Ein- und Ausgabe, darunter Android und iOS.">
+      <svg viewBox="0 0 720 250" role="img" aria-label="Vier Schichten: die Bildschirme der App, darunter die Gerätefunktionen mit acht Fremdpaketen, darunter der Kern @sexdiary/core ohne Runtime-Abhängigkeiten und ohne Ein- und Ausgabe, darunter Android und iOS.">
         <rect x="1" y="1" width="718" height="248" rx="12" fill="none" stroke="var(--border)" />
 
         <text x="20" y="28" class="d-titel-klein">Bildschirme</text>
@@ -191,8 +203,8 @@ const schichtenSvg = (): string => `    <div class="diagramm">
         <line x1="1" y1="60" x2="719" y2="60" stroke="var(--border)" />
 
         <text x="20" y="86" class="d-titel-klein">Gerätefunktionen</text>
-        <text x="20" y="106" class="d-leise">Sperre · Bildschirmschutz · Speicher · Krypto · Kamera · NFC · Erinnerungen</text>
-        <text x="20" y="124" class="d-leise">Sieben Fremdpakete, jedes mit genau einer Aufgabe</text>
+        <text x="20" y="106" class="d-leise">Sperre · Bildschirmschutz · Speicher · Krypto · Kamera · NFC · Erinnerungen · Zeichnen</text>
+        <text x="20" y="124" class="d-leise">Acht Fremdpakete, jedes mit genau einer Aufgabe</text>
         <line x1="1" y1="136" x2="719" y2="136" stroke="var(--border)" />
 
         <rect x="1" y="136" width="718" height="74" fill="var(--text)" />
@@ -235,17 +247,17 @@ ${section(
   "Drei Probleme",
   problemKarten([
     [
-      "messgeraet",
+      "gauge",
       "Risk Awareness &amp; Testbereitschaft",
       "Menschen schätzen ihr Expositionsrisiko falsch ein oder handeln nicht entsprechend.",
     ],
     [
-      "weitergabe",
+      "handoff",
       "Partner Notification",
       "STI-Infektionen sind stigmatisiert. Partner:innen zu kontaktieren, kann aufwändig und schambesetzt sein. Deshalb werden potentiell angesteckte Partner:innen oft gar nicht oder spät informiert.",
     ],
     [
-      "schloss",
+      "lock",
       "Sensible Daten &amp; einfache Bedienung",
       "Bestehende Dienste zur persönlichen Dokumentation oder zur Integration von Testergebnissen sind selten sowohl anonym als auch niedrigschwellig und alltagstauglich.",
     ],
@@ -448,8 +460,8 @@ ${section(
     <ul>
       <li>Die Gesundheitslogik liegt in einem eigenen Paket ohne
         Runtime-Abhängigkeiten. Das ist die Prüffläche.</li>
-      <li>Sieben Fremdpakete in der App-Hülle: Sperre, Bildschirmschutz,
-        Speicher, Krypto, Kamera, NFC, Erinnerungen.</li>
+      <li>Acht Fremdpakete in der App-Hülle: Sperre, Bildschirmschutz,
+        Speicher, Krypto, Kamera, NFC, Erinnerungen, Zeichnen.</li>
       <li>Keine Analytik, kein Crash-Reporting, keine externen Schriften.</li>
       <li>Keine Over-the-Air-Updates. Ausgeliefert wird, was geprüft wurde.</li>
       <li>Keine Konten, keine Anmeldung, kein Nutzerverzeichnis.</li>
