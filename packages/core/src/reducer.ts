@@ -6,6 +6,7 @@
 import type {
   AppData,
   Contact,
+  EntryType,
   Intercourse,
   Preferences,
   Profile,
@@ -14,8 +15,6 @@ import type {
   Vaccination,
 } from "./domain.js";
 import { freshAppData } from "./seed.js";
-
-export type EntryType = "intercourse" | "test" | "contact" | "vaccination";
 
 export type AppAction =
   | { type: "saveIntercourse"; payload: Intercourse }

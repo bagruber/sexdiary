@@ -29,6 +29,12 @@ export const RISK_ORDER: Record<RiskLevel, number> = {
   very_high: 6,
 };
 
+/**
+ * Die vier Eintragsarten. Ein Vokabular fuer alle, die davon reden —
+ * der Reducer beim Loeschen, die Kategoriefarben, die Blattleiste.
+ */
+export type EntryType = "intercourse" | "test" | "contact" | "vaccination";
+
 export type ActFlags = Record<ActKey, 0 | 1>;
 export const emptyActs = (): ActFlags =>
   Object.fromEntries(ACT_KEYS.map((k) => [k, 0])) as ActFlags;

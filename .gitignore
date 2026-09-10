@@ -9,3 +9,9 @@ tsconfig.tsbuildinfo
 # plus die Config-Plugins, und ein eingecheckter Stand laeuft davon weg.
 android/
 ios/
+
+# Bildschirmfotos fremder Apps als Entwurfsreferenz. Sie enthalten
+# Klarnamen Dritter und eine Mailadresse — in einem Repo, das nach
+# openCode.de soll, waere das nach dem ersten Commit nicht mehr
+# ruecknehmbar.
+app ui inspiration/

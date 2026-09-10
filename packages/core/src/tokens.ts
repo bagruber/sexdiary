@@ -1,4 +1,4 @@
-import type { RiskLevel } from "./domain.js";
+import type { EntryType, RiskLevel } from "./domain.js";
 
 /**
  * Colour tokens. Two scales that must never touch: the interaction scale
@@ -119,4 +119,52 @@ function luminance(hex: string): number {
 export function contrast(a: string, b: string): number {
   const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
   return (hi + 0.05) / (lo + 0.05);
+}
+
+/**
+ * Die Kategorieskala — die vier Eintragsarten.
+ *
+ * Das ist eine dritte Skala neben Interaktion und Risiko, und sie
+ * braucht eine Rechtfertigung, weil die Trennung der ersten beiden
+ * oben ausdruecklich verteidigt wird.
+ *
+ * Sie ist auf eine Stelle beschraenkt: den Faecher ueber dem
+ * Plus-Knopf, ein Overlay ueber abgedunkeltem Hintergrund, das
+ * Sekunden lebt. Kategoriefarbe und Risikofarbe stehen dort nie
+ * gleichzeitig lesbar nebeneinander. Ausserhalb des Faechers hat
+ * die Kategorie keine Farbe, sondern nur ihr Symbol.
+ *
+ * Die vier Farbtoene liegen bewusst zwischen 190 und 330 Grad —
+ * Rot, Amber und Gruen bleiben der Risikoskala. Der Abstand zur
+ * Risikorampe und untereinander ist in `test/tokens.test.ts`
+ * gerechnet, nicht nach Augenmass gesetzt.
+ */
+export interface CategoryScale {
+  fill: Record<EntryType, string>;
+  /** Der einzige erlaubte Vordergrund auf jedem `fill`. */
+  on: string;
+}
+
+export const CATEGORY_LIGHT: CategoryScale = {
+  fill: {
+    intercourse: "#8C2157",
+    test: "#21268C",
+    contact: "#70218C",
+    vaccination: "#217B8C",
+  },
+  on: "#FFFFFF",
+};
+
+export const CATEGORY_DARK: CategoryScale = {
+  fill: {
+    intercourse: "#E58AB8",
+    test: "#8A8EE5",
+    contact: "#CD8AE5",
+    vaccination: "#8AD6E5",
+  },
+  on: "#0D1A1E",
+};
+
+export function categoryScale(scheme: "light" | "dark"): CategoryScale {
+  return scheme === "dark" ? CATEGORY_DARK : CATEGORY_LIGHT;
 }
