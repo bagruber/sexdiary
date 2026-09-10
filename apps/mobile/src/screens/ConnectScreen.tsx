@@ -17,6 +17,7 @@ import { parseImportPayload } from "@sexdiary/core";
 import { useApp } from "../state/store";
 import { Card, Chip, GhostButton, PrimaryButton, SectionTitle, Title } from "../ui";
 import { QrCode } from "./QrCode";
+import { PositivePrompt } from "./AddSheets";
 
 type Tab = "share" | "import";
 
@@ -28,6 +29,7 @@ export function ConnectScreen({ onClose }: { onClose: () => void }) {
   const [buf, setBuf] = useState("");
   const [status, setStatus] = useState<{ ok: boolean; msg: string } | null>(null);
   const [permission, requestPermission] = useCameraPermissions();
+  const [positiv, setPositiv] = useState<string[] | null>(null);
 
   const { shareMode, sharePlatform, shareHandle } = data.prefs;
   const withHandle = shareMode === "handle" && !!sharePlatform && !!shareHandle;
@@ -48,6 +50,14 @@ export function ConnectScreen({ onClose }: { onClose: () => void }) {
     if (r.kind === "test") {
       dispatch({ type: "saveTest", payload: r.record });
       setStatus({ ok: true, msg: t("importedTest") });
+      // Ein eingelesener Befund ist derselbe Befund wie ein getippter.
+      // Ohne das haette ausgerechnet der Weg, den die App bewirbt --
+      // Ergebnis per QR aus dem Testangebot -- keinen Anschluss an die
+      // Benachrichtigung gehabt.
+      const pos = Object.entries(r.record.results ?? {})
+        .filter(([, v]) => v === "positive")
+        .map(([sti]) => sti);
+      if (pos.length) setPositiv(pos);
     } else if (r.kind === "contact") {
       dispatch({ type: "saveContact", payload: r.record });
       setStatus({ ok: true, msg: t("importedContact") });
@@ -67,6 +77,8 @@ export function ConnectScreen({ onClose }: { onClose: () => void }) {
     }
     setScanning(true);
   };
+
+  if (positiv) return <PositivePrompt stis={positiv} onClose={onClose} />;
 
   return (
     <ScrollView

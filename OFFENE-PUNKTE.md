@@ -162,11 +162,25 @@ F-Droid und die Nachnutzung durch ein zweites Gesundheitsamt. Empfehlung
 unveraendert EUPL-1.2. Begruendung in `notes/05`, Abschnitt 6.1.
 
 
-## Hostinger-Produkt unbekannt
+## Relay laeuft auf Shared Hosting, also PHP
 
-Shared Hosting oder VPS entscheidet, ob der Partner-Alert-Server ueberhaupt
-gebaut werden kann (kein langlaufender Node-Prozess auf Shared Hosting).
-Siehe `notes/05`, Abschnitt 5.
+Geklaert am 10.09.2026: der Hostinger-Plan ist **Shared**, kein VPS. Damit ist
+kein langlaufender Node-Prozess moeglich, und der Partner-Alert-Server aus
+ADR-0008 wird PHP mit MySQL.
+
+Fuer den Zuschnitt ist das kein Verlust. Der Relay traegt
+`{Empfaenger-Token, Erreger, Zeitstempel}` und kennt drei Vorgaenge: ablegen,
+zum eigenen Token abholen, loeschen. Das sind ein paar Dutzend Zeilen, und fuer
+eine Sicherheitspruefung ist eine lesbare PHP-Datei eher ein Vorteil als eine
+Serverless-Funktion mit Anbieterbindung.
+
+Was damit **nicht** geht und in `notes/05` anders stand: Docker, eigene Ports,
+Hintergrundprozesse. Der Direktabruf von Testergebnissen (ADR-0012) und alles,
+was einen laufenden Dienst braucht, bleibt davon beruehrt.
+
+Offen bleibt die Frage aus dem Pitch, die keine technische ist: **darf ein
+pseudonymisiertes Token ohne Personendaten ueberhaupt auf einem Server
+liegen?** Die gehoert rechtlich geklaert, bevor der Relay Daten annimmt.
 
 
 ## index.html hat kein Favicon

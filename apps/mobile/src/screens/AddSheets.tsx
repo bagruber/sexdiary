@@ -37,7 +37,9 @@ import {
   type Vaccination,
 } from "@sexdiary/core";
 import { useApp } from "../state/store";
+import { AlertsScreen } from "./AlertsScreen";
 import {
+  Card,
   Chip,
   GhostButton,
   PrimaryButton,
@@ -212,8 +214,48 @@ export function AddEncounter({
   );
 }
 
+/**
+ * Nach einem positiven Befund die Frage, die zaehlt.
+ *
+ * Sie steht im Blatt selbst, nicht in der Huelle: so erscheint sie
+ * unabhaengig davon, ob der Test ueber die Plus-Taste, den Verlauf oder
+ * die Verwaltung eingetragen wurde. Ein Rueckruf durch drei Ebenen
+ * haette dieselbe Frage an drei Stellen verdrahtet — und an einer
+ * vergessen.
+ */
+export function PositivePrompt({
+  stis,
+  onClose,
+}: {
+  stis: string[];
+  onClose: () => void;
+}) {
+  const { t, palette } = useApp();
+  const [alerts, setAlerts] = useState(false);
+
+  if (alerts) return <AlertsScreen onClose={onClose} />;
+
+  return (
+    <ScrollView>
+      <Title>{t("positiveResultTitle")}</Title>
+      <Card>
+        <Text style={{ color: palette.text, lineHeight: 21 }}>
+          {t("positiveResultBody", { stis: stis.join(", ") })}
+        </Text>
+      </Card>
+      <PrimaryButton
+        label={t("goToPartnerAlerts")}
+        onPress={() => setAlerts(true)}
+      />
+      <GhostButton label={t("dismissForNow")} onPress={onClose} />
+      <View style={{ height: 32 }} />
+    </ScrollView>
+  );
+}
+
 function AddTest({ onClose, edit }: { onClose: () => void; edit?: TestRecord }) {
   const { dispatch, t, palette } = useApp();
+  const [positiv, setPositiv] = useState<string[] | null>(null);
   const [date, setDate] = useState(edit?.date ?? today());
   const [facility, setFacility] = useState(edit?.fac ?? "");
   const [panel, setPanel] = useState<Set<string>>(() =>
@@ -241,8 +283,15 @@ function AddTest({ onClose, edit }: { onClose: () => void; edit?: TestRecord }) 
       results: res,
     };
     dispatch({ type: "saveTest", payload: record });
-    onClose();
+
+    const pos = Object.entries(res)
+      .filter(([, v]) => v === "positive")
+      .map(([sti]) => sti);
+    if (pos.length) setPositiv(pos);
+    else onClose();
   };
+
+  if (positiv) return <PositivePrompt stis={positiv} onClose={onClose} />;
 
   return (
     <ScrollView keyboardShouldPersistTaps="handled">
