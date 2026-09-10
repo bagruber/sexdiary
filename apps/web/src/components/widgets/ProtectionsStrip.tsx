@@ -1,5 +1,5 @@
 import { Pill, Zap, Shield, ShieldCheck, type LucideIcon } from "lucide-react";
-import { FONT, shadow } from "../../theme/tokens";
+import { shadow } from "../../theme/tokens";
 import { useApp } from "../../state/store";
 import { summarizeProtections } from "@sexdiary/core";
 import { today } from "@sexdiary/core";
@@ -82,7 +82,6 @@ export function ProtectionsStrip() {
             <div style={{ minWidth: 0 }}>
               <div
                 style={{
-                  fontFamily: FONT,
                   fontSize: 12,
                   fontWeight: 700,
                   color: it.color,
@@ -93,7 +92,6 @@ export function ProtectionsStrip() {
               </div>
               <div
                 style={{
-                  fontFamily: FONT,
                   fontSize: 11,
                   color: palette.muted,
                   marginTop: 2,

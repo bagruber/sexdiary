@@ -1,18 +1,20 @@
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Modal, Pressable, ScrollView, View } from "react-native";
 import {
   calcRisk,
   formatDate,
+  getAlerts,
   nextAction,
   plurals,
+  riskColor,
   summarizeProtections,
   today,
   vaccineSeries,
   type RiskData,
 } from "@sexdiary/core";
 import { useApp } from "../state/store";
-import { riskColor } from "../theme";
-import { Card, Meter, Screen, SectionTitle, Title } from "../ui";
+import { Card, Meter, Row, Screen, SectionTitle, Text, Title} from "../ui";
+import { AlertsScreen } from "./AlertsScreen";
 import { ExplainSheet } from "./ExplainSheet";
 
 /**
@@ -43,10 +45,20 @@ function NextActionCard({
   }
 
   return (
-    <Card style={{ borderLeftWidth: 4, borderLeftColor: color, paddingVertical: 18 }}>
-      <Text style={{ color: palette.sub, fontSize: 11, letterSpacing: 0.8 }}>
-        {t("nextAction").toUpperCase()}
-      </Text>
+    <Card style={{ paddingVertical: 18 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 7 }}>
+        <View
+          style={{
+            width: 7,
+            height: 7,
+            borderRadius: 3.5,
+            backgroundColor: color,
+          }}
+        />
+        <Text style={{ color: palette.sub, fontSize: 11, letterSpacing: 0.8 }}>
+          {t("nextAction").toUpperCase()}
+        </Text>
+      </View>
       <Text
         style={{
           color: palette.text,
@@ -124,7 +136,6 @@ function RiskRow({
   onPress: () => void;
 }) {
   const { t, palette } = useApp();
-  const colors = riskColor(palette);
 
   let status: string;
   let color = palette.sub;
@@ -138,7 +149,7 @@ function RiskRow({
     color = palette.bad;
   } else if (risk.exposed && risk.testable) {
     status = t("testableNow");
-    color = risk.mr ? colors[risk.mr] : palette.warn;
+    color = riskColor(palette, risk.mr);
   } else if (risk.exposed) {
     const remaining = Math.max((risk.wd ?? 0) - (risk.days ?? 0), 1);
     status = t("notYetMeaningful", { n: remaining });
@@ -193,6 +204,7 @@ function RiskRow({
 export function DashboardScreen() {
   const { data, t, palette } = useApp();
   const [explain, setExplain] = useState<string | null>(null);
+  const [alerts, setAlerts] = useState(false);
 
   const report = useMemo(
     () =>
@@ -227,12 +239,28 @@ export function DashboardScreen() {
 
   const entries = Object.entries(report.risks);
 
+  // Steht nur da, wenn es etwas zu tun gibt. Ein Dauereintrag "niemanden
+  // zu benachrichtigen" waere eine Zeile, die man lesen lernt zu
+  // ueberspringen — und genau dann uebersieht, wenn sie zaehlt.
+  const alertGroups = useMemo(
+    () => getAlerts(data.tests, data.intercourse, data.contacts),
+    [data.tests, data.intercourse, data.contacts],
+  );
+
   return (
     <Screen>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Title>{t("dashboard")}</Title>
 
         <NextActionCard action={action} color={actionColor} />
+
+        {alertGroups.length > 0 && (
+          <Row
+            label={t("partnerAlerts")}
+            sub={t("partnerAlertsSub")}
+            onPress={() => setAlerts(true)}
+          />
+        )}
 
         <SectionTitle>{t("lastTest")}</SectionTitle>
         <Card>
@@ -283,6 +311,16 @@ export function DashboardScreen() {
           onClose={() => setExplain(null)}
         />
       )}
+
+      <Modal
+        visible={alerts}
+        animationType="slide"
+        onRequestClose={() => setAlerts(false)}
+      >
+        <View style={{ flex: 1, backgroundColor: palette.bg }}>
+          <AlertsScreen onClose={() => setAlerts(false)} />
+        </View>
+      </Modal>
     </Screen>
   );
 }

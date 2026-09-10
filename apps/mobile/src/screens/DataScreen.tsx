@@ -4,24 +4,15 @@
  * be checkable rather than believed.
  */
 import { useMemo, useState } from "react";
-import { Modal, Platform, ScrollView, Text, View } from "react-native";
+import { Modal, Platform, ScrollView, View } from "react-native";
 import { useApp } from "../state/store";
-import { Card, GhostButton, Row, SectionTitle } from "../ui";
+import { Card, GhostButton, Row, SectionTitle, Text } from "../ui";
 
 export function DataScreen({ onClose }: { onClose: () => void }) {
   const { data, t, palette } = useApp();
   const [showRaw, setShowRaw] = useState(false);
 
-  const raw = useMemo(
-    () =>
-      JSON.stringify(
-        // The PIN gates the UI; never render it back to the screen.
-        { ...data, prefs: { ...data.prefs, lockPin: data.prefs.lockPin ? "«redacted»" : null } },
-        null,
-        2,
-      ),
-    [data],
-  );
+  const raw = useMemo(() => JSON.stringify(data, null, 2), [data]);
 
   const counts: { label: string; n: number }[] = [
     { label: t("dataEncounters"), n: data.intercourse.length },

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Camera, Link2, Lock } from "lucide-react";
-import { FONT, shadow } from "../theme/tokens";
+import { shadow } from "../theme/tokens";
 import { Pill, Button } from "../components/ui";
 import { QRCode } from "../components/widgets/QRCode";
 import { QRScanner } from "../components/widgets/QRScanner";
@@ -58,7 +58,6 @@ export function ConnectView() {
     >
       <h1
         style={{
-          fontFamily: FONT,
           fontSize: 26,
           fontWeight: 700,
           color: palette.text,
@@ -69,7 +68,6 @@ export function ConnectView() {
       </h1>
       <p
         style={{
-          fontFamily: FONT,
           fontSize: 13,
           color: palette.muted,
           margin: "0 0 22px",
@@ -95,7 +93,6 @@ export function ConnectView() {
             marginBottom: 14,
             background: (status.ok ? palette.green : palette.rose) + "10",
             border: `1px solid ${(status.ok ? palette.green : palette.rose)}40`,
-            fontFamily: FONT,
             fontSize: 13,
             color: status.ok ? palette.green : palette.rose,
             fontWeight: 600,
@@ -146,7 +143,6 @@ export function ConnectView() {
               <div>
                 <div
                   style={{
-                    fontFamily: FONT,
                     fontSize: 13,
                     color: palette.text,
                     lineHeight: 1.5,
@@ -178,7 +174,7 @@ export function ConnectView() {
 
       {tab === "import" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          <p style={{ fontFamily: FONT, fontSize: 13, color: palette.muted }}>
+          <p style={{ fontSize: 13, color: palette.muted }}>
             {t("importSub")}
           </p>
           <Button onClick={() => setScannerOpen(true)} full>

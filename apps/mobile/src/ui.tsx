@@ -2,13 +2,45 @@ import type { ReactNode } from "react";
 import {
   Pressable,
   StyleSheet,
-  Text,
+  Text as RNText,
   View,
   type StyleProp,
+  type TextProps,
+  type TextStyle,
   type ViewStyle,
 } from "react-native";
 import { useApp } from "./state/store";
 import { tapLight, tapMedium } from "./haptics";
+
+/**
+ * Text mit Atkinson Hyperlegible.
+ *
+ * React Native vererbt `fontFamily` nicht — sie muss an jedes Element.
+ * Statt sie hundertfach hinzuschreiben, sitzt sie hier einmal, und die
+ * Bildschirme importieren `Text` von hier statt von react-native.
+ *
+ * Der zweite Schnitt ist die Staerke: Android synthetisiert bei einer
+ * mitgelieferten Schrift kein Fett, es braucht die Bold-Datei als eigene
+ * Familie. Deshalb wird `fontWeight` ausgewertet und umgesetzt, statt
+ * sich auf den Renderer zu verlassen.
+ */
+export function Text({ style, ...rest }: TextProps) {
+  const flat = StyleSheet.flatten(style) as TextStyle | undefined;
+  const w = flat?.fontWeight;
+  const fett = w === "bold" || (typeof w === "string" && Number(w) >= 600);
+  return (
+    <RNText
+      {...rest}
+      style={[
+        { fontFamily: fett ? "Atkinson-Bold" : "Atkinson" },
+        style,
+        // Die Familie traegt die Staerke; ein zusaetzliches fontWeight
+        // liesse Android zusaetzlich synthetisch fetten.
+        fett ? { fontWeight: "normal" } : null,
+      ]}
+    />
+  );
+}
 
 export function Screen({ children }: { children: ReactNode }) {
   const { palette } = useApp();
@@ -58,10 +90,13 @@ export function Chip({
   label,
   active,
   onPress,
+  icon,
 }: {
   label: string;
   active: boolean;
   onPress: () => void;
+  /** Ein kurzes Zeichen vor der Beschriftung. Siehe `GLYPH` unten. */
+  icon?: string;
 }) {
   const { palette } = useApp();
   return (
@@ -80,12 +115,45 @@ export function Chip({
         },
       ]}
     >
-      <Text style={{ color: active ? palette.accentText : palette.text, fontSize: 13 }}>
+      {icon && (
+        <Text
+          style={{
+            color: active ? palette.accentText : palette.sub,
+            fontSize: 13,
+          }}
+        >
+          {icon}
+        </Text>
+      )}
+      <Text
+        numberOfLines={1}
+        style={{ color: active ? palette.accentText : palette.text, fontSize: 13 }}
+      >
         {label}
       </Text>
     </Pressable>
   );
 }
+
+/**
+ * Zeichen fuer die vier Eintragsarten.
+ *
+ * Bewusst Text statt einer Icon-Bibliothek: @expo/vector-icons ist hier
+ * nicht installiert, und ein Schriftpaket von ueber einem Megabyte fuer
+ * vier Symbole waere ein schlechter Tausch — zumal die App ohnehin schon
+ * drei Drittanbieter-Pakete mit nativem Code traegt.
+ *
+ * Und bewusst keine Farbcodierung: ADR-0015 haelt Gruen, Gelb und Rot
+ * fuer die Risikoskala frei. Zwei Bedeutungen auf derselben Farbe waeren
+ * auf einem Bildschirm, der beides zeigt, schlechter als gar keine.
+ */
+export const GLYPH = {
+  intercourse: "♥",
+  test: "✓",
+  contact: "☺",
+  vaccination: "✚",
+  qr: "▣",
+} as const;
 
 /** Horizontal progress meter with an accessible value. */
 export function Meter({
@@ -172,83 +240,6 @@ export function Row({
   );
 }
 
-/** 4-digit PIN pad. Purely a UI gate — see Preferences.lockPin. */
-export function Keypad({
-  value,
-  onChange,
-  deleteLabel,
-}: {
-  value: string;
-  onChange: (next: string) => void;
-  deleteLabel: string;
-}) {
-  const { palette } = useApp();
-  const keys = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "del"];
-
-  return (
-    <View>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "center",
-          marginBottom: 28,
-        }}
-      >
-        {[0, 1, 2, 3].map((i) => (
-          <View
-            key={i}
-            style={{
-              width: 14,
-              height: 14,
-              borderRadius: 7,
-              marginHorizontal: 8,
-              borderWidth: 1,
-              borderColor: palette.sub,
-              backgroundColor: i < value.length ? palette.text : "transparent",
-            }}
-          />
-        ))}
-      </View>
-      <View
-        style={{
-          flexDirection: "row",
-          flexWrap: "wrap",
-          width: 260,
-          alignSelf: "center",
-        }}
-      >
-        {keys.map((k, i) => {
-          if (k === "") return <View key={i} style={styles.key} />;
-          const isDel = k === "del";
-          return (
-            <Pressable
-              key={i}
-              accessibilityRole="button"
-              accessibilityLabel={isDel ? deleteLabel : k}
-              onPress={() => {
-                tapLight();
-                if (isDel) onChange(value.slice(0, -1));
-                else if (value.length < 4) onChange(value + k);
-              }}
-              style={({ pressed }) => [
-                styles.key,
-                {
-                  backgroundColor: pressed ? palette.border : "transparent",
-                  borderRadius: 40,
-                },
-              ]}
-            >
-              <Text style={{ color: palette.text, fontSize: isDel ? 16 : 26 }}>
-                {isDel ? "⌫" : k}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-    </View>
-  );
-}
-
 export function PrimaryButton({
   label,
   onPress,
@@ -287,9 +278,16 @@ export function PrimaryButton({
 export function GhostButton({
   label,
   onPress,
+  danger,
 }: {
   label: string;
   onPress: () => void;
+  /**
+   * Zerstoerend, aber zweitrangig. Rot in der Schrift statt in der
+   * Flaeche: ein vollflaechig roter Knopf neben "Speichern" zoege den
+   * Blick auf sich, obwohl er der seltenere Fall ist.
+   */
+  danger?: boolean;
 }) {
   const { palette } = useApp();
   return (
@@ -299,9 +297,16 @@ export function GhostButton({
         onPress();
       }}
       accessibilityRole="button"
-      style={[styles.button, { borderWidth: 1, borderColor: palette.border }]}
+      style={[
+        styles.button,
+        { borderWidth: 1, borderColor: danger ? palette.bad : palette.border },
+      ]}
     >
-      <Text style={{ color: palette.text, fontWeight: "600" }}>{label}</Text>
+      <Text
+        style={{ color: danger ? palette.bad : palette.text, fontWeight: "600" }}
+      >
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -330,6 +335,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginRight: 8,
     marginBottom: 8,
+    // Ohne die drei Zeilen wird der Chip in einer Zeile so hoch wie der
+    // groesste daneben (alignItems faellt sonst auf "stretch"), und in
+    // einer horizontalen ScrollView schrumpft er, bis das Wort umbricht.
+    alignSelf: "flex-start",
+    flexShrink: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
   },
   button: {
     borderRadius: 14,
@@ -337,10 +350,97 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
   },
-  key: {
-    width: 80,
-    height: 68,
-    alignItems: "center",
-    justifyContent: "center",
-  },
 });
+
+/**
+ * Die beiden Aktionen, die von jeder Seite aus erreichbar sein muessen.
+ *
+ * Mittig ueber der Reiterleiste, weil beide unter Zeitdruck getroffen
+ * werden. Eine Begegnung traegt man zwar in Ruhe nach; der Tokentausch
+ * passiert im Moment, mit jemandem daneben, und ADR-0014 verlangt fuer
+ * die Begegnung ohnehin einen staendig erreichbaren Platz.
+ *
+ * Bewusst keine Zwillinge: das Plus ist gefuellt, der QR umrandet. Zwei
+ * gleich aussehende Ziele nebeneinander werden verwechselt, und hier
+ * legt das eine einen Eintrag an, waehrend das andere die Kamera
+ * oeffnet.
+ */
+export function FabPair({
+  onAdd,
+  onAddLong,
+  onQr,
+  addLabel,
+  qrLabel,
+}: {
+  onAdd: () => void;
+  onAddLong?: () => void;
+  onQr: () => void;
+  addLabel: string;
+  qrLabel: string;
+}) {
+  const { palette } = useApp();
+
+  const knopf = (
+    label: string,
+    zeichen: string,
+    gefuellt: boolean,
+    onPress: () => void,
+    onLongPress?: () => void,
+  ) => (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={() => {
+        tapMedium();
+        onPress();
+      }}
+      onLongPress={
+        onLongPress &&
+        (() => {
+          tapMedium();
+          onLongPress();
+        })
+      }
+      style={{
+        width: 58,
+        height: 58,
+        borderRadius: 29,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: gefuellt ? palette.accent : palette.card,
+        borderWidth: gefuellt ? 0 : 1,
+        borderColor: palette.border,
+        elevation: 3,
+      }}
+    >
+      <Text
+        style={{
+          color: gefuellt ? palette.accentText : palette.text,
+          fontSize: gefuellt ? 28 : 22,
+          lineHeight: gefuellt ? 32 : 26,
+          fontWeight: "300",
+        }}
+      >
+        {zeichen}
+      </Text>
+    </Pressable>
+  );
+
+  return (
+    <View
+      pointerEvents="box-none"
+      style={{
+        position: "absolute",
+        left: 0,
+        right: 0,
+        bottom: 14,
+        flexDirection: "row",
+        justifyContent: "center",
+        gap: 22,
+      }}
+    >
+      {knopf(addLabel, "+", true, onAdd, onAddLong)}
+      {knopf(qrLabel, GLYPH.qr, false, onQr)}
+    </View>
+  );
+}

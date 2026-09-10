@@ -1,5 +1,4 @@
 import { LayoutGrid, Calendar, QrCode, Settings, type LucideIcon } from "lucide-react";
-import { FONT } from "../../theme/tokens";
 import { useApp } from "../../state/store";
 
 export type ViewId = "dashboard" | "calendar" | "share" | "settings";
@@ -64,7 +63,6 @@ export function BottomNav({ view, setView }: Props) {
             <Icon size={21} strokeWidth={active ? 2.2 : 1.8} />
             <span
               style={{
-                fontFamily: FONT,
                 fontSize: 10,
                 letterSpacing: ".04em",
                 fontWeight: active ? 700 : 400,

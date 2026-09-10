@@ -16,6 +16,15 @@ security-relevant surface small and reviewable.
   (`@noble/ciphers`, audited pure-TypeScript — no native crypto module
   needed, works in Expo Go) with a fresh random 96-bit nonce per write.
   Only ciphertext ever reaches disk (AsyncStorage).
+- **App lock**: the device's own authentication — biometrics where
+  enrolled, the device PIN or pattern otherwise (`expo-local-authentication`).
+  It gates the *interface*; the data is encrypted independently of it.
+  The key is deliberately **not** bound to authentication yet: Android
+  discards such a key when the enrolled biometrics change, which without
+  a backup is a data-loss trap (see `OFFENE-PUNKTE.md`).
+- **Screen capture**: blocked via `expo-screen-capture` — FLAG_SECURE on
+  Android, which also blanks the recents tile. iOS has no equivalent, so
+  the app covers itself when it stops being frontmost.
 - **Backups**: `android:allowBackup=false`; nothing readable leaves the
   device. Explicit passphrase-encrypted export is on the roadmap.
 - **Updates**: OTA updates are disabled in `app.json` — the code that
@@ -24,25 +33,143 @@ security-relevant surface small and reviewable.
 - **Third-party code**: no analytics, no crash uploaders, no SDKs beyond
   Expo modules and the audited cipher library.
 
-Known limitation (tracked in `notes/04-mobile-app-plan.md`): no app-lock
-yet — an attacker holding the *unlocked* phone can open the app. The
-biometric gate is milestone 3.
+## Testing on a real phone
 
-## Running
+**This app has never run on a device.** Typecheck, `expo-doctor` and a
+Metro export say the code is coherent; they say nothing about whether
+the lock holds across backgrounding or whether a reminder fires on the
+right morning. There are two rungs, and the first one costs five
+minutes.
 
-```bash
-npm install            # once, at the repo root
-npm run start -w @sexdiary/mobile    # Expo dev server (QR → Expo Go)
-npm run android -w @sexdiary/mobile  # launch on Android device/emulator
-npm run ios -w @sexdiary/mobile      # launch on iOS simulator (macOS)
-```
-
-Native builds without any cloud service:
+### Rung 1 — Expo Go: does it work at all
 
 ```bash
-npx expo prebuild      # generates android/ + ios/ projects
-# then standard Gradle / Xcode builds on your own machine
+pnpm install                          # once, at the repo root
+pnpm --filter @sexdiary/mobile start  # scan the QR with Expo Go
 ```
+
+No build, no signing, no download. Every native module this app uses is
+part of Expo Go, and `@noble/ciphers` is pure TypeScript, so the whole
+storage path runs unchanged.
+
+What this rung **can** answer — and these are the open questions, not a
+formality:
+
+- Does the app start on the New Architecture at all (it jumped three
+  Expo majors, 54 → 57, and never ran once since)?
+- Does `SecureStore` hold the master key, and does the **second** start
+  decrypt what the first one wrote? That is the single most important
+  check in the whole app.
+- Does the lock prompt appear, and does the device PIN work as fallback?
+- Does a reminder actually get scheduled, and does the text stay
+  discreet on the lock screen?
+
+What it **cannot** answer: anything about the app's identity. Config
+plugins do not apply in Expo Go, so the icon, the app name, the Face ID
+permission text, `allowBackup=false` and the notification icon are Expo
+Go's, not ours. Disguise mode cannot be judged here either.
+
+**Expo Go tests the logic. The APK tests the promises.**
+
+### Rung 2 — an installable APK
+
+Locally, no cloud service involved (the ADR-0010 "self-hosted" path):
+
+```bash
+export JAVA_HOME="C:/Program Files/Android/Android Studio/jbr"
+export ANDROID_HOME="C:/Users/<you>/AppData/Local/Android/Sdk"
+
+npx expo prebuild --platform android   # generates android/, not committed
+cat > android/local.properties <<PROPS
+sdk.dir=$ANDROID_HOME
+cmake.dir=$ANDROID_HOME/cmake/3.31.6
+PROPS
+cd android && ./gradlew assembleRelease
+# → android/app/build/outputs/apk/release/app-release.apk
+```
+
+**This produced an APK on 28.08.2026** — 71 MB, `de.bagruber.sexdiary`,
+all four ABIs, 7m15s. Getting there on Windows needed three things that
+are not obvious, so they are written down here rather than rediscovered.
+
+**1. A JDK.** There is no standalone JDK on this machine. The one that
+works is the JDK 17 bundled with Android Studio, hence the `JAVA_HOME`
+above — Gradle finds no `java` on PATH without it.
+
+**2. CMake 3.31.6, not the 3.22.1 the SDK installs by default.** This is
+the one that actually blocks the build, and it took two failed runs to
+find. Windows caps paths at 260 characters. CMake 3.22.1 encodes the
+absolute source path into the object path, so a codegen file under
+`react-native-safe-area-context` came out at 396 characters and ninja
+refused it. CMake 3.31.6 replaces that encoded path with a hash of the
+source directory — `react_codegen_safeareacontext.dir/823417e8…/` — and
+nothing ever reaches 260.
+
+Note what does *not* help, both measured rather than assumed: moving the
+repo somewhere shallow (under `C:/sd` the path is still 308), and
+enabling Windows long paths (the ninja 1.10.2 in CMake 3.22.1 has no
+`longPathAware` manifest and never queries the setting, so it fails at
+260 regardless). The newer ninja 1.12.1 does query it — but by then
+CMake has already shortened the paths, so it never comes up.
+
+```bash
+sdkmanager "cmake;3.31.6"     # cmdline-tools if you have no sdkmanager
+```
+
+`cmake.dir` in `local.properties` is how the build is pointed at it —
+that file is local and untracked, so pinning the version there costs the
+repo nothing and stays out of anyone else's way.
+
+**3. `nodeLinker: hoisted`**, already set in `pnpm-workspace.yaml`.
+pnpm's default layout nests packages under `.pnpm/<name>@<version>_<hash>/`,
+which alone put the longest source path at 293 characters and produced
+403 CMake warnings. Flat layout brings that to 213 and one warning.
+
+Budget about 4 GB of free disk. A run on the same day with ~2 GB free
+died 17 minutes in, writing `executionHistory.bin` — an error that reads
+like a Gradle bug and is almost always a full disk or a file lock.
+
+The generated project signs the release build with the **debug**
+keystore — verified: `CN=Android Debug`. Fine for sideloading to
+testers, and exactly what must be replaced before anything is
+distributed for real.
+
+One more thing that cost time: piping Gradle through `tail` hides its
+exit code, so a failed build reports success. Redirect to a file and
+check `$?`, or set `pipefail`.
+
+Or via EAS, which builds in the cloud and hands back a download link:
+
+```bash
+npx eas-cli build --platform android --profile preview
+```
+
+`eas.json` carries two profiles: `preview` builds an APK for
+sideloading, `production` an app bundle for the store's internal test
+channel. Both distribution routes are the ones ADR-0010 decided on.
+
+The trade-off is worth stating plainly: EAS is a third party, and the
+source is uploaded to build. Nothing of it ends up *in* the app — it is
+a build service, not a runtime dependency — but the self-hosted path is
+the one that carries the sovereignty argument, so it should stay the one
+that works.
+
+### The checklist that matters
+
+Ticking "it launched" is not a test. In order of what would hurt most:
+
+1. Log an encounter, force-quit, reopen. **The entry is still there.**
+   If not, the whole encryption path is broken.
+2. Switch the app lock on. Leave the app to the background, come back.
+   **It asks.** Try to switch the lock off — **it asks again.**
+3. Take a screenshot. **Android refuses.** Open the recents switcher —
+   **the tile is blank.**
+4. Switch reminders on, log an encounter. Check the pending
+   notification. **It names no infection.**
+5. Log an encounter *before noon*. The main screen says "testable in 45
+   days", not 46. That off-by-one was real until 28.08.2026.
+6. Open a test entry in the timeline. It says **"self-entered"** —
+   every record states where it came from.
 
 ## Structure
 
@@ -53,4 +180,6 @@ npx expo prebuild      # generates android/ + ios/ projects
 | `src/lib/secure-storage.ts` | Keystore-held key + AES-GCM storage adapter |
 | `src/state/store.tsx` | React context around the shared core reducer |
 | `src/screens/` | Dashboard (risk report), Log (encounters + tests), Settings |
-| `src/ui.tsx`, `src/theme.ts` | Minimal UI kit, light/dark palettes |
+| `src/lib/app-lock.ts` | Device authentication for the app lock |
+| `src/lib/reminders.ts` | Local notifications for closing windows |
+| `src/ui.tsx` | Minimal UI kit; the palette comes from core (ADR-0015) |

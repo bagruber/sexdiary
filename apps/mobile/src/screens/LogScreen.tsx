@@ -1,261 +1,43 @@
 import { useMemo, useState } from "react";
-import {
-  Modal,
-  ScrollView,
-  Switch,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Modal, Pressable, ScrollView, View } from "react-native";
 import {
   ACT_KEYS,
-  STI_NAMES,
-  emptyActs,
+  PROTECTABLE_ACTS,
   formatDate,
-  gid,
-  isIsoDate,
-  today,
-  type ActKey,
   type Intercourse,
-  type TestRecord,
-  type TestResultValue,
 } from "@sexdiary/core";
 import { useApp } from "../state/store";
-import {
-  Card,
-  Chip,
-  GhostButton,
-  PrimaryButton,
-  Screen,
-  SectionTitle,
-  Title,
-} from "../ui";
+import { Card, Chip, GhostButton, Screen, SectionTitle, Text, Title} from "../ui";
+import { AddSheet, type AddKind, type EditTarget } from "./AddSheets";
+import { DayDetail, MonthView } from "./MonthView";
 
-function DateField({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-}) {
+/**
+ * What to say about protection for one encounter.
+ *
+ * Only the acts a barrier actually affects are counted. An entry that
+ * is nothing but kissing gets no line at all, rather than an
+ * "unprotected" that reads as a warning about something harmless.
+ */
+function ProtectionLine({ e }: { e: Intercourse }) {
   const { t, palette } = useApp();
-  const valid = isIsoDate(value);
-  return (
-    <View style={{ marginBottom: 12 }}>
-      <Text style={{ color: palette.sub, fontSize: 13, marginBottom: 6 }}>
-        {t("date")} (YYYY-MM-DD)
-      </Text>
-      <TextInput
-        value={value}
-        onChangeText={onChange}
-        placeholder={today()}
-        placeholderTextColor={palette.sub}
-        autoCapitalize="none"
-        style={{
-          borderWidth: 1,
-          borderColor: valid ? palette.border : palette.bad,
-          borderRadius: 12,
-          padding: 12,
-          color: palette.text,
-        }}
-      />
-    </View>
-  );
-}
+  const relevant = PROTECTABLE_ACTS.filter((k) => e.t[k]);
+  if (relevant.length === 0) return null;
 
-function AddEncounter({ onClose }: { onClose: () => void }) {
-  const { data, dispatch, t, palette } = useApp();
-  const [date, setDate] = useState(today());
-  const [acts, setActs] = useState<Set<ActKey>>(new Set());
-  const [protectedActs, setProtected] = useState(false);
-  const [cid, setCid] = useState<string | null>(null);
+  const n = relevant.filter((k) => e.p[k]).length;
+  const key =
+    n === 0 ? "unprotected" : n === relevant.length ? "protected" : "partlyProtected";
+  const color =
+    n === 0 ? palette.sub : n === relevant.length ? palette.good : palette.warn;
 
-  const save = () => {
-    const tf = emptyActs();
-    const pf = emptyActs();
-    for (const a of acts) {
-      tf[a] = 1;
-      if (protectedActs) pf[a] = 1;
-    }
-    const entry: Intercourse = { id: gid("i"), date, cid, t: tf, p: pf };
-    dispatch({ type: "saveIntercourse", payload: entry });
-    onClose();
-  };
-
-  return (
-    <ScrollView keyboardShouldPersistTaps="handled">
-      <Title>{t("intercourse")}</Title>
-      <DateField value={date} onChange={setDate} />
-
-      <SectionTitle>{t("activities")}</SectionTitle>
-      <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-        {ACT_KEYS.map((k) => (
-          <Chip
-            key={k}
-            label={t(k)}
-            active={acts.has(k)}
-            onPress={() =>
-              setActs((prev) => {
-                const next = new Set(prev);
-                if (next.has(k)) next.delete(k);
-                else next.add(k);
-                return next;
-              })
-            }
-          />
-        ))}
-      </View>
-
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginTop: 12,
-        }}
-      >
-        <Text style={{ color: palette.text }}>{t("protection")}</Text>
-        <Switch value={protectedActs} onValueChange={setProtected} />
-      </View>
-
-      <SectionTitle>{t("selectContact")}</SectionTitle>
-      <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-        <Chip
-          label={t("anonymousPartner")}
-          active={cid === null}
-          onPress={() => setCid(null)}
-        />
-        {data.contacts.map((c) => (
-          <Chip
-            key={c.id}
-            label={c.name}
-            active={cid === c.id}
-            onPress={() => setCid(c.id)}
-          />
-        ))}
-      </View>
-
-      <PrimaryButton
-        label={t("save")}
-        onPress={save}
-        disabled={!isIsoDate(date) || acts.size === 0}
-      />
-      <GhostButton label={t("cancel")} onPress={onClose} />
-      <View style={{ height: 32 }} />
-    </ScrollView>
-  );
-}
-
-function AddTest({ onClose }: { onClose: () => void }) {
-  const { dispatch, t, palette } = useApp();
-  const [date, setDate] = useState(today());
-  const [facility, setFacility] = useState("");
-  const [panel, setPanel] = useState<Set<string>>(
-    new Set(["HIV", "Gonorrhea", "Chlamydia", "Syphilis"]),
-  );
-  const [results, setResults] = useState<Record<string, TestResultValue>>({});
-
-  const save = () => {
-    const ts: Record<string, 0 | 1> = {};
-    const res: Record<string, TestResultValue> = {};
-    for (const sti of panel) {
-      ts[sti] = 1;
-      res[sti] = results[sti] ?? "negative";
-    }
-    const record: TestRecord = {
-      id: gid("t"),
-      date,
-      num: "",
-      fac: facility,
-      ts,
-      results: res,
-    };
-    dispatch({ type: "saveTest", payload: record });
-    onClose();
-  };
-
-  return (
-    <ScrollView keyboardShouldPersistTaps="handled">
-      <Title>{t("testEntry")}</Title>
-      <DateField value={date} onChange={setDate} />
-
-      <Text style={{ color: palette.sub, fontSize: 13, marginBottom: 6 }}>
-        {t("facility")} ({t("optional")})
-      </Text>
-      <TextInput
-        value={facility}
-        onChangeText={setFacility}
-        style={{
-          borderWidth: 1,
-          borderColor: palette.border,
-          borderRadius: 12,
-          padding: 12,
-          color: palette.text,
-          marginBottom: 12,
-        }}
-      />
-
-      <SectionTitle>{t("testedFor")}</SectionTitle>
-      <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-        {STI_NAMES.map((sti) => (
-          <Chip
-            key={sti}
-            label={sti}
-            active={panel.has(sti)}
-            onPress={() =>
-              setPanel((prev) => {
-                const next = new Set(prev);
-                if (next.has(sti)) next.delete(sti);
-                else next.add(sti);
-                return next;
-              })
-            }
-          />
-        ))}
-      </View>
-
-      <SectionTitle>{t("results")}</SectionTitle>
-      {[...panel].map((sti) => {
-        const positive = results[sti] === "positive";
-        return (
-          <View
-            key={sti}
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 8,
-            }}
-          >
-            <Text style={{ color: palette.text }}>{sti}</Text>
-            <Chip
-              label={positive ? t("positive") : t("negative")}
-              active={positive}
-              onPress={() =>
-                setResults((prev) => ({
-                  ...prev,
-                  [sti]: positive ? "negative" : "positive",
-                }))
-              }
-            />
-          </View>
-        );
-      })}
-
-      <PrimaryButton
-        label={t("save")}
-        onPress={save}
-        disabled={!isIsoDate(date) || panel.size === 0}
-      />
-      <GhostButton label={t("cancel")} onPress={onClose} />
-      <View style={{ height: 32 }} />
-    </ScrollView>
-  );
+  return <Text style={{ color, marginTop: 2, fontSize: 13 }}>{t(key)}</Text>;
 }
 
 export function LogScreen() {
   const { data, t, palette } = useApp();
-  const [adding, setAdding] = useState<"intercourse" | "test" | null>(null);
+  const [adding, setAdding] = useState<AddKind | null>(null);
+  const [ansicht, setAnsicht] = useState<"list" | "month">("list");
+  const [tag, setTag] = useState<string | null>(null);
+  const [edit, setEdit] = useState<EditTarget | null>(null);
 
   const timeline = useMemo(() => {
     const enc = data.intercourse.map((e) => ({ kind: "enc" as const, date: e.date, e }));
@@ -272,9 +54,35 @@ export function LogScreen() {
     <Screen>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Title>{t("calendar")}</Title>
-        <PrimaryButton label={`+ ${t("intercourse")}`} onPress={() => setAdding("intercourse")} />
-        <GhostButton label={`+ ${t("testEntry")}`} onPress={() => setAdding("test")} />
 
+        <View style={{ flexDirection: "row", marginBottom: 8 }}>
+          <Chip
+            label={t("viewList")}
+            active={ansicht === "list"}
+            onPress={() => setAnsicht("list")}
+          />
+          <Chip
+            label={t("viewMonth")}
+            active={ansicht === "month"}
+            onPress={() => setAnsicht("month")}
+          />
+        </View>
+
+        {ansicht === "month" && (
+          <>
+            <MonthView onPickDay={setTag} />
+            {tag && <DayDetail date={tag} onEdit={setEdit} />}
+          </>
+        )}
+        <GhostButton label={`+ ${t("testEntry")}`} onPress={() => setAdding("test")} />
+        <GhostButton label={`+ ${t("contact")}`} onPress={() => setAdding("contact")} />
+        <GhostButton
+          label={`+ ${t("vaccination")}`}
+          onPress={() => setAdding("vaccination")}
+        />
+
+        {ansicht === "list" && (
+          <>
         <SectionTitle>{t("addEntry")}</SectionTitle>
         {timeline.length === 0 && (
           <Card>
@@ -283,7 +91,13 @@ export function LogScreen() {
         )}
         {timeline.map((item) =>
           item.kind === "enc" ? (
-            <Card key={item.e.id}>
+            <Pressable
+              key={item.e.id}
+              accessibilityRole="button"
+              accessibilityHint={t("edit")}
+              onPress={() => setEdit({ kind: "intercourse", record: item.e })}
+            >
+            <Card>
               <Text style={{ color: palette.text, fontWeight: "600" }}>
                 {formatDate(item.e.date, data.prefs.lang)} ·{" "}
                 {contactName(item.e.cid)}
@@ -291,23 +105,38 @@ export function LogScreen() {
               <Text style={{ color: palette.sub, marginTop: 4, fontSize: 13 }}>
                 {ACT_KEYS.filter((k) => item.e.t[k]).map((k) => t(k)).join(", ")}
               </Text>
-              <Text
-                style={{
-                  color: ACT_KEYS.some((k) => item.e.p[k]) ? palette.good : palette.sub,
-                  marginTop: 2,
-                  fontSize: 13,
-                }}
-              >
-                {ACT_KEYS.some((k) => item.e.p[k]) ? t("protected") : t("unprotected")}
-              </Text>
+              <ProtectionLine e={item.e} />
             </Card>
+            </Pressable>
           ) : (
-            <Card key={item.r.id}>
+            <Pressable
+              key={item.r.id}
+              accessibilityRole="button"
+              accessibilityHint={t("edit")}
+              onPress={() => setEdit({ kind: "test", record: item.r })}
+            >
+            <Card>
               <Text style={{ color: palette.text, fontWeight: "600" }}>
                 {formatDate(item.r.date, data.prefs.lang)} · {t("testEntry")}
               </Text>
               <Text style={{ color: palette.sub, marginTop: 4, fontSize: 13 }}>
                 {Object.keys(item.r.ts).join(", ")}
+              </Text>
+              {/* ADR-0007 A6: every record says where it came from. This
+                  is the part that works before a single test centre
+                  takes part — it turns each entry into a labelled claim
+                  instead of an unqualified fact. */}
+              <Text
+                style={{
+                  color: item.r.signed ? palette.good : palette.sub,
+                  marginTop: 4,
+                  fontSize: 12,
+                  fontWeight: item.r.signed ? "600" : "400",
+                }}
+              >
+                {item.r.signed
+                  ? t("signedBy", { name: item.r.signed.issuer })
+                  : t("selfEntered")}
               </Text>
               {Object.entries(item.r.results ?? {}).some(([, v]) => v === "positive") && (
                 <Text style={{ color: palette.bad, marginTop: 2, fontSize: 13 }}>
@@ -319,15 +148,42 @@ export function LogScreen() {
                 </Text>
               )}
             </Card>
+            </Pressable>
           ),
+        )}
+          </>
         )}
         <View style={{ height: 24 }} />
       </ScrollView>
 
+      <Modal
+        visible={edit !== null}
+        animationType="slide"
+        onRequestClose={() => setEdit(null)}
+      >
+        <View
+          style={{ flex: 1, backgroundColor: palette.bg, padding: 16, paddingTop: 48 }}
+        >
+          {edit && (
+            <AddSheet
+              kind={edit.kind}
+              onKind={() => undefined}
+              onClose={() => setEdit(null)}
+              edit={edit}
+            />
+          )}
+        </View>
+      </Modal>
+
       <Modal visible={adding !== null} animationType="slide" onRequestClose={() => setAdding(null)}>
         <View style={{ flex: 1, backgroundColor: palette.bg, padding: 16, paddingTop: 48 }}>
-          {adding === "intercourse" && <AddEncounter onClose={() => setAdding(null)} />}
-          {adding === "test" && <AddTest onClose={() => setAdding(null)} />}
+          {adding && (
+            <AddSheet
+              kind={adding}
+              onKind={setAdding}
+              onClose={() => setAdding(null)}
+            />
+          )}
         </View>
       </Modal>
     </Screen>

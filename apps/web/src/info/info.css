@@ -1,0 +1,306 @@
+/*
+ * Informationsseite.
+ *
+ * Atkinson Hyperlegible, mitgeliefert aus /fonts — nie verlinkt. Google
+ * Fonts wurde im Juli 2026 aus Datenschutzgruenden entfernt, und ein
+ * Verweis auf einen fremden Server waere derselbe Fehler mit anderem
+ * Absender.
+ *
+ * Die Schrift ist vom Braille Institute fuer maximale
+ * Zeichenunterscheidbarkeit entworfen. Das ist hier ein
+ * Barrierefreiheits-Argument, kein Stilentscheid: 1, l und I sind
+ * unterscheidbar, 0 und O ebenso.
+ */
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("/fonts/AtkinsonHyperlegible-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("/fonts/AtkinsonHyperlegible-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+* { box-sizing: border-box; }
+
+html { color-scheme: light dark; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.6 "Atkinson Hyperlegible", system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--card);
+  color: var(--text);
+  padding: 12px 16px;
+  z-index: 10;
+}
+.skip:focus { left: 8px; top: 8px; }
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px max(20px, calc((100% - 720px) / 2));
+  border-bottom: 1px solid var(--border);
+}
+
+.marke { margin: 0; font-weight: 700; letter-spacing: -0.01em; }
+
+button {
+  font: inherit;
+  font-size: 13px;
+  color: var(--sub);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+button:hover { color: var(--text); }
+
+main { padding: 0 max(20px, calc((100% - 720px) / 2)); }
+
+section { padding: 40px 0; border-bottom: 1px solid var(--border); }
+section:last-child { border-bottom: none; }
+
+.hero { padding: 64px 0 48px; border-bottom: 1px solid var(--border); }
+
+h1 {
+  margin: 0;
+  font-size: clamp(28px, 5vw, 40px);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  max-width: 20ch;
+}
+
+.lead { font-size: 18px; color: var(--sub); max-width: 46ch; }
+
+h2 {
+  margin: 0 0 16px;
+  font-size: 20px;
+  letter-spacing: -0.01em;
+}
+
+p { max-width: 62ch; }
+
+ul { max-width: 62ch; padding-left: 20px; }
+li { margin-bottom: 10px; }
+
+a { color: var(--text); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+
+.stis {
+  display: block;
+  margin-top: 8px;
+  color: var(--sub);
+  font-size: 15px;
+}
+
+/*
+ * Der Hinweis auf die ungeprueften Werte und die Platzhalter sind keine
+ * Randnotizen: sie sagen, was diese Seite noch nicht behaupten darf.
+ * Deshalb stehen sie im Textfluss, abgesetzt durch Flaeche statt durch
+ * einen farbigen Streifen an der Kante.
+ */
+.hinweis, .fehlt {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 15px;
+}
+
+.fehlt { color: var(--sub); }
+
+footer {
+  padding: 28px max(20px, calc((100% - 720px) / 2)) 48px;
+  border-top: 1px solid var(--border);
+  color: var(--sub);
+  font-size: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+/* Kartenraster fuer die Luecken und die Ergaenzungen. */
+.karten {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  max-width: 720px;
+}
+.karte {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+.karte h3 { margin: 0 0 8px; font-size: 15px; }
+.karte p { margin: 0; font-size: 15px; color: var(--sub); }
+
+h3 { margin: 24px 0 8px; font-size: 16px; }
+section > h3:first-of-type { margin-top: 0; }
+
+.zitat {
+  font-size: 17px;
+  border-left: none;
+  padding: 16px 0 0;
+  color: var(--text);
+}
+
+/* Beispielcodes zum Abscannen vom Bildschirm. */
+.qrs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 20px;
+  max-width: 620px;
+  margin-top: 16px;
+}
+.qr { margin: 0; }
+.qr svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.qr figcaption {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--sub);
+  line-height: 1.4;
+}
+
+/*
+ * Abläufe. Links die Handlung, darunter was das Werkzeug damit tut —
+ * die Einrückung ist das Argument: die App handelt nie zuerst.
+ */
+.vorspann {
+  font-size: 17px;
+  color: var(--sub);
+  max-width: 52ch;
+}
+
+.ablauf {
+  list-style: none;
+  counter-reset: schritt;
+  padding: 0;
+  margin: 20px 0 0;
+  max-width: 62ch;
+}
+.ablauf > li {
+  counter-increment: schritt;
+  position: relative;
+  padding: 0 0 20px 44px;
+  margin: 0;
+  border-left: 1px solid var(--border);
+}
+.ablauf > li:last-child { border-left-color: transparent; padding-bottom: 0; }
+.ablauf > li::before {
+  content: counter(schritt);
+  position: absolute;
+  left: -13px;
+  top: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--sub);
+  font-size: 13px;
+  line-height: 24px;
+  text-align: center;
+}
+.ablauf .tat { margin: 0 0 6px; font-weight: 700; }
+.ablauf .folge { margin: 0; color: var(--sub); font-size: 15px; }
+
+/*
+ * Der offene Schritt ist keine Randnotiz, sondern die eine Stelle, an
+ * der die Geschichte heute noch nicht aufgeht. Er wird durch Fläche
+ * hervorgehoben, nicht durch eine Semantikfarbe — die gehört der
+ * Risikoskala (ADR-0015).
+ */
+.ablauf > li.offen {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px 16px 44px;
+  margin-left: -1px;
+}
+.ablauf > li.offen::before { background: var(--card); }
+
+/* Module mit Stand. */
+.module {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 0;
+  max-width: 62ch;
+}
+.module > li {
+  padding: 16px 0;
+  margin: 0;
+  border-top: 1px solid var(--border);
+}
+.module > li:last-child { border-bottom: 1px solid var(--border); }
+.module h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+}
+.module p { margin: 0; color: var(--sub); font-size: 15px; }
+
+/*
+ * Der Stand steht neutral. „gebaut“ in Grün und „ungeklärt“ in Rot
+ * waere die Semantikskala an einer Stelle, an der sie nichts zu suchen
+ * hat: sie bedeutet in dieser App Infektionsrisiko.
+ */
+.stand {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--sub);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 9px;
+  white-space: nowrap;
+}
+
+/*
+ * Diagramme, von Hand geschrieben statt aus einer Bibliothek — eine
+ * waere ein Drittanbieter-Skript. Sie scrollen für sich, damit die
+ * Seite selbst nie seitlich läuft.
+ */
+.diagramm {
+  overflow-x: auto;
+  margin: 20px 0;
+  padding-bottom: 4px;
+}
+.diagramm svg {
+  display: block;
+  width: 100%;
+  min-width: 620px;
+  height: auto;
+}
+.d-titel { font-size: 15px; font-weight: 700; fill: var(--text); }
+.d-titel-klein { font-size: 13px; font-weight: 700; fill: var(--text); }
+.d-zeile { font-size: 12px; fill: var(--text); }
+.d-leise { font-size: 12px; fill: var(--sub); }
+.d-marke { font-size: 11px; fill: var(--sub); text-anchor: middle; }
+.d-invers { fill: var(--bg); }

@@ -6,10 +6,10 @@
  * Exit is deliberately non-obvious: three taps on the title.
  */
 import { useRef } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { useApp } from "../state/store";
 import { tapLight } from "../haptics";
-import { Card } from "../ui";
+import { Card, Text } from "../ui";
 
 export function DecoyScreen({ onExit }: { onExit: () => void }) {
   const { t, palette } = useApp();

@@ -4,3 +4,8 @@ dist
 *.log
 .vite
 tsconfig.tsbuildinfo
+
+# Von `expo prebuild` erzeugt. Nicht committen: die Quelle ist app.json
+# plus die Config-Plugins, und ein eingecheckter Stand laeuft davon weg.
+android/
+ios/

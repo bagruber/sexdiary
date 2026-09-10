@@ -1,5 +1,4 @@
 import { Stethoscope, Clock, CheckCircle2, type LucideIcon } from "lucide-react";
-import { FONT } from "../../theme/tokens";
 import { useApp } from "../../state/store";
 
 interface Props {
@@ -49,7 +48,6 @@ export function StatusBanner({ state, primary, secondary }: Props) {
       <div style={{ minWidth: 0 }}>
         <div
           style={{
-            fontFamily: FONT,
             fontWeight: 700,
             fontSize: 15,
             color,
@@ -60,7 +58,6 @@ export function StatusBanner({ state, primary, secondary }: Props) {
         </div>
         <div
           style={{
-            fontFamily: FONT,
             fontSize: 12,
             color: palette.sub,
             lineHeight: 1.4,

@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { FONT, shadow } from "../theme/tokens";
+import { shadow } from "../theme/tokens";
 import { SectionLabel, Toggle, Sheet, Checkbox, Button } from "../components/ui";
 import { useApp } from "../state/store";
 import { COUNTRIES, STI_NAMES } from "@sexdiary/core";
@@ -81,7 +81,6 @@ export function SettingsView({
             <div style={{ flex: 1, minWidth: 0 }}>
               <div
                 style={{
-                  fontFamily: FONT,
                   fontSize: 14,
                   fontWeight: 500,
                   color: item.danger ? palette.rose : palette.text,
@@ -92,7 +91,6 @@ export function SettingsView({
               {item.sub && (
                 <div
                   style={{
-                    fontFamily: FONT,
                     fontSize: 12,
                     color: palette.muted,
                     marginTop: 2,
@@ -112,7 +110,6 @@ export function SettingsView({
                   border: `1px solid ${palette.border}`,
                   borderRadius: 8,
                   color: palette.text,
-                  fontFamily: FONT,
                   fontSize: 12,
                   padding: "7px 10px",
                   cursor: "pointer",
@@ -143,7 +140,6 @@ export function SettingsView({
                   border: `1px solid ${palette.border}`,
                   borderRadius: 8,
                   color: palette.text,
-                  fontFamily: FONT,
                   fontSize: 12,
                   padding: "7px 10px",
                   outline: "none",
@@ -158,7 +154,6 @@ export function SettingsView({
             {item.type === "info" && (
               <span
                 style={{
-                  fontFamily: FONT,
                   fontSize: 12,
                   color: palette.muted,
                   textAlign: "right",
@@ -189,7 +184,6 @@ export function SettingsView({
     <div style={{ flex: 1, overflowY: "auto", padding: "28px 16px 100px" }}>
       <h1
         style={{
-          fontFamily: FONT,
           fontSize: 26,
           fontWeight: 700,
           color: palette.text,
@@ -262,20 +256,6 @@ export function SettingsView({
         },
         {
           type: "toggle",
-          label: t("testReminders"),
-          sub: t("testRemindersSub"),
-          value: prefs.notifs,
-          onChange: (v) => updPrefs({ notifs: v }),
-        },
-        {
-          type: "toggle",
-          label: t("appLock"),
-          sub: t("appLockSub"),
-          value: prefs.lock,
-          onChange: (v) => updPrefs({ lock: v }),
-        },
-        {
-          type: "toggle",
           label: t("highPrevToggle"),
           sub: t("highPrevToggleSub"),
           value: prefs.highPrev,
@@ -294,6 +274,33 @@ export function SettingsView({
           sub: t("hideLowRiskSub"),
           value: prefs.hideLowRisk,
           onChange: (v) => updPrefs({ hideLowRisk: v }),
+        },
+      ])}
+
+      {/*
+        The four defences the product is actually shaped around. They are
+        listed rather than hidden so a demonstration shows what the app
+        is for — and marked unavailable rather than faked, because a
+        browser genuinely cannot deliver any of them (ADR-0001).
+      */}
+      {renderSection(t("privacy"), [
+        { type: "info", label: t("appLock"), sub: t("appLockSub"), value: t("demoNeedsApp") },
+        {
+          type: "info",
+          label: t("disguiseMode"),
+          sub: t("disguiseModeSub"),
+          value: t("demoNeedsApp"),
+        },
+        {
+          type: "info",
+          label: t("testReminders"),
+          sub: t("testRemindersSub"),
+          value: t("demoNeedsApp"),
+        },
+        {
+          type: "info",
+          label: t("screenshotBlocked"),
+          value: t("demoNeedsApp"),
         },
       ])}
 
@@ -388,7 +395,6 @@ export function SettingsView({
         <Sheet onClose={() => setCondOpen(false)} title={t("knownConditionsTitle")}>
           <p
             style={{
-              fontFamily: FONT,
               fontSize: 13,
               color: palette.muted,
               lineHeight: 1.5,

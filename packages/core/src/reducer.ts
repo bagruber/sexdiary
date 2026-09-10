@@ -9,10 +9,11 @@ import type {
   Intercourse,
   Preferences,
   Profile,
+  SentAlert,
   TestRecord,
   Vaccination,
-} from "./domain";
-import { freshAppData } from "./seed";
+} from "./domain.js";
+import { freshAppData } from "./seed.js";
 
 export type EntryType = "intercourse" | "test" | "contact" | "vaccination";
 
@@ -25,6 +26,7 @@ export type AppAction =
   | { type: "updateProfile"; patch: Partial<Profile> }
   | { type: "updatePrefs"; patch: Partial<Preferences> }
   | { type: "setOnboarded"; value: boolean }
+  | { type: "saveAlert"; payload: SentAlert }
   | { type: "replaceAll"; payload: AppData }
   | { type: "clearAll" };
 
@@ -67,6 +69,14 @@ export function appReducer(state: AppData, action: AppAction): AppData {
       return { ...state, prefs: { ...state.prefs, ...action.patch } };
     case "setOnboarded":
       return { ...state, onboarded: action.value };
+    case "saveAlert": {
+      // Eine Benachrichtigung je Kontakt und Erreger. Ein zweiter Versand
+      // ersetzt den ersten, statt die Liste doppelt zu fuehren.
+      const rest = state.alerts.filter(
+        (a) => !(a.cid === action.payload.cid && a.sti === action.payload.sti),
+      );
+      return { ...state, alerts: [...rest, action.payload] };
+    }
     case "replaceAll":
       return action.payload;
     case "clearAll": {
