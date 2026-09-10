@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Sexdiary",
+    "name": "Journal",
     "slug": "sexdiary",
     "version": "0.2.0",
     "orientation": "portrait",
@@ -46,7 +46,8 @@
         }
       ],
       "expo-sharing",
-      "expo-font"
+      "expo-font",
+      "react-native-nfc-manager"
     ]
   }
 }

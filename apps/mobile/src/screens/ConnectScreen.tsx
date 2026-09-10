@@ -18,6 +18,7 @@ import { useApp } from "../state/store";
 import { Card, Chip, GhostButton, PrimaryButton, SectionTitle, Text, Title} from "../ui";
 import { QrCode } from "./QrCode";
 import { PositivePrompt } from "./AddSheets";
+import { karteLesen, karteSchreiben, nfcAbbrechen, nfcVerfuegbar } from "../lib/nfc";
 
 type Tab = "share" | "import";
 
@@ -30,6 +31,7 @@ export function ConnectScreen({ onClose }: { onClose: () => void }) {
   const [status, setStatus] = useState<{ ok: boolean; msg: string } | null>(null);
   const [permission, requestPermission] = useCameraPermissions();
   const [positiv, setPositiv] = useState<string[] | null>(null);
+  const [nfcBusy, setNfcBusy] = useState<"read" | "write" | null>(null);
 
   const { shareMode, sharePlatform, shareHandle } = data.prefs;
   const withHandle = shareMode === "handle" && !!sharePlatform && !!shareHandle;
@@ -67,6 +69,34 @@ export function ConnectScreen({ onClose }: { onClose: () => void }) {
     setScanning(false);
     setPasting(false);
     setBuf("");
+  };
+
+  /**
+   * Lesen und Schreiben teilen sich Vorpruefung, Fehlerbehandlung und
+   * Aufraeumen; getrennt waeren es zwei fast gleiche Bloecke, in denen
+   * je einer das Abbrechen vergessen kann.
+   */
+  const nfc = async (was: "read" | "write") => {
+    setStatus(null);
+    if (!(await nfcVerfuegbar())) {
+      setStatus({ ok: false, msg: t("nfcUnavailable") });
+      return;
+    }
+    setNfcBusy(was);
+    try {
+      if (was === "read") {
+        const roh = await karteLesen();
+        if (roh) take(roh);
+        else setStatus({ ok: false, msg: t("importInvalid") });
+      } else {
+        await karteSchreiben(payload);
+        setStatus({ ok: true, msg: t("nfcWritten") });
+      }
+    } catch {
+      setStatus({ ok: false, msg: t("nfcFailed") });
+    } finally {
+      setNfcBusy(null);
+    }
   };
 
   const startScan = async () => {
@@ -177,9 +207,30 @@ export function ConnectScreen({ onClose }: { onClose: () => void }) {
           <SectionTitle>{t("shareNFC")}</SectionTitle>
           <Card>
             <Text style={{ color: palette.sub, fontSize: 13, lineHeight: 19 }}>
-              {t("nfcPending")}
+              {t("nfcNoPhoneToPhone")}
             </Text>
           </Card>
+          {nfcBusy ? (
+            <>
+              <Card>
+                <Text style={{ color: palette.text, fontSize: 13 }}>
+                  {t("nfcHold")}
+                </Text>
+              </Card>
+              <GhostButton
+                label={t("cancel")}
+                onPress={() => {
+                  void nfcAbbrechen();
+                  setNfcBusy(null);
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <GhostButton label={t("nfcCardRead")} onPress={() => void nfc("read")} />
+              <GhostButton label={t("nfcCardWrite")} onPress={() => void nfc("write")} />
+            </>
+          )}
         </>
       )}
 

@@ -27,8 +27,12 @@ Offen, in dieser Reihenfolge sinnvoll:
    README von `apps/mobile`. Offen bleibt: **eigener Keystore** statt des
    Debug-Schluessels (geprueft: `CN=Android Debug`), bevor irgendetwas
    verteilt wird.
-4. **Alternatives Icon und OS-Name.** Ohne das verrät eine Benachrichtigung im
-   Tarnmodus auf dem Sperrbildschirm weiterhin den App-Namen.
+4. **Alternatives Icon.** Der OS-Name ist seit dem 10.09.2026 dauerhaft
+   „Journal“ — eine Benachrichtigung auf dem Sperrbildschirm nennt damit keinen
+   verräterischen Absender mehr. Das **Icon** bleibt das eigene: es zur Laufzeit
+   zu wechseln geht auf Android nur über `activity-alias` und eine weitere
+   Drittanbieter-Abhängigkeit. Bewusst vertagt, bis klar ist, ob es das wert
+   ist.
 
 Bewusst nicht gebaut: der Schlüssel ist **nicht** an die Authentisierung
 gebunden (`SecureStore` mit `requireAuthentication`). Das wäre der stärkere
