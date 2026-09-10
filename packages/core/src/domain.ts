@@ -104,6 +104,39 @@ export interface Vaccination {
   endDate?: string | null;
 }
 
+/**
+ * Antwortvokabular aus ADR-0011. Geschlossene Liste, nie Freitext:
+ * Freitext hiesse, dass das Relay Inhalte traegt, und er waere ein
+ * Belaestigungskanal.
+ */
+export const ALERT_REPLIES = ["read", "handling", "done", "testedNegative"] as const;
+export type AlertReply = (typeof ALERT_REPLIES)[number];
+
+/**
+ * Wie benachrichtigt wurde. "personal" heisst ausserhalb der App —
+ * gesagt, geschrieben, angerufen. Das ist kein zweitklassiger Weg,
+ * sondern oft der bessere; die App merkt es sich nur, damit niemand
+ * zweimal gefragt wird.
+ */
+export type AlertChannel = "relay" | "personal";
+
+export interface SentAlert {
+  id: string;
+  /** Kontakt, an den ging. */
+  cid: string;
+  /** Erreger-Label, wie es uebertragen wurde. */
+  sti: string;
+  sentAt: string;
+  channel: AlertChannel;
+  /**
+   * Frisch erzeugtes Antwort-Token, nur wenn ein Rueckkanal gewollt war.
+   * Je Benachrichtigung neu und mit nichts anderem verknuepft (ADR-0011).
+   */
+  replyToken?: string;
+  reply?: AlertReply;
+  repliedAt?: string;
+}
+
 export interface Profile {
   age: string;
   pa: PartnerAnatomy;
@@ -145,6 +178,8 @@ export interface AppData {
   intercourse: Intercourse[];
   tests: TestRecord[];
   vaccinations: Vaccination[];
+  /** Wen die App ueber welchen Befund benachrichtigt hat. */
+  alerts: SentAlert[];
   profile: Profile;
   prefs: Preferences;
   myToken: string;

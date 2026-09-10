@@ -17,7 +17,7 @@
 import type { AppData, Lang } from "./domain.js";
 import { freshAppData } from "./seed.js";
 
-export const CURRENT_SCHEMA_VERSION = 3;
+export const CURRENT_SCHEMA_VERSION = 4;
 
 export interface StorageEnvelope {
   v: number;
@@ -47,6 +47,9 @@ const MIGRATIONS: Record<number, Migration> = {
     const { lockPin, ...rest } = prefs as Record<string, unknown>;
     return { ...data, prefs: { ...rest, lock: lockPin != null } };
   },
+  // v3 → v4: die App merkt sich, wen sie ueber welchen Befund
+  // benachrichtigt hat. Aeltere Staende haben nichts gesendet.
+  3: (data) => ({ ...data, alerts: [] }),
 };
 
 export function encodeAppData(data: AppData): string {
@@ -125,6 +128,7 @@ export function sanitizeAppData(
     intercourse: arr(data.intercourse, base.intercourse),
     tests: arr(data.tests, base.tests),
     vaccinations: arr(data.vaccinations, base.vaccinations),
+    alerts: arr(data.alerts, base.alerts),
     profile: {
       ...base.profile,
       ...profileRaw,

@@ -185,6 +185,7 @@ export function freshAppData(lang: Lang = "en"): AppData {
     intercourse: SEED_INTERCOURSE,
     tests: SEED_TESTS,
     vaccinations: SEED_VACCINATIONS,
+    alerts: [],
     profile: { ...SEED_PROFILE },
     prefs: { ...BASE_PREFS, lang },
     myToken: genToken(),
