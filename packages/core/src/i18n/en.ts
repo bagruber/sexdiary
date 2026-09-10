@@ -377,6 +377,8 @@ export const en = {
   deleteEntryConfirm: "Delete? For a contact this takes their token with it — no anonymous notification after that.",
   manageData: "Manage entries",
   manageDataSub: "View and delete contacts, tests and vaccinations",
+  viewList: "List",
+  viewMonth: "Month",
   remindersCheck: "Check reminders",
   remindersCheckSub: "Shows what is scheduled, and sends a test",
   remindersPending: "{n} scheduled",

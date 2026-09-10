@@ -366,6 +366,8 @@ export const de: Dict = {
   deleteEntryConfirm: "Löschen? Bei einem Kontakt geht sein Token mit — eine anonyme Benachrichtigung ist danach nicht mehr möglich.",
   manageData: "Einträge verwalten",
   manageDataSub: "Kontakte, Tests und Impfungen ansehen und löschen",
+  viewList: "Liste",
+  viewMonth: "Monat",
   remindersCheck: "Erinnerungen prüfen",
   remindersCheckSub: "Zeigt, was geplant ist, und schickt eine Testmeldung",
   remindersPending: "{n} geplant",

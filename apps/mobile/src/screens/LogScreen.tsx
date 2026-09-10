@@ -7,8 +7,9 @@ import {
   type Intercourse,
 } from "@sexdiary/core";
 import { useApp } from "../state/store";
-import { Card, GhostButton, Screen, SectionTitle, Title } from "../ui";
+import { Card, Chip, GhostButton, Screen, SectionTitle, Title } from "../ui";
 import { AddSheet, type AddKind } from "./AddSheets";
+import { DayDetail, MonthView } from "./MonthView";
 
 /**
  * What to say about protection for one encounter.
@@ -34,6 +35,8 @@ function ProtectionLine({ e }: { e: Intercourse }) {
 export function LogScreen() {
   const { data, t, palette } = useApp();
   const [adding, setAdding] = useState<AddKind | null>(null);
+  const [ansicht, setAnsicht] = useState<"list" | "month">("list");
+  const [tag, setTag] = useState<string | null>(null);
 
   const timeline = useMemo(() => {
     const enc = data.intercourse.map((e) => ({ kind: "enc" as const, date: e.date, e }));
@@ -50,6 +53,26 @@ export function LogScreen() {
     <Screen>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Title>{t("calendar")}</Title>
+
+        <View style={{ flexDirection: "row", marginBottom: 8 }}>
+          <Chip
+            label={t("viewList")}
+            active={ansicht === "list"}
+            onPress={() => setAnsicht("list")}
+          />
+          <Chip
+            label={t("viewMonth")}
+            active={ansicht === "month"}
+            onPress={() => setAnsicht("month")}
+          />
+        </View>
+
+        {ansicht === "month" && (
+          <>
+            <MonthView onPickDay={setTag} />
+            {tag && <DayDetail date={tag} />}
+          </>
+        )}
         <GhostButton label={`+ ${t("testEntry")}`} onPress={() => setAdding("test")} />
         <GhostButton label={`+ ${t("contact")}`} onPress={() => setAdding("contact")} />
         <GhostButton
@@ -57,6 +80,8 @@ export function LogScreen() {
           onPress={() => setAdding("vaccination")}
         />
 
+        {ansicht === "list" && (
+          <>
         <SectionTitle>{t("addEntry")}</SectionTitle>
         {timeline.length === 0 && (
           <Card>
@@ -110,6 +135,8 @@ export function LogScreen() {
               )}
             </Card>
           ),
+        )}
+          </>
         )}
         <View style={{ height: 24 }} />
       </ScrollView>
