@@ -28,6 +28,31 @@ describe("storage envelope", () => {
     expect(decoded.contacts).toEqual(legacy.contacts);
   });
 
+  describe("v2 → v3: the app-owned PIN is dropped", () => {
+    const v2 = (lockPin: string | null) =>
+      JSON.stringify({
+        v: 2,
+        savedAt: "2026-08-01T00:00:00.000Z",
+        data: { ...freshAppData("de"), prefs: { ...freshAppData("de").prefs, lockPin } },
+      });
+
+    it("carries a set PIN over as a switched-on lock", () => {
+      // Someone who had a PIN wanted a lock. Migrating them to lock:false
+      // would quietly unlock an app they had deliberately protected.
+      const decoded = decodeAppData(v2("1234"), "de");
+      expect(decoded.prefs.lock).toBe(true);
+    });
+
+    it("leaves the lock off when there was no PIN", () => {
+      expect(decodeAppData(v2(null), "de").prefs.lock).toBe(false);
+    });
+
+    it("does not carry the PIN into the new shape", () => {
+      const decoded = decodeAppData(v2("1234"), "de");
+      expect("lockPin" in decoded.prefs).toBe(false);
+    });
+  });
+
   it("fills defaults for missing prefs and profile fields", () => {
     const decoded = decodeAppData(
       JSON.stringify({ contacts: [], tests: [], prefs: { lang: "de" } }),

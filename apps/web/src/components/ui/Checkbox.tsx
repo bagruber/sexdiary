@@ -1,5 +1,4 @@
 import { Check } from "lucide-react";
-import { FONT } from "../../theme/tokens";
 import { useApp } from "../../state/store";
 
 interface Props {
@@ -47,7 +46,7 @@ export function Checkbox({ checked, onChange, label, color, dim }: Props) {
         {checked && <Check size={14} strokeWidth={3} color="#fff" />}
       </div>
       {label && (
-        <span style={{ fontFamily: FONT, fontSize: 14, color: palette.text }}>{label}</span>
+        <span style={{ fontSize: 14, color: palette.text }}>{label}</span>
       )}
     </label>
   );

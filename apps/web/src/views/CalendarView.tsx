@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { FONT, shadow } from "../theme/tokens";
+import { shadow } from "../theme/tokens";
 import { Dot } from "../components/ui";
 import { DaySheet } from "../components/sheets/DaySheet";
 import { useApp } from "../state/store";
@@ -72,7 +72,6 @@ export function CalendarView({ onEdit }: Props) {
         <h1
           style={{
             margin: 0,
-            fontFamily: FONT,
             fontSize: 26,
             fontWeight: 700,
             color: palette.text,
@@ -121,7 +120,6 @@ export function CalendarView({ onEdit }: Props) {
             key={d}
             style={{
               textAlign: "center",
-              fontFamily: FONT,
               fontSize: 11,
               fontWeight: 700,
               color: palette.muted,
@@ -192,7 +190,6 @@ export function CalendarView({ onEdit }: Props) {
             >
               <span
                 style={{
-                  fontFamily: FONT,
                   fontSize: 13,
                   fontWeight: isToday(d) ? 700 : 400,
                   color: isToday(d) ? palette.teal : palette.text,
@@ -246,7 +243,7 @@ export function CalendarView({ onEdit }: Props) {
             }}
           >
             <Dot color={c} size={8} />
-            <span style={{ fontFamily: FONT, fontSize: 12, color: palette.muted }}>{l}</span>
+            <span style={{ fontSize: 12, color: palette.muted }}>{l}</span>
           </div>
         ))}
       </div>

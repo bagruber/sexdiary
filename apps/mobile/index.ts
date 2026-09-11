@@ -12,7 +12,7 @@ if (!g.crypto?.getRandomValues) {
 }
 
 // App is required after the polyfill so module-init code already sees it.
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const App = require("./App").default;
 
 registerRootComponent(App);

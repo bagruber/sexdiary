@@ -8,13 +8,14 @@ import {
 } from "react";
 import {
   appReducer,
+  freshAppData,
   makeT,
   type AppAction,
   type AppData,
   type EntryType,
+  type Lang,
   type Translator,
 } from "@sexdiary/core";
-import { loadAppData, saveAppData, clearAppData } from "../lib/storage";
 import { paletteFor, resolvedTheme, type Palette } from "../theme/palette";
 
 export type { EntryType };
@@ -29,12 +30,27 @@ interface Ctx {
 
 const AppContext = createContext<Ctx | null>(null);
 
-export function AppProvider({ children }: { children: ReactNode }) {
-  const [data, dispatch] = useReducer(appReducer, undefined, loadAppData);
+function detectLang(): Lang {
+  if (typeof navigator === "undefined") return "en";
+  return navigator.language?.toLowerCase().startsWith("de") ? "de" : "en";
+}
 
-  useEffect(() => {
-    saveAppData(data);
-  }, [data]);
+/**
+ * Nothing here is written anywhere.
+ *
+ * This build is a demonstration of the native app, not a second place to
+ * keep a diary — ADR-0001. State lives in memory for as long as the tab
+ * does, and a reload starts over from the sample data. That is the whole
+ * safeguard: a browser cannot deliver the screenshot block, the
+ * hardware-backed lock or the covered app-switcher preview the product
+ * is built around, so it must not become somewhere real entries
+ * accumulate. Making it forget is cheaper and more honest than warning
+ * people not to.
+ */
+export function AppProvider({ children }: { children: ReactNode }) {
+  const [data, dispatch] = useReducer(appReducer, undefined, () =>
+    freshAppData(detectLang()),
+  );
 
   const t = useMemo(() => makeT(data.prefs.lang), [data.prefs.lang]);
   const isDark = resolvedTheme(data.prefs.theme) === "dark";
@@ -61,5 +77,3 @@ export function useApp(): Ctx {
   if (!ctx) throw new Error("useApp must be used inside AppProvider");
   return ctx;
 }
-
-export { clearAppData };

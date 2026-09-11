@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ChevronDown, Check, ExternalLink } from "lucide-react";
-import { FONT, shadow } from "../../theme/tokens";
+import { shadow } from "../../theme/tokens";
 import { riskColor } from "../../theme/palette";
 import { Tag } from "../ui";
 import { useApp } from "../../state/store";
@@ -16,7 +16,7 @@ export function RiskCard({ name, data }: Props) {
   const { t, palette, isDark } = useApp();
   const [open, setOpen] = useState(false);
   const [rem, setRem] = useState(false);
-  const color = riskColor(data.mr);
+  const color = riskColor(data.mr, isDark);
   const isT = !!data.testable;
 
   return (
@@ -66,7 +66,6 @@ export function RiskCard({ name, data }: Props) {
           >
             <span
               style={{
-                fontFamily: FONT,
                 fontWeight: 700,
                 fontSize: 15,
                 color: palette.text,
@@ -87,7 +86,6 @@ export function RiskCard({ name, data }: Props) {
           </div>
           <div
             style={{
-              fontFamily: FONT,
               fontSize: 12,
               color: isT ? palette.green : palette.muted,
               fontWeight: isT ? 700 : 400,
@@ -106,7 +104,6 @@ export function RiskCard({ name, data }: Props) {
           {data.allP && (
             <span
               style={{
-                fontFamily: FONT,
                 fontSize: 10,
                 color: palette.green,
                 fontWeight: 600,
@@ -163,10 +160,10 @@ export function RiskCard({ name, data }: Props) {
             />
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-            <span style={{ fontFamily: FONT, fontSize: 10, color: palette.muted }}>
+            <span style={{ fontSize: 10, color: palette.muted }}>
               {data.days}d / {data.wd}d
             </span>
-            <span style={{ fontFamily: FONT, fontSize: 10, color: palette.muted }}>
+            <span style={{ fontSize: 10, color: palette.muted }}>
               {t("exposures", { n: data.n ?? 0, s: (data.n ?? 0) > 1 ? "s" : "" })}
             </span>
           </div>
@@ -184,7 +181,6 @@ export function RiskCard({ name, data }: Props) {
                 minHeight: 40,
                 background: rem ? palette.green + "0C" : palette.cardEl,
                 border: `1.5px solid ${rem ? palette.green : palette.border}`,
-                fontFamily: FONT,
                 fontSize: 12,
                 color: rem ? palette.green : palette.muted,
                 fontWeight: 600,
@@ -199,12 +195,11 @@ export function RiskCard({ name, data }: Props) {
       )}
       {open && (
         <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${palette.border}` }}>
-          <div style={{ fontFamily: FONT, fontSize: 12, color: palette.muted, margin: "14px 0 8px" }}>
+          <div style={{ fontSize: 12, color: palette.muted, margin: "14px 0 8px" }}>
             {t("exposures", { n: data.n ?? 0, s: (data.n ?? 0) > 1 ? "s" : "" })}
           </div>
           <div
             style={{
-              fontFamily: FONT,
               fontSize: 11,
               fontWeight: 700,
               color: palette.muted,
@@ -235,7 +230,7 @@ export function RiskCard({ name, data }: Props) {
                   flexShrink: 0,
                 }}
               />
-              <span style={{ fontFamily: FONT, fontSize: 13, color: palette.text, lineHeight: 1.55 }}>
+              <span style={{ fontSize: 13, color: palette.text, lineHeight: 1.55 }}>
                 {s}
               </span>
             </div>
@@ -245,7 +240,6 @@ export function RiskCard({ name, data }: Props) {
             target="_blank"
             rel="noopener noreferrer"
             style={{
-              fontFamily: FONT,
               fontSize: 12,
               color: palette.teal,
               fontWeight: 600,

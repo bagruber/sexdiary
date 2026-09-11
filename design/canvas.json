@@ -1,0 +1,23 @@
+{
+  "pages": [
+    { "id": "page-1", "name": "App" },
+    { "id": "page-2", "name": "Variante B" }
+  ],
+  "artboards": [
+    { "file": "Main.dc.html",          "page": "page-1", "x": 0,    "y": 0,    "w": 390,  "h": 844, "title": "Heute — gewählte Richtung" },
+    { "file": "SchnellLoggen.dc.html", "page": "page-1", "x": 490,  "y": 0,    "w": 390,  "h": 844, "title": "Progressive Erfassung" },
+    { "file": "Erklaerung.dc.html",    "page": "page-1", "x": 980,  "y": 0,    "w": 390,  "h": 844, "title": "Warum diese Einschätzung" },
+    { "file": "Befund.dc.html",        "page": "page-1", "x": 1470, "y": 0,    "w": 390,  "h": 844, "title": "Befunde — signiert vs. selbst" },
+    { "file": "Positiv.dc.html",       "page": "page-1", "x": 1960, "y": 0,    "w": 390,  "h": 844, "title": "Positiv — geführter Ablauf" },
+    { "file": "Rueckmeldung.dc.html",  "page": "page-1", "x": 2450, "y": 0,    "w": 390,  "h": 844, "title": "Beim Benachrichtigten" },
+    { "file": "Struktur.dc.html",      "page": "page-1", "x": 0,    "y": 1000, "w": 1120, "h": 660, "title": "Seitenstruktur alt / neu" },
+    { "file": "Zeitachse.dc.html",     "page": "page-2", "x": 0,    "y": 0,    "w": 390,  "h": 844, "title": "Variante B — Zeitachse" }
+  ],
+  "annotations": [
+    { "id": "gewaehlt", "x": 0, "y": -130, "w": 880,
+      "text": "Richtung A ist gewählt (ADR-0014). Die Antwort steht vor allem anderen; alles Seltene übernimmt den Bildschirm, wenn es dran ist.\n\nFarben und Schriften sind noch nicht entschieden — diese Entwürfe zeigen die heutige App-Palette, nicht die künftige. Siehe architecture/design-tokens.md." },
+    { "id": "variante-b", "page": "page-2", "x": 0, "y": -150, "w": 560,
+      "text": "Nicht verworfen, nur nicht jetzt.\n\nB macht das diagnostische Fenster sichtbar statt beschrieben, und die Position auf der Achse wäre ein zweiter Kodierungskanal neben der Farbe — womit der BITV-Befund nebenbei gelöst wäre. Unter A muss er eigens gebaut werden (arc42, R17).\n\nZwei Anlässe, sie hervorzuholen: wenn Nutzer die Fensterlogik trotz Erklärung nicht verstehen, oder wenn der zweite Kanal unter A umständlich gerät." }
+  ],
+  "launch": { "view": "canvas", "page": "page-1" }
+}

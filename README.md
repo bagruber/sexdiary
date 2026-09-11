@@ -12,7 +12,7 @@ It is not a medical device and provides no medical advice.
 
 ## Repository layout
 
-npm-workspaces monorepo:
+pnpm-workspaces monorepo:
 
 | Path | What |
 |------|------|
@@ -43,14 +43,14 @@ npm-workspaces monorepo:
 ## Running it
 
 ```bash
-npm install          # once, at the repo root (installs all workspaces)
-npm run dev          # web dev server
-npm run build        # typecheck + build web app into ./docs
-npm test             # core unit tests (risk engine, schemas, storage)
-npm run typecheck    # typecheck all workspaces
+pnpm install         # once, at the repo root (installs all workspaces)
+pnpm run dev         # web dev server
+pnpm run build       # typecheck + build web app into ./docs
+pnpm test            # core unit tests (risk engine, schemas, storage)
+pnpm run typecheck   # typecheck all workspaces
 
 # mobile (see apps/mobile/README.md)
-npm run start -w @sexdiary/mobile
+pnpm --filter @sexdiary/mobile start
 ```
 
 GitHub Pages is served from `main` branch, `/docs` folder.

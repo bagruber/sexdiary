@@ -5,18 +5,17 @@
  * risk engine emits alongside the score. Nothing is recomputed in the UI,
  * so what the user reads is exactly what the engine used.
  */
-import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { Modal, ScrollView, View } from "react-native";
 import {
-  ACT_KEYS,
   WIKI,
   formatDate,
   plurals,
+  riskColor,
   type ActKey,
   type RiskData,
 } from "@sexdiary/core";
 import { useApp } from "../state/store";
-import { riskColor } from "../theme";
-import { Card, GhostButton, SectionTitle } from "../ui";
+import { Card, GhostButton, SectionTitle, Text } from "../ui";
 
 export function ExplainSheet({
   sti,
@@ -28,7 +27,6 @@ export function ExplainSheet({
   onClose: () => void;
 }) {
   const { data, t, palette } = useApp();
-  const colors = riskColor(palette);
   const lang = data.prefs.lang;
 
   const contactName = (cid: string | null) =>
@@ -122,7 +120,7 @@ export function ExplainSheet({
                         </Text>
                         <Text
                           style={{
-                            color: colors[c.level],
+                            color: riskColor(palette, c.level),
                             fontSize: 12,
                             fontWeight: "600",
                           }}

@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import { FONT } from "../../theme/tokens";
 import { useApp } from "../../state/store";
 
 interface Props {
@@ -22,7 +21,6 @@ export function Pill({ active, onClick, children, color }: Props) {
         background: active ? c : "transparent",
         border: `1.5px solid ${active ? c : palette.border}`,
         color: active ? "#fff" : palette.muted,
-        fontFamily: FONT,
         fontSize: 13,
         fontWeight: 600,
         cursor: "pointer",

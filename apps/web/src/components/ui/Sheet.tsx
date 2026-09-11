@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { X } from "lucide-react";
-import { FONT, shadowLg } from "../../theme/tokens";
+import { shadowLg } from "../../theme/tokens";
 import { useApp } from "../../state/store";
 
 interface Props {
@@ -72,7 +72,6 @@ export function Sheet({ onClose, children, title }: Props) {
           >
             <span
               style={{
-                fontFamily: FONT,
                 fontSize: 18,
                 fontWeight: 700,
                 color: palette.text,

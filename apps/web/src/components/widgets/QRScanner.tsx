@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { FONT } from "../../theme/tokens";
 import { useApp } from "../../state/store";
 import { startCameraScan, type ScanResult } from "../../lib/qr-scan";
 
@@ -89,7 +88,6 @@ export function QRScanner({ onData, onClose, active }: Props) {
             color: "#fff",
             padding: "8px 14px",
             borderRadius: 20,
-            fontFamily: FONT,
             fontSize: 13,
             backdropFilter: "blur(4px)",
           }}
@@ -114,7 +112,6 @@ export function QRScanner({ onData, onClose, active }: Props) {
             borderRadius: 14,
             background: palette.card,
             border: "none",
-            fontFamily: FONT,
             fontSize: 14,
             fontWeight: 600,
             color: palette.text,

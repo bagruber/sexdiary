@@ -1,5 +1,4 @@
 import type { CSSProperties, ReactNode } from "react";
-import { FONT } from "../../theme/tokens";
 
 interface Props {
   color: string;
@@ -24,7 +23,6 @@ export function Tag({ color, children, small, filled, style }: Props) {
         fontWeight: 600,
         letterSpacing: ".02em",
         whiteSpace: "nowrap",
-        fontFamily: FONT,
         ...style,
       }}
     >

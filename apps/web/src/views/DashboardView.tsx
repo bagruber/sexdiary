@@ -1,5 +1,5 @@
 import { AlertTriangle, Bell, ChevronRight } from "lucide-react";
-import { FONT, shadow } from "../theme/tokens";
+import { shadow } from "../theme/tokens";
 import { useApp } from "../state/store";
 import { calcRisk, getAlerts, type RiskData } from "@sexdiary/core";
 import { RISK_ORDER } from "@sexdiary/core";
@@ -40,7 +40,6 @@ export function DashboardView({ onAlerts }: Props) {
       <div style={{ marginBottom: 24 }}>
         <h1
           style={{
-            fontFamily: FONT,
             fontSize: 26,
             fontWeight: 700,
             color: palette.text,
@@ -51,7 +50,6 @@ export function DashboardView({ onAlerts }: Props) {
         </h1>
         <p
           style={{
-            fontFamily: FONT,
             fontSize: 13,
             color: palette.muted,
             margin: 0,
@@ -123,7 +121,6 @@ export function DashboardView({ onAlerts }: Props) {
           <div style={{ flex: 1, textAlign: "left" }}>
             <div
               style={{
-                fontFamily: FONT,
                 fontWeight: 700,
                 fontSize: 14,
                 color: palette.rose,
@@ -131,7 +128,7 @@ export function DashboardView({ onAlerts }: Props) {
             >
               {t("partnerAlerts")}
             </div>
-            <div style={{ fontFamily: FONT, fontSize: 12, color: palette.muted }}>
+            <div style={{ fontSize: 12, color: palette.muted }}>
               {t("partnerAlertsSub")}
             </div>
           </div>
@@ -164,7 +161,6 @@ export function DashboardView({ onAlerts }: Props) {
             <div>
               <div
                 style={{
-                  fontFamily: FONT,
                   fontWeight: 700,
                   fontSize: 15,
                   color: palette.text,
@@ -173,13 +169,12 @@ export function DashboardView({ onAlerts }: Props) {
               >
                 {lastTest.fac}
               </div>
-              <div style={{ fontFamily: FONT, fontSize: 12, color: palette.muted }}>
+              <div style={{ fontSize: 12, color: palette.muted }}>
                 {formatDate(lastTest.date, lang)} · #{lastTest.num}
               </div>
             </div>
             <div
               style={{
-                fontFamily: FONT,
                 fontSize: 12,
                 color: palette.teal,
                 fontWeight: 600,
@@ -216,7 +211,6 @@ export function DashboardView({ onAlerts }: Props) {
                   >
                     <span
                       style={{
-                        fontFamily: FONT,
                         fontSize: 13,
                         color: info ? (isR ? palette.text : palette.sub) : palette.muted,
                         fontWeight: isR ? 600 : 400,
@@ -229,7 +223,6 @@ export function DashboardView({ onAlerts }: Props) {
                         display: "inline-flex",
                         alignItems: "center",
                         gap: 4,
-                        fontFamily: FONT,
                         fontSize: 11,
                         color: info
                           ? info.result === "positive"
@@ -258,7 +251,7 @@ export function DashboardView({ onAlerts }: Props) {
             border: `1px solid ${palette.border}`,
           }}
         >
-          <div style={{ fontFamily: FONT, fontSize: 14, color: palette.muted }}>
+          <div style={{ fontSize: 14, color: palette.muted }}>
             {t("noTests")}
           </div>
         </div>

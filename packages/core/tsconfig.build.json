@@ -1,0 +1,17 @@
+{
+  // Emits the published artefact. Node module resolution on purpose:
+  // it is the only setting that proves the emitted files resolve
+  // outside a bundler, which is what "real package" has to mean.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": ["src"]
+}

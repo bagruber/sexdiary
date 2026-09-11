@@ -30,6 +30,7 @@
  */
 
 import {
+  CONTACT_PLATFORMS,
   ACT_KEYS,
   emptyActs,
   type ActFlags,
@@ -40,8 +41,8 @@ import {
   type TestRecord,
   type TestResultValue,
   type Vaccination,
-} from "./domain";
-import { gid } from "./id";
+} from "./domain.js";
+import { gid } from "./id.js";
 
 export interface TestResultPayload {
   v: 1;
@@ -75,13 +76,8 @@ const MAX_BACKUP_CHARS = 5_000_000;
 const MAX_TEXT_FIELD = 200;
 const MAX_STI_ENTRIES = 40;
 
-const PLATFORMS: ContactHandlePlatform[] = [
-  "instagram",
-  "telegram",
-  "signal",
-  "whatsapp",
-  "snapchat",
-];
+/** Eine Liste, nicht zwei: sie kommt aus dem Domaenenmodell. */
+const PLATFORMS: readonly ContactHandlePlatform[] = CONTACT_PLATFORMS;
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 

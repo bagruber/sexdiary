@@ -15,10 +15,7 @@
     "strict": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true,
-    "paths": {
-      "@sexdiary/core": ["../../packages/core/src/index.ts"]
-    }
+    "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "../../packages/core/src"]
+  "include": ["src"]
 }

@@ -1,10 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import {
   calcRisk,
   doxyCoverage,
   getAlerts,
   nextAction,
   prepActiveOn,
+  reminderSchedule,
   vaccineProtection,
   vaccineSeries,
 } from "../src/risk";
@@ -281,5 +282,75 @@ describe("getAlerts", () => {
     expect(alerts[0].sti).toBe("Syphilis");
     expect(alerts[0].contacts.map((c) => c.id)).toEqual(["c1"]);
     expect(alerts[0].hasAnon).toBe(true);
+  });
+});
+
+describe("reminderSchedule", () => {
+  const vx: Vaccination[] = [];
+
+  // The schedule is arithmetic on today's date, and `daysAgo` reads the
+  // same clock. Left to the real one, the expectations below flip when
+  // the test runs across midnight — which is exactly what happened.
+  beforeAll(() => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 27, 15, 0, 0));
+  });
+  afterAll(() => vi.useRealTimers());
+
+  it("names the day a window closes, counted from the exposure", () => {
+    // Gonorrhoea's window is 7 days; an encounter 2 days ago closes in 5.
+    const report = calcRisk(
+      [encounter("e1", daysAgo(2), ["recAnal"])],
+      [],
+      vx,
+      "Germany",
+    );
+    const gonorrhoea = reminderSchedule(report, "2026-08-27").find((r) =>
+      r.stis.includes("Gonorrhea"),
+    );
+    expect(gonorrhoea?.inDays).toBe(5);
+    expect(gonorrhoea?.date).toBe("2026-09-01");
+  });
+
+  it("puts everything that opens on one day into one reminder", () => {
+    const report = calcRisk(
+      [encounter("e1", daysAgo(1), ["recAnal"])],
+      [],
+      vx,
+      "Germany",
+    );
+    const schedule = reminderSchedule(report, "2026-08-27");
+    const dates = schedule.map((r) => r.date);
+    expect(new Set(dates).size).toBe(dates.length);
+    // HIV and Hep B share a 45-day window, so they share a reminder.
+    const shared = schedule.find((r) => r.stis.includes("HIV"));
+    expect(shared?.stis).toContain("Hep B");
+  });
+
+  it("is ordered by how soon it is due", () => {
+    const report = calcRisk(
+      [encounter("e1", daysAgo(1), ["recAnal"])],
+      [],
+      vx,
+      "Germany",
+    );
+    const days = reminderSchedule(report).map((r) => r.inDays);
+    expect(days).toEqual([...days].sort((a, b) => a - b));
+    expect(days.every((d) => d >= 1)).toBe(true);
+  });
+
+  it("says nothing about windows that have already closed", () => {
+    // 60 days out, every window in the database has passed.
+    const report = calcRisk(
+      [encounter("e1", daysAgo(60), ["recAnal"])],
+      [],
+      vx,
+      "Germany",
+    );
+    expect(reminderSchedule(report)).toEqual([]);
+  });
+
+  it("says nothing when there was no exposure", () => {
+    expect(reminderSchedule(calcRisk([], [], vx, "Germany"))).toEqual([]);
   });
 });

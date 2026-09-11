@@ -8,6 +8,7 @@ import { AlertsView } from "./views/AlertsView";
 import { OnboardingView } from "./views/OnboardingView";
 import { TestsListView, ContactsListView } from "./views/ListViews";
 import { BottomNav, type ViewId } from "./components/chrome/BottomNav";
+import { DemoBar } from "./components/chrome/DemoBar";
 import { FAB } from "./components/chrome/FAB";
 import {
   AddEditSheet,
@@ -149,6 +150,8 @@ function AppShell() {
         overflow: "hidden",
       }}
     >
+      <DemoBar />
+
       {overlay?.kind === "alerts" && <AlertsView onBack={() => setOverlay(null)} />}
       {overlay?.kind === "testsList" && (
         <TestsListView

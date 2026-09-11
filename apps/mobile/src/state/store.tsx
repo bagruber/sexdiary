@@ -13,13 +13,14 @@ import { getLocales } from "expo-localization";
 import {
   appReducer,
   makeT,
+  paletteFor,
   type AppAction,
   type AppData,
   type Lang,
+  type Palette,
   type Translator,
 } from "@sexdiary/core";
 import { loadAppData, saveAppData } from "../lib/secure-storage";
-import { dark, light, type MobilePalette } from "../theme";
 
 export function detectLang(): Lang {
   return getLocales()[0]?.languageCode === "de" ? "de" : "en";
@@ -29,7 +30,7 @@ interface Ctx {
   data: AppData;
   dispatch: (action: AppAction) => void;
   t: Translator;
-  palette: MobilePalette;
+  palette: Palette;
   isDark: boolean;
 }
 
@@ -70,7 +71,7 @@ export function AppProvider({
   const theme = data?.prefs.theme ?? "system";
   const isDark =
     theme === "dark" || (theme === "system" && systemScheme === "dark");
-  const palette = isDark ? dark : light;
+  const palette = paletteFor(isDark ? "dark" : "light");
 
   if (!data) return <>{loading}</>;
 

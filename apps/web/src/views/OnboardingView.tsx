@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { FONT } from "../theme/tokens";
 import { Pill, Input, Button, FieldLabel } from "../components/ui";
 import { useApp } from "../state/store";
 import type { Lang, PartnerAnatomy } from "@sexdiary/core";
@@ -40,7 +39,6 @@ export function OnboardingView({ onDone }: Props) {
       <div style={{ flex: 1 }}>
         <h1
           style={{
-            fontFamily: FONT,
             fontSize: 30,
             fontWeight: 700,
             color: palette.text,
@@ -51,7 +49,6 @@ export function OnboardingView({ onDone }: Props) {
         </h1>
         <p
           style={{
-            fontFamily: FONT,
             fontSize: 14,
             color: palette.muted,
             lineHeight: 1.6,

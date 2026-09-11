@@ -1,5 +1,5 @@
 import { ChevronLeft } from "lucide-react";
-import { FONT, shadow } from "../theme/tokens";
+import { shadow } from "../theme/tokens";
 import { Tag } from "../components/ui";
 import { useApp } from "../state/store";
 import { formatDate } from "@sexdiary/core";
@@ -18,7 +18,6 @@ function BackHeader({ onBack, title }: { onBack: () => void; title: string }) {
         style={{
           background: "none",
           border: "none",
-          fontFamily: FONT,
           fontSize: 14,
           color: palette.teal,
           fontWeight: 600,
@@ -35,7 +34,6 @@ function BackHeader({ onBack, title }: { onBack: () => void; title: string }) {
       </button>
       <h1
         style={{
-          fontFamily: FONT,
           fontSize: 26,
           fontWeight: 700,
           color: palette.text,
@@ -57,7 +55,7 @@ export function TestsListView({ onBack, onEdit }: BaseProps) {
     <div style={{ flex: 1, overflowY: "auto", padding: "28px 16px 100px" }}>
       <BackHeader onBack={onBack} title={t("testsHeading")} />
       {sorted.length === 0 && (
-        <p style={{ fontFamily: FONT, fontSize: 14, color: palette.muted }}>
+        <p style={{ fontSize: 14, color: palette.muted }}>
           {t("noTestsLong")}
         </p>
       )}
@@ -84,7 +82,6 @@ export function TestsListView({ onBack, onEdit }: BaseProps) {
           >
             <div
               style={{
-                fontFamily: FONT,
                 fontWeight: 700,
                 fontSize: 14,
                 color: palette.text,
@@ -92,7 +89,7 @@ export function TestsListView({ onBack, onEdit }: BaseProps) {
             >
               {rec.fac || rec.num || "Test"}
             </div>
-            <div style={{ fontFamily: FONT, fontSize: 12, color: palette.muted }}>
+            <div style={{ fontSize: 12, color: palette.muted }}>
               {formatDate(rec.date, data.prefs.lang)}
             </div>
           </div>
@@ -123,7 +120,7 @@ export function ContactsListView({ onBack, onEdit }: BaseProps) {
     <div style={{ flex: 1, overflowY: "auto", padding: "28px 16px 100px" }}>
       <BackHeader onBack={onBack} title={t("contactsHeading")} />
       {sorted.length === 0 && (
-        <p style={{ fontFamily: FONT, fontSize: 14, color: palette.muted }}>
+        <p style={{ fontSize: 14, color: palette.muted }}>
           {t("noContacts")}
         </p>
       )}
@@ -143,7 +140,6 @@ export function ContactsListView({ onBack, onEdit }: BaseProps) {
         >
           <div
             style={{
-              fontFamily: FONT,
               fontWeight: 700,
               fontSize: 14,
               color: palette.text,
@@ -155,7 +151,6 @@ export function ContactsListView({ onBack, onEdit }: BaseProps) {
           {c.notes && (
             <div
               style={{
-                fontFamily: FONT,
                 fontSize: 12,
                 color: palette.muted,
                 marginBottom: 4,

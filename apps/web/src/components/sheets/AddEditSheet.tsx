@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
-import { FONT } from "../../theme/tokens";
 import {
   Sheet,
   Pill,
@@ -266,7 +265,6 @@ export function AddEditSheet({
                     >
                       <div
                         style={{
-                          fontFamily: FONT,
                           fontSize: 12,
                           color: palette.amber,
                           lineHeight: 1.5,
@@ -279,7 +277,6 @@ export function AddEditSheet({
                         style={{
                           background: "none",
                           border: "none",
-                          fontFamily: FONT,
                           fontSize: 12,
                           color: palette.teal,
                           fontWeight: 600,
@@ -365,7 +362,6 @@ export function AddEditSheet({
                               : r === "positive"
                               ? palette.rose
                               : palette.green,
-                          fontFamily: FONT,
                           fontSize: 11,
                           fontWeight: 600,
                           cursor: "pointer",
@@ -441,7 +437,6 @@ export function AddEditSheet({
               <div key={s} style={{ marginBottom: 10 }}>
                 <span
                   style={{
-                    fontFamily: FONT,
                     fontSize: 11,
                     color: palette.muted,
                     textTransform: "capitalize",

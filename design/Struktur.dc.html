@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    body { margin: 0; font-family: -apple-system, "Segoe UI", Roboto, system-ui, sans-serif;
+           background: #F5F3EF; color: #1F1D2B; -webkit-font-smoothing: antialiased; }
+    a { color: #2E7D52; } a:hover { color: #24603f; }
+    * { box-sizing: border-box; }
+  </style>
+</helmet>
+
+<div style="width:1120px;height:660px;padding:36px 40px;background:#F5F3EF">
+  <div style="font-size:24px;font-weight:700;margin-bottom:6px">Seitenstruktur</div>
+  <div style="font-size:14px;color:#6E6A7A;margin-bottom:30px">
+    Vier gleich große Tabs behandeln vier sehr ungleiche Aufgaben als gleichwertig.
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:48px">
+
+    <div>
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#6E6A7A;margin:18px 0 8px;margin-top:0">Heute</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+        <div style="width:122px;background:#FFFFFF;border:1px solid #E5E1D8;border-radius:12px;padding:10px 12px">
+      <div style="font-size:13px;font-weight:600;color:#1F1D2B">Dashboard</div><div style="font-size:11px;color:#6E6A7A;margin-top:3px;line-height:1.35">Risikokarten</div></div>
+        <div style="width:122px;background:#FFFFFF;border:1px solid #E5E1D8;border-radius:12px;padding:10px 12px">
+      <div style="font-size:13px;font-weight:600;color:#1F1D2B">Log</div><div style="font-size:11px;color:#6E6A7A;margin-top:3px;line-height:1.35">Erfassen + Timeline</div></div>
+        <div style="width:122px;background:#FFFFFF;border:1px solid #E5E1D8;border-radius:12px;padding:10px 12px">
+      <div style="font-size:13px;font-weight:600;color:#1F1D2B">Deine Daten</div><div style="font-size:11px;color:#6E6A7A;margin-top:3px;line-height:1.35">Rohdaten</div></div>
+        <div style="width:122px;background:#FFFFFF;border:1px solid #E5E1D8;border-radius:12px;padding:10px 12px">
+      <div style="font-size:13px;font-weight:600;color:#1F1D2B">Einstellungen</div></div>
+      </div>
+      <div style="font-size:13px;color:#6E6A7A;line-height:1.6">
+        Der Positiv-Ablauf ist ein Modal, das in eine Liste entlässt.
+        Die Erfassung ist ein Formular mit 16 Schaltern. Beide Extreme —
+        der häufigste und der wichtigste Vorgang — sind am schlechtesten
+        bedient.
+      </div>
+    </div>
+
+    <div>
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:#6E6A7A;margin:18px 0 8px;margin-top:0">Vorschlag</div>
+      <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px">
+        <div style="width:152px;background:#1F1D2B;border:1px solid #E5E1D8;border-radius:12px;padding:10px 12px">
+      <div style="font-size:13px;font-weight:600;color:#FFFFFF">Heute</div><div style="font-size:11px;color:#B9B5C4;margin-top:3px;line-height:1.35">Die Antwort + Belege</div></div>
+        <div style="padding-top:12px;font-size:18px;color:#6E6A7A">+</div>
+        <div style="width:138px;background:#FFFFFF;border:1px solid #E5E1D8;border-radius:12px;padding:10px 12px">
+      <div style="font-size:13px;font-weight:600;color:#1F1D2B">Begegnung</div><div style="font-size:11px;color:#6E6A7A;margin-top:3px;line-height:1.35">Ein Tipp, immer da</div></div>
+      </div>
+      <div style="font-size:12px;color:#6E6A7A;margin:0 0 14px">Alles andere übernimmt den Bildschirm, wenn es dran ist:</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div style="width:104px;background:#F5F3EF;border:1px solid #E5E1D8;border-radius:12px;padding:10px 12px">
+      <div style="font-size:13px;font-weight:600;color:#1F1D2B">Verlauf</div></div>
+        <div style="width:104px;background:#F5F3EF;border:1px solid #E5E1D8;border-radius:12px;padding:10px 12px">
+      <div style="font-size:13px;font-weight:600;color:#1F1D2B">Erklärung</div></div>
+        <div style="width:104px;background:#F5F3EF;border:1px solid #E5E1D8;border-radius:12px;padding:10px 12px">
+      <div style="font-size:13px;font-weight:600;color:#1F1D2B">Befunde</div></div>
+        <div style="width:118px;background:#F5F3EF;border:1px solid #E5E1D8;border-radius:12px;padding:10px 12px">
+      <div style="font-size:13px;font-weight:600;color:#1F1D2B">Positiv-Ablauf</div></div>
+        <div style="width:104px;background:#F5F3EF;border:1px solid #E5E1D8;border-radius:12px;padding:10px 12px">
+      <div style="font-size:13px;font-weight:600;color:#1F1D2B">Kontakte</div></div>
+        <div style="width:112px;background:#F5F3EF;border:1px solid #E5E1D8;border-radius:12px;padding:10px 12px">
+      <div style="font-size:13px;font-weight:600;color:#1F1D2B">Deine Daten</div></div>
+        <div style="width:118px;background:#F5F3EF;border:1px solid #E5E1D8;border-radius:12px;padding:10px 12px">
+      <div style="font-size:13px;font-weight:600;color:#1F1D2B">Einstellungen</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:18px;margin-top:36px">
+    <div style="background:#FFFFFF;border:1px solid #E5E1D8;border-radius:16px;padding:14px">
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px">Eine Frage, eine Antwort</div>
+      <div style="font-size:13px;color:#6E6A7A;line-height:1.55">
+        95 % der Öffnungen sind „bin ich okay?“ und „ich hatte Sex“.
+        Die bekommen den Platz, nicht die Tab-Leiste.
+      </div>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #E5E1D8;border-radius:16px;padding:14px">
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px">Präzision ist optional</div>
+      <div style="font-size:13px;color:#6E6A7A;line-height:1.55">
+        Ein Tipp loggt. Wer nichts angibt, bekommt eine vorsichtige
+        Schätzung — sichtbar als Schätzung, jederzeit nachbesserbar.
+      </div>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #E5E1D8;border-radius:16px;padding:14px">
+      <div style="font-size:14px;font-weight:600;margin-bottom:6px">Seltenes darf groß sein</div>
+      <div style="font-size:13px;color:#6E6A7A;line-height:1.55">
+        Ein positiver Befund ist kein Modal. Er übernimmt den Bildschirm
+        und führt durch drei Schritte.
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

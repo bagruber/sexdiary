@@ -1,4 +1,3 @@
-import { FONT } from "../../theme/tokens";
 import { useApp } from "../../state/store";
 
 export type Option = string | { value: string; label: string };
@@ -22,7 +21,6 @@ export function Select({ value, onChange, options, placeholder }: Props) {
         borderRadius: 12,
         border: `1.5px solid ${palette.border}`,
         background: palette.cardEl,
-        fontFamily: FONT,
         fontSize: 14,
         color: value ? palette.text : palette.muted,
         outline: "none",

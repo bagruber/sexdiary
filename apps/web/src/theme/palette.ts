@@ -1,3 +1,7 @@
+import {
+  paletteFor as corePaletteFor,
+  riskColor as coreRiskColor,
+} from "@sexdiary/core";
 import type { RiskLevel, Theme } from "@sexdiary/core";
 
 export interface Palette {
@@ -59,16 +63,17 @@ export function paletteFor(theme: Theme): Palette {
   return resolvedTheme(theme) === "dark" ? DARK : LIGHT;
 }
 
-export function riskColor(r: RiskLevel | undefined): string {
-  return (
-    {
-      none: "#6CB088",
-      negligible: "#6BC98F",
-      very_low: "#8ABB3A",
-      low: "#D4B033",
-      moderate: "#E08840",
-      high: "#DB5E5E",
-      very_high: "#C4264A",
-    }[r ?? "none"] ?? "#999"
-  );
+/**
+ * The risk scale lives in `@sexdiary/core` (ADR-0015). It is the only
+ * encoding channel for the app's core statement, so it belongs with the
+ * health logic where it is contrast-tested — not duplicated here. The
+ * seven local hex values it replaces failed WCAG on light in six of
+ * seven steps, `very_high` worst of all on dark.
+ *
+ * The rest of this palette stays local: the tracker is replaced by the
+ * information site in wave 4, and restyling it now would be a redesign,
+ * not a refactor.
+ */
+export function riskColor(r: RiskLevel | undefined, dark: boolean): string {
+  return coreRiskColor(corePaletteFor(dark ? "dark" : "light"), r);
 }

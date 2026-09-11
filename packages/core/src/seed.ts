@@ -9,8 +9,8 @@ import {
   type Preferences,
   type TestRecord,
   type Vaccination,
-} from "./domain";
-import { genToken } from "./id";
+} from "./domain.js";
+import { genToken } from "./id.js";
 
 const mkEntry = (
   id: string,
@@ -164,7 +164,7 @@ const BASE_PREFS: Preferences = {
   theme: "system",
   country: "Germany",
   notifs: false,
-  lock: true,
+  lock: false,
   highPrev: true,
   reducedMotion: false,
   hideLowRisk: false,
@@ -172,7 +172,6 @@ const BASE_PREFS: Preferences = {
   sharePlatform: "instagram",
   shareHandle: "",
   disguise: false,
-  lockPin: null,
 };
 
 /**
@@ -186,6 +185,7 @@ export function freshAppData(lang: Lang = "en"): AppData {
     intercourse: SEED_INTERCOURSE,
     tests: SEED_TESTS,
     vaccinations: SEED_VACCINATIONS,
+    alerts: [],
     profile: { ...SEED_PROFILE },
     prefs: { ...BASE_PREFS, lang },
     myToken: genToken(),
