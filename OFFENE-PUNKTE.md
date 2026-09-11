@@ -169,12 +169,21 @@ Vierfach-Aufbau kritisiert.
 benachrichtigt — sie an getrennte Orte zu legen hiesse, im Ernstfall zwischen
 zwei Bildschirmen zu wechseln.
 
-## Die Infoseite geht nach `main`
+## Die Infoseite ist live
 
-Entschieden am 11.09.2026: PR #1 wird gemerged, GitHub Pages liefert ab dann
-die Infoseite unter `/index`. Die alte Webapp bleibt unter `/demo.html`
-erreichbar und speichert nichts mehr — diese Aufteilung stand schon auf dem
-Branch, es fehlte nur der Merge.
+Seit dem 11.09.2026 gemerged (PR #1, 61 Commits, Merge-Commit `8d9d760`).
+GitHub Pages liefert unter <https://bagruber.github.io/sexdiary/> die
+Infoseite; die alte Webapp liegt als Demo unter `/demo.html` und speichert
+nichts mehr. Diese Aufteilung stand schon auf dem Branch, es fehlte nur der
+Merge.
+
+**Am Live-Stand nachgeprüft, nicht angenommen:** die Adresse liefert die
+Infoseite und keine Spur des alten Trackers, Schriften kommen aus `/fonts`,
+der einzige externe Verweis im Markup ist der SVG-Namensraum — also kein
+Drittanbieter-Request. Alle drei ausgelieferten JS-Chunks der Demo enthalten
+**null** `localStorage` und keinen der alten Datenschlüssel, jeweils mit
+Gegenprobe geprüft, nachdem eine erste Sonde still gegen die falsche Datei
+lief.
 
 **Die Prüfung war rot und ist es nicht mehr.** Gescheitert war allein
 `git diff --exit-code -- docs`, und der Unterschied bestand aus 17

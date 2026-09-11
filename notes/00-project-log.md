@@ -38,6 +38,17 @@ deletion was proposed — Art. 17 and 20 are things this project insists on
 elsewhere. Benedict's call: nobody but him had the address, so it is a line in
 `OFFENE-PUNKTE.md` rather than code on a public page.
 
+**Merged and verified live.** 61 commits, merge commit rather than squash —
+the decision log leans on individual commit messages, and squashing would flatten
+exactly the history this repo exists to keep. Pages rebuilt from `8d9d760`, and
+the URL was then checked rather than assumed: the info page is served, the old
+tracker is gone from it, fonts come from `/fonts`, and the only external string
+in the markup is the SVG namespace. Every JS chunk the demo actually loads has
+zero `localStorage` and none of the old keys — and the first probe of that was
+worthless, because it ran against an i18n hash that no longer exists and
+returned a confident zero. The control string caught it. Second time this
+session that a probe passed by pointing at nothing.
+
 **A web version of the app is not a task yet.** It was asked for explicitly as
 a *perspective*, and it contradicts ADR-0001, so it is recorded as needing its
 own ADR before any code. The honest framing is in the open points: everything a
