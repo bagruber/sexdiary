@@ -3,7 +3,52 @@
 Reverse-chronological decision log. Read this first each session; append
 before ending one. `docs/` is GitHub Pages build output — notes live here.
 
-## 2026-09-10 (latest) — The signature check is wired, and it rejects
+## 2026-09-11 (latest) — The information page goes live, and the CI was red for seventeen carriage returns
+
+Benedict cleared the deploy. The arrangement he asked for — info page at
+`/index`, the old web app parked behind a link — **already existed on the
+branch**: `docs/demo.html` is that app, it stopped storing anything in August,
+and the info page links it under "Ansehen". So the work was not building it, it
+was merging it.
+
+**Except the CI was failing, and the reason was invisible.** Lint, typecheck,
+tests and build all passed; only `git diff --exit-code -- docs` failed, on
+`docs/index.html`, with a diff whose lines looked byte-identical. They were not:
+`apps/web/index.html` is stored LF, Windows checks it out as CRLF under
+`core.autocrlf=true`, and Vite copies that head *verbatim* into the built page.
+The committed output therefore carried 17 CRs that a Linux runner cannot
+reproduce. 57.29 kB against 57.27 kB — the whole failure was twenty bytes.
+
+Worth noting what did *not* fix it: `git add --renormalize` left the blob
+alone, and so did removing and re-adding the file. The clean filter does not
+retroactively strip CRs that are already in a committed blob. What fixed it was
+deleting the working copy, checking it out again under the new attribute so it
+came back as LF, and rebuilding from that.
+
+`.gitattributes` with `* text=auto eol=lf` now pins it. Without that the fault
+returns on the next Windows build, and returns invisibly — which is the worst
+kind for this repo. Verified the way it had to be: pushed, and the Linux run
+went green. A local Windows run proving "docs matches" proves nothing about the
+platform that was failing.
+
+**Orphaned health data: raised, and deliberately left alone.** Anyone who used
+the old storing tracker at the Pages URL still has `sexdiary.v1.appData` in
+their browser; after the merge nothing reads it. A notice offering export and
+deletion was proposed — Art. 17 and 20 are things this project insists on
+elsewhere. Benedict's call: nobody but him had the address, so it is a line in
+`OFFENE-PUNKTE.md` rather than code on a public page.
+
+**A web version of the app is not a task yet.** It was asked for explicitly as
+a *perspective*, and it contradicts ADR-0001, so it is recorded as needing its
+own ADR before any code. The honest framing is in the open points: everything a
+browser version could carry without contradicting that decision — the risk
+calculation, the windows, the explanations, no memory — is roughly what
+`demo.html` already is. If nothing beyond that survives the no-storage
+constraint, the demo *is* the web version and the item closes.
+
+---
+
+## 2026-09-10 — The signature check is wired, and it rejects
 
 New APK first (`a89e320`, 96 MB, ten and a half minutes). The commit was read
 *before* the build, not at copy time — that is the 09.09 lesson — and the tree

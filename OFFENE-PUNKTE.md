@@ -169,21 +169,56 @@ Vierfach-Aufbau kritisiert.
 benachrichtigt — sie an getrennte Orte zu legen hiesse, im Ernstfall zwischen
 zwei Bildschirmen zu wechseln.
 
-## Gepusht, CI läuft, nichts ist in `main`
+## Die Infoseite geht nach `main`
 
-30 Commits auf `refactor/wellen-0-bis-3`, PR #1 gegen `main`. Die Prüfung läuft
-seit dem 09.09.2026 und war durchgehend grün — auch der Schritt, der lange
-ungeprüft war: Linux erzeugt dieselben `docs/`-Hashes wie Windows.
+Entschieden am 11.09.2026: PR #1 wird gemerged, GitHub Pages liefert ab dann
+die Infoseite unter `/index`. Die alte Webapp bleibt unter `/demo.html`
+erreichbar und speichert nichts mehr — diese Aufteilung stand schon auf dem
+Branch, es fehlte nur der Merge.
 
-**GitHub Pages liefert weiterhin den alten, speichernden Tracker aus `main`.**
-Bewusst so gelassen, bis die Infoseite mitgemerged wird. Wer die URL hat, legt
-dort bis dahin Gesundheitsdaten im Browser ab.
+**Die Prüfung war rot und ist es nicht mehr.** Gescheitert war allein
+`git diff --exit-code -- docs`, und der Unterschied bestand aus 17
+Wagenrückläufen: `apps/web/index.html` liegt als LF im Repo, Windows checkt es
+mit `core.autocrlf=true` als CRLF aus, Vite kopiert diesen Kopf wörtlich nach
+`docs/index.html`. Auf Linux entstehen die CR nicht. Behoben durch
+`.gitattributes` mit `* text=auto eol=lf` — ohne das käme der Fehler beim
+nächsten Windows-Build zurück, und wieder unsichtbar.
+
+**Altdaten im Browser: bewusst nichts unternommen.** Wer den alten, speichernden
+Tracker unter der Pages-Adresse benutzt hat, hat dort Gesundheitsdaten im
+`localStorage` (`sexdiary.v1.appData`, dazu `.corrupt` und
+`sexdiary.v1.mockServer.alerts`). Die neue Seite liest sie nicht, sie bleiben
+unsichtbar liegen. Ein Hinweis mit Export und Löschen war vorgeschlagen und
+am 11.09.2026 verworfen — ausser Benedict hatte niemand die Adresse. Steht
+hier, falls das später jemand anders beurteilt.
 
 `pnpm/action-setup@v4` läuft auf Node 20, das GitHub als veraltet meldet.
 
-Weiter offen: zwei Änderungen im Working Tree von `hausbasis`, beide uncommitted
-— der gegenstandslose Ausnahme-Eintrag für sexdiary ist entfernt, und
-`baseline.json` führt die sechs ESLint-Pakete.
+
+## Eine Webfassung der App ist ein offener Entwurf, keine Aufgabe
+
+Gewünscht am 11.09.2026, ausdrücklich perspektivisch: eine Variante der
+aktuellen Android-App als Webapp, mit den Teilen, die im Browser möglich sind.
+
+**Das widerspricht [ADR-0001](architecture/adr/0001-native-only.md) und braucht
+deshalb eine eigene ADR, bevor eine Zeile dafür entsteht.** Die alte
+Entscheidung sagt: das Produkt ist die native App, der Browser bekommt eine
+reine Informationsseite — weil keine der Abwehrmassnahmen gegen den
+realistischen Angreifer im Browser umsetzbar ist. Keystore-Sperre,
+Screenshot-Sperre, verdeckte Vorschau, Tarnicon: alle vier fallen weg.
+
+Was eine Webfassung **tragen könnte**, ohne dieser Begründung zu widersprechen:
+Risikorechnung und diagnostische Fenster als Rechner ohne Gedächtnis,
+Erklärtexte, der Aufbau zum Anschauen. Also ungefähr das, was `demo.html` heute
+schon ist.
+
+Was sie **nicht** tragen darf, solange ADR-0001 gilt: ein Protokoll, das etwas
+speichert. Genau das war der alte Tracker, und genau deshalb wurde er ersetzt.
+
+Die Frage für die ADR ist damit nicht „geht das technisch", sondern: gibt es
+einen Nutzen, der über die heutige Demo hinausgeht und ohne Speicher auskommt?
+Wenn nein, ist die Demo die Webfassung und der Punkt erledigt.
+
 
 ## Die Anforderungen stehen jetzt geschrieben
 
