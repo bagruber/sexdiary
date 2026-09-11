@@ -1,0 +1,27 @@
+# Zeilenenden festnageln.
+#
+# Am 10.09.2026 ist die Pruefung daran gescheitert: `apps/web/index.html`
+# liegt als LF im Repo, Windows checkt es mit core.autocrlf=true als CRLF
+# aus, und Vite kopiert diesen Kopf woertlich in `docs/index.html`. Der
+# gebaute Stand trug damit 17 CR, die auf Linux nicht entstehen — und der
+# Schritt, der `docs/` gegen den Quellstand prueft, meldete einen
+# Unterschied, den man in keinem Diff sieht.
+#
+# `eol=lf` heisst: auch die Arbeitskopie auf Windows hat LF. Damit bauen
+# beide Plattformen dieselben Bytes, und der Vergleich bedeutet wieder
+# etwas. Ohne diese Datei kommt der Fehler beim naechsten Build zurueck.
+* text=auto eol=lf
+
+# Binaerdateien nie anfassen.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.ico  binary
+*.pdf  binary
+*.woff  binary
+*.woff2 binary
+*.ttf  binary
+*.otf  binary
+*.apk  binary
+*.keystore binary
+*.jar  binary
